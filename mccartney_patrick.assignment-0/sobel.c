@@ -9,7 +9,8 @@ int write_pgm(char *file, void *image, uint32_t x, uint32_t y)
 {
   FILE *o;
 
-  if (!(o = fopen(file, "w"))) {
+  if (!(o = fopen(file, "w")))
+  {
     perror(file);
 
     return -1;
@@ -20,7 +21,8 @@ int write_pgm(char *file, void *image, uint32_t x, uint32_t y)
   /* Assume input data is correctly formatted. *
    * There's no way to handle it, otherwise.   */
 
-  if (fwrite(image, 1, x * y, o) != (x * y)) {
+  if (fwrite(image, 1, x * y, o) != (x * y))
+  {
     perror("fwrite");
     fclose(o);
 
@@ -43,24 +45,28 @@ int read_pgm(char *file, void *image, uint32_t x, uint32_t y)
   char s[80];
   unsigned i, j;
 
-  if (!(f = fopen(file, "r"))) {
+  if (!(f = fopen(file, "r")))
+  {
     perror(file);
 
     return -1;
   }
 
-  if (!fgets(s, 80, f) || strncmp(s, "P5", 2)) {
+  if (!fgets(s, 80, f) || strncmp(s, "P5", 2))
+  {
     fprintf(stderr, "Expected P6\n");
 
     return -1;
   }
 
   /* Eat comments */
-  do {
+  do
+  {
     fgets(s, 80, f);
   } while (s[0] == '#');
 
-  if (sscanf(s, "%u %u", &i, &j) != 2 || i != x || j != y) {
+  if (sscanf(s, "%u %u", &i, &j) != 2 || i != x || j != y)
+  {
     fprintf(stderr, "Expected x and y dimensions %u %u\n", x, y);
     fclose(f);
 
@@ -68,18 +74,21 @@ int read_pgm(char *file, void *image, uint32_t x, uint32_t y)
   }
 
   /* Eat comments */
-  do {
+  do
+  {
     fgets(s, 80, f);
   } while (s[0] == '#');
 
-  if (strncmp(s, "255", 3)) {
+  if (strncmp(s, "255", 3))
+  {
     fprintf(stderr, "Expected 255\n");
     fclose(f);
 
     return -1;
   }
 
-  if (fread(image, 1, x * y, f) != x * y) {
+  if (fread(image, 1, x * y, f) != x * y)
+  {
     perror("fread");
     fclose(f);
 
@@ -95,20 +104,51 @@ int main(int argc, char *argv[])
 {
   int8_t image[1024][1024];
   int8_t out[1024][1024];
+
   int debug = 1;
 
   if (debug)
+  {
     printf("%s\n", argv[1]);
+  }
 
+  char *sobel = strdup(argv[1]);
 
-  char* edge = strdup(argv[1]);
-  int len = strlen(edge); //remember this is the length of the string starting at 0, and ends at the null byte '\0'
+  // remove .edge and concat the correct name for our output file
+  sobel[strlen(sobel) - 4] = '\0';
+  strcat(sobel, ".edge.pgm");
 
   if (debug)
-    printf("%s %i", edge, len);
+  {
+    printf("%s %li\n", sobel, strlen(sobel));
+  }
 
+  read_pgm(argv[1], image, 1024, 1024);
 
-read_pgm(argv[1], image, 1024, 1024);
+  int i, j, r, c = 0;
+  for (i = 0; i < 1024; i++)
+  {
+    for (j = 0; j < 1024; j++)
+    {
+      out[i][j] = 0;
+    }
+  }
+
+  i = j = 0; // sets both i and j = 0
+  double accumulator = 0.0;
+
+  for (r = 1; i < 1023; i++)
+  {
+    for (c = 1; j < 1023; j++)
+    {
+      accumulator = 0.0;
+      
+    }
+  }
+
+  write_pgm(sobel, image, 1024, 1024);
+
+  return 0;
   /* Example usage of PGM functions */
   /* This assumes that motorcycle.pgm is a pgm image of size 1024x1024 */
   // read_pgm("motorcycle.pgm", image, 1024, 1024);
@@ -116,6 +156,4 @@ read_pgm(argv[1], image, 1024, 1024);
   /* After processing the image and storing your output in "out", write *
    * to motorcycle.edge.pgm.                                            */
   // write_pgm("motorcycle.edge.pgm", out, 1024, 1024);
-
-  return 0;
 }

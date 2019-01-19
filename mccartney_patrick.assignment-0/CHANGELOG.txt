@@ -1,1 +1,5 @@
-1/17/2019 Added debug statments and started assignment preparing to operate on the string argument.
+1/17/2019 Added debug statments.
+    Added string operations to format the output filename. Relearned some C syntax.
+1/18/2019 Added CHANGELOG, README, MAKEFILE (with clean).
+    Began testing basic input and output of pgm functions.
+    Currently the program does not function, but should be easily completed next time.
