@@ -3,3 +3,6 @@
 1/18/2019 Added CHANGELOG, README, MAKEFILE (with clean).
     Began testing basic input and output of pgm functions.
     Currently the program does not function, but should be easily completed next time.
+1/19/2019 Added ConvoluteX and ConvoluteY functions. Added Define size 1024 and refactored.
+    Created for loop which uses the convolute functions to compute the new image.
+    Removed debug statements and unnecessary code.

@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#define size 1024
+
 /* Do not modify write_pgm() or read_pgm() */
 int write_pgm(char *file, void *image, uint32_t x, uint32_t y)
 {
@@ -100,17 +102,42 @@ int read_pgm(char *file, void *image, uint32_t x, uint32_t y)
   return 0;
 }
 
+
+double convoluteX(int8_t array[size][size], int row, int col) {
+  //calculates by top down, col col col, could do any order you like
+  // Matrix is of the value:
+  // [-1 0 +1]
+  // [-2 0 +2]
+  // [-1 0 +1]
+  // therefore middle column will be 0, does not need to be calculated
+  double col1 = (array[row - 1][col - 1] * -1.0)
+    + (array[row][col - 1] * -2.0) + (array[row + 1][col] * -1.0);
+
+  double col3 = (array[row - 1][col + 1] * 1.0) +
+    (array[row][col + 1] * 2.0) + (array[row + 1][col + 1] * 1.0);
+
+  return col1 + col3;
+}
+
+double convoluteY(int8_t array[size][size], int row, int col) {
+  // calculated row by row, middle row sums to 0 so no need to calculate
+  // Matrix is of the value:
+  // [-1 -2 -1]
+  // [ 0  0  0]
+  // [+1 +2 +1]
+  double row1 = (array[row-1][col-1] * -1.0) +
+    (array[row-1][col] * -2.0) + (array[row-1][col+1] * -1.0);
+
+  double row3 = (array[row+1][col-1] * 1.0) +
+    (array[row+1][col] * 2.0) + (array[row+1][col+1] * 1.0);
+
+  return row1 + row3;
+}
+
 int main(int argc, char *argv[])
 {
-  int8_t image[1024][1024];
-  int8_t out[1024][1024];
-
-  int debug = 1;
-
-  if (debug)
-  {
-    printf("%s\n", argv[1]);
-  }
+  int8_t image[size][size];
+  int8_t out[size][size];
 
   char *sobel = strdup(argv[1]);
 
@@ -118,35 +145,28 @@ int main(int argc, char *argv[])
   sobel[strlen(sobel) - 4] = '\0';
   strcat(sobel, ".edge.pgm");
 
-  if (debug)
-  {
-    printf("%s %li\n", sobel, strlen(sobel));
-  }
+  read_pgm(argv[1], image, size, size);
 
-  read_pgm(argv[1], image, 1024, 1024);
-
-  int i, j, r, c = 0;
-  for (i = 0; i < 1024; i++)
+  int i, j = 0;
+  for (i = 0; i < size; i++)
   {
-    for (j = 0; j < 1024; j++)
+    for (j = 0; j < size; j++)
     {
-      out[i][j] = 0;
+      out[i][j] = 0; // in another language we might not need to itialize all the values ourselves
     }
   }
 
-  i = j = 0; // sets both i and j = 0
-  double accumulator = 0.0;
-
-  for (r = 1; i < 1023; i++)
+  for (i = 1; i < size - 1; i++)
   {
-    for (c = 1; j < 1023; j++)
+    for (j = 1; j < size - 1; j++)
     {
-      accumulator = 0.0;
-      
+      double Ox = convoluteX(image, i, j);
+      double Oy = convoluteY(image, i, j);
+      out[i][j] = sqrt((Ox * Ox) + (Oy + Oy));
     }
   }
 
-  write_pgm(sobel, image, 1024, 1024);
+  write_pgm(sobel, out, size, size);
 
   return 0;
   /* Example usage of PGM functions */
