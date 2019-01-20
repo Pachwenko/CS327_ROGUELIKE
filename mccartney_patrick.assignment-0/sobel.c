@@ -100,6 +100,7 @@ int read_pgm(char *file, void *image, uint32_t x, uint32_t y)
   return 0;
 }
 
+
 int main(int argc, char *argv[])
 {
   int8_t image[1024][1024];
@@ -125,14 +126,18 @@ int main(int argc, char *argv[])
 
   read_pgm(argv[1], image, 1024, 1024);
 
+
+
   int i, j, r, c = 0;
   for (i = 0; i < 1024; i++)
   {
     for (j = 0; j < 1024; j++)
     {
-      out[i][j] = 0;
+      out[i][j] = 0; // in another language we might not need to itialize all the values ourselves
     }
   }
+
+
 
   i = j = 0; // sets both i and j = 0
   double accumulator = 0.0;
@@ -142,7 +147,7 @@ int main(int argc, char *argv[])
     for (c = 1; j < 1023; j++)
     {
       accumulator = 0.0;
-      
+
     }
   }
 
