@@ -5,6 +5,7 @@
 #include <math.h>
 
 #define size 1024
+
 /* Do not modify write_pgm() or read_pgm() */
 int write_pgm(char *file, void *image, uint32_t x, uint32_t y)
 {
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
     printf("%s %li\n", sobel, strlen(sobel));
   }
 
-  read_pgm(argv[1], image, 1024, 1024);
+  read_pgm(argv[1], image, size, size);
 
 
 
@@ -179,11 +180,12 @@ int main(int argc, char *argv[])
     for (c = 1; j < size - 1; j++)
     {
       double Ox = convoluteX(image, i, j);
-
+      double Oy = convoluteY(image, i, j);
+      out[i][j] = sqrt((Ox * Ox) + (Oy + Oy));
     }
   }
 
-  write_pgm(sobel, image, 1024, 1024);
+  write_pgm(sobel, out, size, size);
 
   return 0;
   /* Example usage of PGM functions */
