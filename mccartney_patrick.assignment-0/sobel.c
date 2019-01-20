@@ -137,7 +137,7 @@ double convoluteY(int8_t array[size][size], int row, int col) {
 int main(int argc, char *argv[])
 {
   int8_t image[size][size];
-  int8_t out[size][size];
+  uint8_t out[size][size];
 
   char *sobel = strdup(argv[1]);
 
@@ -162,7 +162,13 @@ int main(int argc, char *argv[])
     {
       double Ox = convoluteX(image, i, j);
       double Oy = convoluteY(image, i, j);
-      out[i][j] = sqrt((Ox * Ox) + (Oy + Oy));
+      double value = sqrt((Ox * Ox) + (Oy + Oy));
+      if (value > 255) {
+        value = 255;
+      } else if (value < 0) {
+        value = 0;
+      }
+      out[i][j] = (uint8_t) value;
     }
   }
 
