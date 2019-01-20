@@ -139,29 +139,15 @@ int main(int argc, char *argv[])
   int8_t image[size][size];
   int8_t out[size][size];
 
-  int debug = 1;
-
-  if (debug)
-  {
-    printf("%s\n", argv[1]);
-  }
-
   char *sobel = strdup(argv[1]);
 
   // remove .edge and concat the correct name for our output file
   sobel[strlen(sobel) - 4] = '\0';
   strcat(sobel, ".edge.pgm");
 
-  if (debug)
-  {
-    printf("%s %li\n", sobel, strlen(sobel));
-  }
-
   read_pgm(argv[1], image, size, size);
 
-
-
-  int i, j, r, c = 0;
+  int i, j = 0;
   for (i = 0; i < size; i++)
   {
     for (j = 0; j < size; j++)
@@ -170,14 +156,9 @@ int main(int argc, char *argv[])
     }
   }
 
-
-
-  i = j = 0; // re-sets both i and j = 0
-  double accumulator = 0.0;
-
-  for (r = 1; i < size - 1; i++)
+  for (i = 1; i < size - 1; i++)
   {
-    for (c = 1; j < size - 1; j++)
+    for (j = 1; j < size - 1; j++)
     {
       double Ox = convoluteX(image, i, j);
       double Oy = convoluteY(image, i, j);
