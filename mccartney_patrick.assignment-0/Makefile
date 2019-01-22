@@ -12,3 +12,7 @@ clean:
 
 clean2:
 	rm -f sobel *~
+
+run: sobel.c
+	gcc sobel.c -o sobel -lm
+	./run.sh

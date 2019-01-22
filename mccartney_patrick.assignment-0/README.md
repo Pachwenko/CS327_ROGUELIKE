@@ -5,6 +5,7 @@ The input file is given as a .pgm such as "./sobel picture.pgm" and the program
 will then create a "picture.edge.pgm" file with the sobel filter effectively applied.
 
 ## Example Useage
+
 ```bash
 # compile the program with make
 make

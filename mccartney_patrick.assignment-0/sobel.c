@@ -103,15 +103,15 @@ int read_pgm(char *file, void *image, uint32_t x, uint32_t y)
 }
 
 
-double convoluteX(int8_t array[size][size], int row, int col) {
+double convoluteX(uint8_t array[size][size], int row, int col) {
   //calculates by top down, col col col, could do any order you like
   // Matrix is of the value:
   // [-1 0 +1]
   // [-2 0 +2]
   // [-1 0 +1]
   // therefore middle column will be 0, does not need to be calculated
-  double col1 = (array[row - 1][col - 1] * -1.0)
-    + (array[row][col - 1] * -2.0) + (array[row + 1][col] * -1.0);
+  double col1 = (array[row - 1][col - 1] * -1.0) -
+    (array[row][col - 1] * 2.0) - (array[row + 1][col] * 1.0);
 
   double col3 = (array[row - 1][col + 1] * 1.0) +
     (array[row][col + 1] * 2.0) + (array[row + 1][col + 1] * 1.0);
@@ -119,14 +119,15 @@ double convoluteX(int8_t array[size][size], int row, int col) {
   return col1 + col3;
 }
 
-double convoluteY(int8_t array[size][size], int row, int col) {
+double convoluteY(uint8_t array[size][size], int row, int col) {
   // calculated row by row, middle row sums to 0 so no need to calculate
   // Matrix is of the value:
   // [-1 -2 -1]
   // [ 0  0  0]
   // [+1 +2 +1]
-  double row1 = (array[row-1][col-1] * -1.0) +
-    (array[row-1][col] * -2.0) + (array[row-1][col+1] * -1.0);
+
+  double row1 = (array[row-1][col-1] * -1.0) -
+    (array[row-1][col] * 2.0) - (array[row-1][col+1] * 1.0);
 
   double row3 = (array[row+1][col-1] * 1.0) +
     (array[row+1][col] * 2.0) + (array[row+1][col+1] * 1.0);
@@ -136,7 +137,7 @@ double convoluteY(int8_t array[size][size], int row, int col) {
 
 int main(int argc, char *argv[])
 {
-  int8_t image[size][size];
+  uint8_t image[size][size];
   uint8_t out[size][size];
 
   char *sobel = strdup(argv[1]);
@@ -156,19 +157,18 @@ int main(int argc, char *argv[])
     }
   }
 
-  for (i = 1; i < size - 1; i++)
+  int row, col = 0;
+  for (col = 1; col < size - 1; col++)
   {
-    for (j = 1; j < size - 1; j++)
+    for (row = 1; row < size - 1; row++)
     {
-      double Ox = convoluteX(image, i, j);
-      double Oy = convoluteY(image, i, j);
-      double value = sqrt((Ox * Ox) + (Oy + Oy));
+      double Ox = convoluteX(image, row, col);
+      double Oy = convoluteY(image, row, col);
+      int value = (int) sqrt((Ox * Ox) + (Oy * Oy));
       if (value > 255) {
         value = 255;
-      } else if (value < 0) {
-        value = 0;
       }
-      out[i][j] = (uint8_t) value;
+      out[row][col] = (uint8_t) value;
     }
   }
 
