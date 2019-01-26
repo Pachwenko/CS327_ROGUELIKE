@@ -149,7 +149,10 @@ int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
     {
         for (row = y; row < y + height; row++)
         {
-            if (!(isValid(dungeon[row][col])))
+            if (!(isValid(dungeon[row-1][col-1]) && isValid(dungeon[row][col-1])
+                && isValid(dungeon[row-1][col]) && isValid(dungeon[row][col])
+                && isValid(dungeon[row+1][col]) && isValid(dungeon[row][col+1])
+                && isValid(dungeon[row+1][col+1])))
             {
                 return 0;
             }
