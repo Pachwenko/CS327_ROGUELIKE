@@ -5,19 +5,21 @@
 // upward staircase are less than '<', downward stairs are greater than '>'
 
 
-#define dungeonX 80
-#define dungeonY 21 //remember in C columns or Y comes first as to increase performance
-#define numRooms 6
-#define minRoomWidth 4
-#define minRoomHeight 3
+#define DUNGEONCOLS 80
+#define DUNGEONROWS 21
+#define NUMROOMS 6
+#define MINROOMWIDTH 4
+#define MINROOMHEIGHT 3
 
 void printDungeon(char** dungeon);
 char** initializeDungeon();
 void freeDungeon(char** dungeon);
+void createRooms(char** dungeon);
 
 int main(int argc, char* argv[]) {
     char** dungeon = initializeDungeon();
     printDungeon(*&dungeon);
+    createRooms(*&dungeon);
 
     freeDungeon(*&dungeon);
     return 0;
@@ -26,7 +28,7 @@ int main(int argc, char* argv[]) {
 char** initializeDungeon() {
     char** dungeon;
     //allocate pointers to the rows of our dungeon
-    dungeon = malloc(dungeonY * sizeof(char*));
+    dungeon = malloc(DUNGEONROWS * sizeof(char*));
 
     if (dungeon == NULL) {
         fprintf(stderr, "Dungeon is null - out of memory\n");
@@ -35,8 +37,8 @@ char** initializeDungeon() {
 
     //now allocate enough columns for each row
     int i = 0;
-    for (i = 0; i < dungeonY; i++) {
-        dungeon[i] = malloc(dungeonX * sizeof(char*));
+    for (i = 0; i < DUNGEONROWS; i++) {
+        dungeon[i] = malloc(DUNGEONCOLS * sizeof(char*));
         if (dungeon[i] == NULL) {
             fprintf(stderr, "Out of memory - allocating dungeolCols");
             exit(0);
@@ -44,26 +46,26 @@ char** initializeDungeon() {
     }
 
     int row, col = 0;
-    for (row = 0; row < dungeonY; row++) {
-        for (col = 0; col < dungeonX; col++) {
+    for (row = 0; row < DUNGEONROWS; row++) {
+        for (col = 0; col < DUNGEONCOLS; col++) {
             dungeon[row][col] = ' ';
         }
     }
-    for (row = 0; row < dungeonY; row++) {
+    for (row = 0; row < DUNGEONROWS; row++) {
         dungeon[row][0] = '|';
-        dungeon[row][dungeonX - 1] = '|';
+        dungeon[row][DUNGEONCOLS - 1] = '|';
     }
-    for (col = 0; col < dungeonX; col++) {
+    for (col = 0; col < DUNGEONCOLS; col++) {
         dungeon[0][col] = '-';
-        dungeon[dungeonY - 1][col] = '-';
+        dungeon[DUNGEONROWS - 1][col] = '-';
     }
     return dungeon;
 }
 
 void printDungeon(char** dungeon) {
     int row, col = 0;
-    for (row = 0; row < dungeonY; row++) {
-        for (col = 0; col < dungeonX; col++) {
+    for (row = 0; row < DUNGEONROWS; row++) {
+        for (col = 0; col < DUNGEONCOLS; col++) {
             printf("%c", dungeon[row][col]);
         }
         printf("\n");
@@ -72,8 +74,12 @@ void printDungeon(char** dungeon) {
 
 void freeDungeon(char** dungeon) {
     int i = 0;
-    for (i = 0; i < dungeonY; i++) {
+    for (i = 0; i < DUNGEONROWS; i++) {
         free(dungeon[i]);
     }
     free(dungeon);
+}
+
+void createRooms(char** dungeon) {
+
 }
