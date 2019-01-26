@@ -4,6 +4,7 @@
 // For reference, spaces are rocks ' ', floors are periods '.', corridors are hashes '#',
 // upward staircase are less than '<', downward stairs are greater than '>'
 
+
 #define dungeonCols 80
 #define dungeonRows 21
 #define numRooms 6

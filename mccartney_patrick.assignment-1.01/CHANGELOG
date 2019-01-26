@@ -2,3 +2,4 @@
     Added initializeDungeon and printDungeon functions.
     Debugged malloc and passing the dynamic array.
     Added freeDungeon function to avoid memory leaks.
+
