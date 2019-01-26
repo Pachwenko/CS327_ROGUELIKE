@@ -17,15 +17,17 @@ char** initializeDungeon();
 void freeDungeon(char** dungeon);
 void createRooms(char** dungeon);
 int isImmuteable(char value);
+int isValid(char value);
+int canPlaceRoom(char** dungeon, int x, int y, int width, int height);
 
 int main(int argc, char* argv[]) {
     char** dungeon = initializeDungeon();
-    printDungeon(*&dungeon);
+    printDungeon(dungeon);
     //createRooms(*&dungeon);
 
     srand(time(NULL));
 
-    freeDungeon(*&dungeon);
+    freeDungeon(dungeon);
     return 0;
 }
 
@@ -91,6 +93,13 @@ int isImmuteable(char value) {
     return 0;
 }
 
+int isValid(char value) {
+    if (isImmuteable(value)) {
+        return 0;
+    }
+
+}
+
 void createRooms(char** dungeon) {
     int rooms = 0;
     while (rooms < NUMROOMS) {
@@ -98,13 +107,27 @@ void createRooms(char** dungeon) {
 
         int width = MINROOMWIDTH;
         int height = MINROOMHEIGHT;
-        if (!(placeRoom(width, height))) {
-            fprintf(stderr, "Failed to create a room");
-            exit;
+
+        int x = (rand() % DUNGEONCOLS) + 1;
+        int y = (rand() % DUNGEONROWS) + 1;
+        // check if the room can be placed
+        if (canPlaceRoom(dungeon, x, y, width, height)) {
+            printf("Succes! you can place a damn room~\n");
+            rooms++;
+
+            // write the room!! to memory
         }
     }
 }
 
-int placeRoom(int width, int height) {
-
+int canPlaceRoom(char** dungeon, int x, int y, int width, int height) {
+    int i, j = 0;
+    for (i = 0; i < x; i++) {
+        for (j = 0; j < y; j++) {
+            if (!(isValid(dungeon[i][j]))) {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }
