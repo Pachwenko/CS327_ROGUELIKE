@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
 {
     srand(time(NULL));
     char **dungeon = initializeDungeon();
-    printDungeon(dungeon);
     createRooms(dungeon);
 
     printDungeon(dungeon);
@@ -125,17 +124,15 @@ void createRooms(char **dungeon)
     {
         // TODO: replace width and height with random values
 
-        int width = MINROOMWIDTH;
-        int height = MINROOMHEIGHT;
+        int width = MINROOMWIDTH + (rand() % 7 + 1);
+        int height = MINROOMHEIGHT + (rand() % 7 + 1);
 
         int x = (rand() % DUNGEONCOLS) + 1;
         int y = (rand() % DUNGEONROWS) + 1;
         // check if the room can be placed
         if (canPlaceRoom(dungeon, x, y, width, height))
         {
-            printf("Succes! you can place a damn room~\n");
             rooms++;
-
             placeRoom(dungeon, x, y, width, height);
         }
     }
@@ -143,14 +140,17 @@ void createRooms(char **dungeon)
 
 int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
 {
-    if ((x + width + 1) > DUNGEONCOLS || (y + height + 1) > DUNGEONROWS) {
+    if ((x + width + 1) > DUNGEONCOLS || (y + height + 1) > DUNGEONROWS)
+    {
         return 0;
     }
     int row, col = 0;
-    for (row = y; row < y + height; row++) {
-        for (col = x; col < x + width; col++) {
-            //printf("Going to check: %i %i %c\n", row, col, dungeon[row][col]);
-            if (!(isValid(dungeon[row][col]))) {
+    for (col = x; col < x + width; col++)
+    {
+        for (row = y; row < y + height; row++)
+        {
+            if (!(isValid(dungeon[row][col])))
+            {
                 return 0;
             }
         }
@@ -160,9 +160,12 @@ int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
 
 void placeRoom(char **dungeon, int x, int y, int width, int height)
 {
-    int row, col = 0;
-    for (row = y; row < y + height; row++) {
-        for (col = x; col < x + width; col++) {
+    // Attempting to follow the column first standard
+    int col, row = 0;
+    for (col = x; col < x + width; col++)
+    {
+        for (row = y; row < y + height; row++)
+        {
             dungeon[row][col] = '.';
         }
     }
