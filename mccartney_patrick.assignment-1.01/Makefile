@@ -1,0 +1,9 @@
+all: generator
+
+generator: generator.c
+	gcc -ggdb3 -O0 -Q generator.c -o generator
+
+#da was sugguested but removed since it created 15 files
+
+clean:
+	rm -f generator generator.c.* test_output.txt *~
