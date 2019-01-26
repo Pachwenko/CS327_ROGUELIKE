@@ -97,7 +97,9 @@ int isValid(char value) {
     if (isImmuteable(value)) {
         return 0;
     }
-
+    if (value == '.' || value == '#' || value == '<' || value == '>') {
+        return 0;
+    }
 }
 
 void createRooms(char** dungeon) {
@@ -115,7 +117,7 @@ void createRooms(char** dungeon) {
             printf("Succes! you can place a damn room~\n");
             rooms++;
 
-            // write the room!! to memory
+            // write the room!! to memory!
         }
     }
 }
