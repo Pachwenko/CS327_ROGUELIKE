@@ -94,12 +94,10 @@ int isImmuteable(char value) {
 }
 
 int isValid(char value) {
-    if (isImmuteable(value)) {
+    if (isImmuteable(value) || value == '.' || value == '#' || value == '<' || value == '>') {
         return 0;
     }
-    if (value == '.' || value == '#' || value == '<' || value == '>') {
-        return 0;
-    }
+    return 1;
 }
 
 void createRooms(char** dungeon) {
