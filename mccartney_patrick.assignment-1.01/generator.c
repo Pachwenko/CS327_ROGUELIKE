@@ -8,23 +8,25 @@
 #define DUNGEONCOLS 80
 #define DUNGEONROWS 21
 #define NUMROOMS 6
+#define ROOMDATA 4
 #define MINROOMWIDTH 4
 #define MINROOMHEIGHT 3
 
 void printDungeon(char **dungeon);
 char **initializeDungeon();
 void freeDungeon(char **dungeon);
-void createRooms(char **dungeon);
+void createRooms(char **dungeon, int rooms[NUMROOMS][4]);
 int isImmuteable(char value);
 int isValid(char value);
 int canPlaceRoom(char **dungeon, int x, int y, int width, int height);
-void placeRoom(char **dungeon, int x, int y, int width, int height);
+void drawRoom(char **dungeon, int x, int y, int width, int height);
 
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
     char **dungeon = initializeDungeon();
-    createRooms(dungeon);
+    int rooms[NUMROOMS][ROOMDATA];
+    createRooms(dungeon, rooms);
 
     printDungeon(dungeon);
     freeDungeon(dungeon);
@@ -117,23 +119,26 @@ int isValid(char value)
     return 1;
 }
 
-void createRooms(char **dungeon)
+void createRooms(char **dungeon, int rooms[NUMROOMS][4])
 {
-    int rooms = 0;
+    int numRooms = 0;
     while (rooms < NUMROOMS)
     {
-        // TODO: replace width and height with random values
-
         int width = MINROOMWIDTH + (rand() % 7 + 1);
         int height = MINROOMHEIGHT + (rand() % 7 + 1);
 
         int x = (rand() % DUNGEONCOLS) + 1;
         int y = (rand() % DUNGEONROWS) + 1;
-        // check if the room can be placed
         if (canPlaceRoom(dungeon, x, y, width, height))
         {
-            rooms++;
-            placeRoom(dungeon, x, y, width, height);
+            rooms[numRooms][0] = x;
+            rooms[numRooms][1] = y;
+            rooms[numRooms][2] = width;
+            rooms[numRooms][3] = height;
+            numRooms++;
+
+            // could be refactored to draw all at once instead of one at a time
+            drawRoom(dungeon, x, y, width, height);
         }
     }
 }
@@ -161,7 +166,7 @@ int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
     return 1;
 }
 
-void placeRoom(char **dungeon, int x, int y, int width, int height)
+void drawRoom(char **dungeon, int x, int y, int width, int height)
 {
     // Attempting to follow the column first standard
     int col, row = 0;
@@ -172,4 +177,8 @@ void placeRoom(char **dungeon, int x, int y, int width, int height)
             dungeon[row][col] = '.';
         }
     }
+}
+
+void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
+    
 }
