@@ -15,11 +15,12 @@ void printDungeon(char** dungeon);
 char** initializeDungeon();
 void freeDungeon(char** dungeon);
 void createRooms(char** dungeon);
+int isImmuteable(char value);
 
 int main(int argc, char* argv[]) {
     char** dungeon = initializeDungeon();
     printDungeon(*&dungeon);
-    createRooms(*&dungeon);
+    //createRooms(*&dungeon);
 
     freeDungeon(*&dungeon);
     return 0;
@@ -36,50 +37,62 @@ char** initializeDungeon() {
     }
 
     //now allocate enough columns for each row
-    int i = 0;
-    for (i = 0; i < DUNGEONROWS; i++) {
-        dungeon[i] = malloc(DUNGEONCOLS * sizeof(char*));
-        if (dungeon[i] == NULL) {
+    int y, x = 0;
+    for (y = 0; y < DUNGEONCOLS; y++) {
+        dungeon[y] = malloc(DUNGEONROWS * sizeof(char*));
+        if (dungeon[y] == NULL) {
             fprintf(stderr, "Out of memory - allocating dungeolCols");
             exit(0);
         }
     }
 
-    int row, col = 0;
-    for (row = 0; row < DUNGEONROWS; row++) {
-        for (col = 0; col < DUNGEONCOLS; col++) {
-            dungeon[row][col] = ' ';
+    for (y = 0; y < DUNGEONROWS; y++) {
+        for (x = 0; x < DUNGEONCOLS; x++) {
+            dungeon[y][x] = ' ';
         }
     }
-    for (row = 0; row < DUNGEONROWS; row++) {
-        dungeon[row][0] = '|';
-        dungeon[row][DUNGEONCOLS - 1] = '|';
+    for (y = 0; y < DUNGEONROWS; y++) {
+        dungeon[y][0] = '|';
+        dungeon[y][DUNGEONCOLS - 1] = '|';
     }
-    for (col = 0; col < DUNGEONCOLS; col++) {
-        dungeon[0][col] = '-';
-        dungeon[DUNGEONROWS - 1][col] = '-';
+    for (x = 0; x < DUNGEONCOLS; x++) {
+        dungeon[0][x] = '-';
+        dungeon[DUNGEONROWS - 1][x] = '-';
     }
     return dungeon;
 }
 
 void printDungeon(char** dungeon) {
-    int row, col = 0;
-    for (row = 0; row < DUNGEONROWS; row++) {
-        for (col = 0; col < DUNGEONCOLS; col++) {
-            printf("%c", dungeon[row][col]);
+    int x, y = 0;
+    for (y = 0; y < DUNGEONROWS; y++) {
+        for (x = 0; x < DUNGEONCOLS; x++) {
+            printf("%c", dungeon[y][x]);
         }
         printf("\n");
     }
 }
 
 void freeDungeon(char** dungeon) {
-    int i = 0;
-    for (i = 0; i < DUNGEONROWS; i++) {
-        free(dungeon[i]);
+    int y = 0;
+    for (y = 0; y < DUNGEONCOLS; y++) {
+        free(dungeon[y]);
     }
     free(dungeon);
 }
 
 void createRooms(char** dungeon) {
+int row, col = 0;
+    for (col = 0; col < DUNGEONROWS; col++) {
+        for (row = 0; row < DUNGEONCOLS; row++) {
+            printf("%c", dungeon[row][col]);
+        }
+        printf("\n");
+    }
+}
 
+int isImmuteable(char value) {
+    if (value == '|' || value == '-') {
+        return 1;
+    }
+    return 0;
 }
