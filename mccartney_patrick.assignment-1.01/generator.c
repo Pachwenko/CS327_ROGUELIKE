@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 
 // For reference, spaces are rocks ' ', floors are periods '.', corridors are hashes '#',
@@ -11,6 +12,10 @@
 #define ROOMDATA 4
 #define MINROOMWIDTH 4
 #define MINROOMHEIGHT 3
+#define ROOM_SIZE_X 0
+#define ROOM_SIZE_Y 1
+#define ROOM_POS_X 2
+#define ROOM_POS_Y 3
 
 void printDungeon(char **dungeon);
 char **initializeDungeon();
@@ -20,6 +25,7 @@ int isImmuteable(char value);
 int isValid(char value);
 int canPlaceRoom(char **dungeon, int x, int y, int width, int height);
 void drawRoom(char **dungeon, int x, int y, int width, int height);
+void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]);
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +33,9 @@ int main(int argc, char *argv[])
     char **dungeon = initializeDungeon();
     int rooms[NUMROOMS][ROOMDATA];
     createRooms(dungeon, rooms);
+    printDungeon(dungeon);
+
+    createCooridors(dungeon, rooms);
 
     printDungeon(dungeon);
     freeDungeon(dungeon);
@@ -122,7 +131,7 @@ int isValid(char value)
 void createRooms(char **dungeon, int rooms[NUMROOMS][4])
 {
     int numRooms = 0;
-    while (rooms < NUMROOMS)
+    while (numRooms < 2)
     {
         int width = MINROOMWIDTH + (rand() % 7 + 1);
         int height = MINROOMHEIGHT + (rand() % 7 + 1);
@@ -131,10 +140,10 @@ void createRooms(char **dungeon, int rooms[NUMROOMS][4])
         int y = (rand() % DUNGEONROWS) + 1;
         if (canPlaceRoom(dungeon, x, y, width, height))
         {
-            rooms[numRooms][0] = x;
-            rooms[numRooms][1] = y;
-            rooms[numRooms][2] = width;
-            rooms[numRooms][3] = height;
+            rooms[numRooms][ROOM_POS_X] = x;
+            rooms[numRooms][ROOM_POS_Y] = y;
+            rooms[numRooms][ROOM_SIZE_X] = width;
+            rooms[numRooms][ROOM_SIZE_Y] = height;
             numRooms++;
 
             // could be refactored to draw all at once instead of one at a time
@@ -185,6 +194,16 @@ void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
     // from the halfway to the second room
     // we can overrite the room structure
     // TODO how strict is the 4x3 room rule? What if our rooms arent rectangles
+    int x = rooms[0][ROOM_POS_X];
+    int y = rooms[0][ROOM_POS_Y];
 
-    
+    int midx = rooms[0][ROOM_POS_X];
+    int midy = rooms[1][ROOM_POS_Y];
+
+    while (x != midx) {
+        x += (midx - x) / abs(midx - x);
+        if (isValid(dungeon[x][y])) {
+            dungeon[x][y] = '#';
+        }
+    }
 }
