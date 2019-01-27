@@ -8,7 +8,7 @@
 
 #define DUNGEONCOLS 80
 #define DUNGEONROWS 21
-#define NUMROOMS 3
+#define NUMROOMS 6
 #define ROOMDATA 4
 #define MINROOMWIDTH 4
 #define MINROOMHEIGHT 3
@@ -18,7 +18,7 @@
 #define ROOM_POS_Y 3
 
 void printDungeon(char **dungeon);
-char **initializeDungeon();
+char **allocateDungeon();
 void freeDungeon(char **dungeon);
 void createRooms(char **dungeon, int rooms[NUMROOMS][4]);
 int isImmuteable(char value);
@@ -31,7 +31,8 @@ void placeStairs(char **dungeon, int rooms[NUMROOMS][ROOMDATA]);
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    char **dungeon = initializeDungeon();
+    char **dungeon = allocateDungeon();
+    drawBorder(dungeon);
     int rooms[NUMROOMS][ROOMDATA];
     createRooms(dungeon, rooms);
     createCooridors(dungeon, 0, rooms);
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-char **initializeDungeon()
+char **allocateDungeon()
 {
     char **dungeon;
     //allocate pointers to the rows of our dungeon
@@ -65,7 +66,10 @@ char **initializeDungeon()
             exit(0);
         }
     }
+    return dungeon;
+}
 
+void drawBorder(char** dungeon) {
     int row, col = 0;
     for (row = 0; row < DUNGEONROWS; row++)
     {
@@ -84,7 +88,6 @@ char **initializeDungeon()
         dungeon[0][col] = '-';
         dungeon[DUNGEONROWS - 1][col] = '-';
     }
-    return dungeon;
 }
 
 void printDungeon(char **dungeon)
