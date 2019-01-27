@@ -8,7 +8,7 @@
 
 #define DUNGEONCOLS 80
 #define DUNGEONROWS 21
-#define NUMROOMS 6
+#define NUMROOMS 3
 #define ROOMDATA 4
 #define MINROOMWIDTH 4
 #define MINROOMHEIGHT 3
@@ -25,7 +25,8 @@ int isImmuteable(char value);
 int isValid(char value);
 int canPlaceRoom(char **dungeon, int x, int y, int width, int height);
 void drawRoom(char **dungeon, int x, int y, int width, int height);
-void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]);
+void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]);
+void placeStairs(char **dungeon, int rooms[NUMROOMS][ROOMDATA]);
 
 int main(int argc, char *argv[])
 {
@@ -33,9 +34,8 @@ int main(int argc, char *argv[])
     char **dungeon = initializeDungeon();
     int rooms[NUMROOMS][ROOMDATA];
     createRooms(dungeon, rooms);
-    printDungeon(dungeon);
-
-    createCooridors(dungeon, rooms);
+    createCooridors(dungeon, 0, rooms);
+    placeStairs(dungeon, rooms);
 
     printDungeon(dungeon);
     freeDungeon(dungeon);
@@ -128,30 +128,6 @@ int isValid(char value)
     return 1;
 }
 
-void createRooms(char **dungeon, int rooms[NUMROOMS][4])
-{
-    int numRooms = 0;
-    while (numRooms < 2)
-    {
-        int width = MINROOMWIDTH + (rand() % 7 + 1);
-        int height = MINROOMHEIGHT + (rand() % 7 + 1);
-
-        int x = (rand() % DUNGEONCOLS) + 1;
-        int y = (rand() % DUNGEONROWS) + 1;
-        if (canPlaceRoom(dungeon, x, y, width, height))
-        {
-            rooms[numRooms][ROOM_POS_X] = x;
-            rooms[numRooms][ROOM_POS_Y] = y;
-            rooms[numRooms][ROOM_SIZE_X] = width;
-            rooms[numRooms][ROOM_SIZE_Y] = height;
-            numRooms++;
-
-            // could be refactored to draw all at once instead of one at a time
-            drawRoom(dungeon, x, y, width, height);
-        }
-    }
-}
-
 int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
 {
     if ((x + width + 1) > DUNGEONCOLS || (y + height + 1) > DUNGEONROWS)
@@ -175,6 +151,30 @@ int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
     return 1;
 }
 
+void createRooms(char **dungeon, int rooms[NUMROOMS][4])
+{
+    int numRooms = 0;
+    while (numRooms < NUMROOMS)
+    {
+        int width = MINROOMWIDTH + (rand() % 7 + 1);
+        int height = MINROOMHEIGHT + (rand() % 7 + 1);
+
+        int x = (rand() % DUNGEONCOLS) + 1;
+        int y = (rand() % DUNGEONROWS) + 1;
+        if (canPlaceRoom(dungeon, x, y, width, height))
+        {
+            rooms[numRooms][ROOM_POS_X] = x;
+            rooms[numRooms][ROOM_POS_Y] = y;
+            rooms[numRooms][ROOM_SIZE_X] = width;
+            rooms[numRooms][ROOM_SIZE_Y] = height;
+            numRooms++;
+
+            // could be refactored to draw all at once instead of one at a time
+            drawRoom(dungeon, x, y, width, height);
+        }
+    }
+}
+
 void drawRoom(char **dungeon, int x, int y, int width, int height)
 {
     // Attempting to follow the column first standard
@@ -188,22 +188,18 @@ void drawRoom(char **dungeon, int x, int y, int width, int height)
     }
 }
 
-void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
-    // basic idea is to use a halfway point between 2 rooms
-    // then draw a straight line from one room to the halfway and
-    // from the halfway to the second room
-    // we can overrite the room structure
-    int x = rooms[0][ROOM_POS_X];
-    int y = rooms[0][ROOM_POS_Y];
+void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]) {
+    // basic idea is to keep adding to x using the provided formula
+    // when the origin is equal to the destination then go to
+    // doing the same for the y values. Also, don't overrite rooms
+    int x = rooms[roomNum][ROOM_POS_X];
+    int y = rooms[roomNum][ROOM_POS_Y];
 
-    int midx = rooms[1][ROOM_POS_X];
-    int midy = rooms[1][ROOM_POS_Y];
+    int midx = rooms[roomNum+1][ROOM_POS_X];
+    int midy = rooms[roomNum+1][ROOM_POS_Y];
 
-    // fprintf(stderr, "trying to reach: (%i, %i)\n", midx, midy);
     while (x != midx) {
-        // fprintf(stderr, "%i %i\n", x, y);
         x += (midx-x) / abs(midx-x);
-        // printf("%i\n", x);
         if ((isValid(dungeon[y][x]))) {
             dungeon[y][x] = '#';
         }
@@ -215,4 +211,18 @@ void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
             dungeon[y][x] = '#';
         }
     }
+
+    if (roomNum < NUMROOMS - 2) {
+        createCooridors(dungeon, roomNum+1, rooms);
+    }
+}
+
+void placeStairs(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
+    int upX = (rand() % rooms[0][ROOM_SIZE_X]) + rooms[0][ROOM_POS_X];
+    int upY = (rand() % rooms[0][ROOM_SIZE_Y]) + rooms[0][ROOM_POS_Y];
+    dungeon[upY][upX] = '<';
+
+    int downX = (rand() % rooms[1][ROOM_SIZE_X]) + rooms[1][ROOM_POS_X];
+    int downY = (rand() % rooms[1][ROOM_SIZE_Y]) + rooms[1][ROOM_POS_Y];
+    dungeon[downY][downX] = '>';
 }
