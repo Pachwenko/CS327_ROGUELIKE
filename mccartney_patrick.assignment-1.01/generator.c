@@ -8,7 +8,7 @@
 
 #define DUNGEONCOLS 80
 #define DUNGEONROWS 21
-#define NUMROOMS 6
+#define NUMROOMS 8
 #define ROOMDATA 4
 #define MINROOMWIDTH 4
 #define MINROOMHEIGHT 3
@@ -19,6 +19,7 @@
 
 void printDungeon(char **dungeon);
 char **allocateDungeon();
+void drawBlank(char** dungeon);
 void freeDungeon(char **dungeon);
 void createRooms(char **dungeon, int rooms[NUMROOMS][4]);
 int isImmuteable(char value);
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
 {
     srand(time(NULL));
     char **dungeon = allocateDungeon();
-    drawBorder(dungeon);
+    drawBlank(dungeon);
     int rooms[NUMROOMS][ROOMDATA];
     createRooms(dungeon, rooms);
     createCooridors(dungeon, 0, rooms);
@@ -69,7 +70,7 @@ char **allocateDungeon()
     return dungeon;
 }
 
-void drawBorder(char** dungeon) {
+void drawBlank(char** dungeon) {
     int row, col = 0;
     for (row = 0; row < DUNGEONROWS; row++)
     {
@@ -225,7 +226,7 @@ void placeStairs(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
     int upY = (rand() % rooms[0][ROOM_SIZE_Y]) + rooms[0][ROOM_POS_Y];
     dungeon[upY][upX] = '<';
 
-    int downX = (rand() % rooms[1][ROOM_SIZE_X]) + rooms[1][ROOM_POS_X];
-    int downY = (rand() % rooms[1][ROOM_SIZE_Y]) + rooms[1][ROOM_POS_Y];
+    int downX = (rand() % rooms[NUMROOMS-1][ROOM_SIZE_X]) + rooms[NUMROOMS-1][ROOM_POS_X];
+    int downY = (rand() % rooms[NUMROOMS-1][ROOM_SIZE_Y]) + rooms[NUMROOMS-1][ROOM_POS_Y];
     dungeon[downY][downX] = '>';
 }
