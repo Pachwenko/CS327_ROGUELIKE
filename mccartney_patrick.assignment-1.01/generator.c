@@ -193,17 +193,26 @@ void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
     // then draw a straight line from one room to the halfway and
     // from the halfway to the second room
     // we can overrite the room structure
-    // TODO how strict is the 4x3 room rule? What if our rooms arent rectangles
     int x = rooms[0][ROOM_POS_X];
     int y = rooms[0][ROOM_POS_Y];
 
-    int midx = rooms[0][ROOM_POS_X];
+    int midx = rooms[1][ROOM_POS_X];
     int midy = rooms[1][ROOM_POS_Y];
 
+    // fprintf(stderr, "trying to reach: (%i, %i)\n", midx, midy);
     while (x != midx) {
-        x += (midx - x) / abs(midx - x);
-        if (isValid(dungeon[x][y])) {
-            dungeon[x][y] = '#';
+        // fprintf(stderr, "%i %i\n", x, y);
+        x += (midx-x) / abs(midx-x);
+        // printf("%i\n", x);
+        if ((isValid(dungeon[y][x]))) {
+            dungeon[y][x] = '#';
+        }
+    }
+
+    while (y != midy) {
+        y += (midy-y) / abs(midy-y);
+        if ((isValid(dungeon[y][x]))) {
+            dungeon[y][x] = '#';
         }
     }
 }
