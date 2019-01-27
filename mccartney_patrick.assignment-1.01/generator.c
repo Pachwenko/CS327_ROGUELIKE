@@ -180,5 +180,11 @@ void drawRoom(char **dungeon, int x, int y, int width, int height)
 }
 
 void createCooridors(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
+    // basic idea is to use a halfway point between 2 rooms
+    // then draw a straight line from one room to the halfway and
+    // from the halfway to the second room
+    // we can overrite the room structure
+    // TODO how strict is the 4x3 room rule? What if our rooms arent rectangles
+
     
 }
