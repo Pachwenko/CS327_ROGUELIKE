@@ -199,18 +199,18 @@ void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA])
     int x = rooms[roomNum][ROOM_POS_X];
     int y = rooms[roomNum][ROOM_POS_Y];
 
-    int midx = rooms[roomNum+1][ROOM_POS_X];
-    int midy = rooms[roomNum+1][ROOM_POS_Y];
+    int x1 = rooms[roomNum+1][ROOM_POS_X];
+    int y1 = rooms[roomNum+1][ROOM_POS_Y];
 
-    while (x != midx) {
-        x += (midx-x) / abs(midx-x);
+    while (x != x1) {
+        x += (x1-x) / abs(x1-x);
         if ((isValid(dungeon[y][x]))) {
             dungeon[y][x] = '#';
         }
     }
 
-    while (y != midy) {
-        y += (midy-y) / abs(midy-y);
+    while (y != y1) {
+        y += (y1-y) / abs(y1-y);
         if ((isValid(dungeon[y][x]))) {
             dungeon[y][x] = '#';
         }
