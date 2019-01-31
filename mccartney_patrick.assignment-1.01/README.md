@@ -13,4 +13,7 @@ make
 ## Number of rooms
 
 Change the number of rooms by changing this line:
-#define NUMROOMS 8
+
+```C
+#define MAXROOMS 8
+```
