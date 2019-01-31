@@ -23,22 +23,22 @@ struct material {
     uint8_t hardness;
 };
 
-void printDungeon(char **dungeon);
-char **allocateDungeon();
+void printDungeon(struct material **dungeon);
+struct material **allocateDungeon();
 void drawBlank(char** dungeon);
-void freeDungeon(char **dungeon);
-void createRooms(char **dungeon, int rooms[NUMROOMS][4]);
+void freeDungeon(struct material **dungeon);
+void createRooms(struct material **dungeon, int rooms[NUMROOMS][4]);
 int isImmuteable(char value);
 int isValid(char value);
-int canPlaceRoom(char **dungeon, int x, int y, int width, int height);
-void drawRoom(char **dungeon, int x, int y, int width, int height);
-void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]);
-void placeStairs(char **dungeon, int rooms[NUMROOMS][ROOMDATA]);
+int canPlaceRoom(struct material **dungeon, int x, int y, int width, int height);
+void drawRoom(struct material **dungeon, int x, int y, int width, int height);
+void createCooridors(struct material **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]);
+void placeStairs(struct material **dungeon, int rooms[NUMROOMS][ROOMDATA]);
 
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    char **dungeon = allocateDungeon();
+    struct material **dungeon = allocateDungeon();
     drawBlank(dungeon);
     int rooms[NUMROOMS][ROOMDATA];
     createRooms(dungeon, rooms);
@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-char **allocateDungeon()
+struct material **allocateDungeon()
 {
-    char **dungeon;
+    struct material **dungeon;
     //allocate pointers to the rows of our dungeon
-    dungeon = malloc(DUNGEONROWS * sizeof(char *));
+    dungeon = malloc(DUNGEONROWS * sizeof(struct material *));
 
     if (dungeon == NULL)
     {
@@ -97,7 +97,7 @@ void drawBlank(char** dungeon) {
     }
 }
 
-void printDungeon(char **dungeon)
+void printDungeon(struct material **dungeon)
 {
     int row, col = 0;
     for (row = 0; row < DUNGEONROWS; row++)
@@ -110,7 +110,7 @@ void printDungeon(char **dungeon)
     }
 }
 
-void freeDungeon(char **dungeon)
+void freeDungeon(struct material **dungeon)
 {
     int i = 0;
     for (i = 0; i < DUNGEONROWS; i++)
@@ -138,7 +138,7 @@ int isValid(char value)
     return 1;
 }
 
-int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
+int canPlaceRoom(struct material **dungeon, int x, int y, int width, int height)
 {
     if ((x + width + 1) > DUNGEONCOLS || (y + height + 1) > DUNGEONROWS)
     {
@@ -161,7 +161,7 @@ int canPlaceRoom(char **dungeon, int x, int y, int width, int height)
     return 1;
 }
 
-void createRooms(char **dungeon, int rooms[NUMROOMS][4])
+void createRooms(struct material **dungeon, int rooms[NUMROOMS][4])
 {
     int numRooms = 0;
     while (numRooms < NUMROOMS)
@@ -185,7 +185,7 @@ void createRooms(char **dungeon, int rooms[NUMROOMS][4])
     }
 }
 
-void drawRoom(char **dungeon, int x, int y, int width, int height)
+void drawRoom(struct material **dungeon, int x, int y, int width, int height)
 {
     // Attempting to follow the column first standard
     int col, row = 0;
@@ -202,7 +202,7 @@ void drawRoom(char **dungeon, int x, int y, int width, int height)
     A better implementation could keep track of which rooms were connected along the way
     which would require checking which '.' belongs to which room and only connecting that room once
     */
-void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]) {
+void createCooridors(struct material **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]) {
     // basic idea is to keep adding to x using the provided formula
     // when the origin is equal to the destination then go to
     // doing the same for the y values. Also, don't overrite rooms
@@ -231,7 +231,7 @@ void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA])
     }
 }
 
-void placeStairs(char **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
+void placeStairs(struct material **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
     int upX = (rand() % rooms[0][ROOM_SIZE_X]) + rooms[0][ROOM_POS_X];
     int upY = (rand() % rooms[0][ROOM_SIZE_Y]) + rooms[0][ROOM_POS_Y];
     dungeon[upY][upX] = '<';
