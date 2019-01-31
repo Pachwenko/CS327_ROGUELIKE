@@ -1,6 +1,13 @@
-5444ade 2019-01-27 | added README, cleaned up code and Makefile (HEAD -> master)
+d68cc77 2019-01-31 | refactored NUMROOMS, last edit before assn1.02
+50163c5 2019-01-31 | fully refactored rooms and dungeon into structs and debugged
+075d1a1 2019-01-30 | working blank generator with structs
+4de513d 2019-01-30 | find replaces char ** with struct material **
+2528711 2019-01-30 | added struct material, no refactoring done yet
+908d079 2019-01-29 | refactored createCooridors for readability
+94dd1c2 2019-01-27 | added changelog
+5444ade 2019-01-27 | added README, cleaned up code and Makefile
 6ce2255 2019-01-27 | refactored initializeDungeon
-105c359 2019-01-27 | added placeStairs function (origin/master, origin/HEAD)
+105c359 2019-01-27 | added placeStairs function
 35ef188 2019-01-26 | debugged createCooridors
 5656cca 2019-01-26 | started debugging createCooridors, added getting-started
 6b76761 2019-01-26 | added doc to createCooridors
@@ -19,3 +26,4 @@ b6497cb 2019-01-25 | removed [y][x] convention for readability. added createRoom
 4f059e3 2019-01-25 | refactored cols to X and rows to Y
 04725b6 2019-01-25 | created dynamic array, initializeDungeon and printDungeon
 76d89b6 2019-01-25 | created 1.01
+
