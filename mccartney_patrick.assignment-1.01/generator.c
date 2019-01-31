@@ -9,7 +9,7 @@
 
 #define DUNGEONCOLS 80
 #define DUNGEONROWS 21
-#define NUMROOMS 8
+#define NUMROOMS 8 // this is the maximum number of rooms
 #define ROOMDATA 4
 #define MINROOMWIDTH 4
 #define MINROOMHEIGHT 3
@@ -23,17 +23,26 @@ struct material {
     uint8_t hardness;
 };
 
+struct room {
+    //1 byte each, 4 bytes total and in order they go xpos, ypos, width, height
+    uint8_t xpos;
+    uint8_t ypos;
+    uint8_t width;
+    uint8_t height;
+    uint8_t wasConnected; // rememnber not to write this to save file, this is only for generation
+};
+
 void printDungeon(struct material **dungeon);
 struct material **allocateDungeon();
 void drawBlank(struct material **dungeon);
 void freeDungeon(struct material **dungeon);
-void createRooms(struct material **dungeon, int rooms[NUMROOMS][4]);
+void createRooms(struct material **dungeon, struct room rooms[NUMROOMS]);
 int isImmuteable(char value);
 int isValid(char value);
 int canPlaceRoom(struct material **dungeon, int x, int y, int width, int height);
 void drawRoom(struct material **dungeon, int x, int y, int width, int height);
-void createCooridors(struct material **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]);
-void placeStairs(struct material **dungeon, int rooms[NUMROOMS][ROOMDATA]);
+void createCooridors(struct material **dungeon, int roomNum, struct room rooms[NUMROOMS]);
+void placeStairs(struct material **dungeon, struct room rooms[NUMROOMS]);
 
 int main(int argc, char *argv[])
 {
@@ -42,10 +51,10 @@ int main(int argc, char *argv[])
     srand(seconds);
     struct material **dungeon = allocateDungeon();
     drawBlank(dungeon);
-    int rooms[NUMROOMS][ROOMDATA];
-    // createRooms(dungeon, rooms);
-    // createCooridors(dungeon, 0, rooms);
-    // placeStairs(dungeon, rooms);
+    struct room rooms[NUMROOMS];
+    createRooms(dungeon, rooms);
+    createCooridors(dungeon, 0, rooms);
+    placeStairs(dungeon, rooms);
     printDungeon(dungeon);
     freeDungeon(dungeon);
     return 0;
@@ -121,123 +130,125 @@ void freeDungeon(struct material **dungeon)
     free(dungeon);
 }
 
-// int isImmuteable(char value)
-// {
-//     if (value == '-' || value == '|')
-//     {
-//         return 1;
-//     }
-//     return 0;
-// }
+int isImmuteable(char value)
+{
+    if (value == '-' || value == '|')
+    {
+        return 1;
+    }
+    return 0;
+}
 
-// int isValid(char value)
-// {
-//     if (isImmuteable(value) || value == '.' || value == '#' || value == '<' || value == '>')
-//     {
-//         return 0;
-//     }
-//     return 1;
-// }
+int isValid(char value)
+{
+    if (isImmuteable(value) || value == '.' || value == '#' || value == '<' || value == '>')
+    {
+        return 0;
+    }
+    return 1;
+}
 
-// int canPlaceRoom(struct material **dungeon, int x, int y, int width, int height)
-// {
-//     if ((x + width + 1) > DUNGEONCOLS || (y + height + 1) > DUNGEONROWS)
-//     {
-//         return 0;
-//     }
-//     int row, col = 0;
-//     for (col = x; col < x + width; col++)
-//     {
-//         for (row = y; row < y + height; row++)
-//         {
-//             if (!(isValid(dungeon[row-1][col-1]) && isValid(dungeon[row][col-1])
-//                 && isValid(dungeon[row-1][col]) && isValid(dungeon[row][col])
-//                 && isValid(dungeon[row+1][col]) && isValid(dungeon[row][col+1])
-//                 && isValid(dungeon[row+1][col+1])))
-//             {
-//                 return 0;
-//             }
-//         }
-//     }
-//     return 1;
-// }
+int canPlaceRoom(struct material **dungeon, int x, int y, int width, int height)
+{
+    if ((x + width + 1) > DUNGEONCOLS || (y + height + 1) > DUNGEONROWS)
+    {
+        return 0;
+    }
+    int row, col = 0;
+    for (col = x; col < x + width; col++)
+    {
+        for (row = y; row < y + height; row++)
+        {
+            if (!(isValid(dungeon[row-1][col-1].value) && isValid(dungeon[row][col-1].value)
+                && isValid(dungeon[row-1][col].value) && isValid(dungeon[row][col].value)
+                && isValid(dungeon[row+1][col].value) && isValid(dungeon[row][col+1].value)
+                && isValid(dungeon[row+1][col+1].value)))
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
 
-// void createRooms(struct material **dungeon, int rooms[NUMROOMS][4])
-// {
-//     int numRooms = 0;
-//     while (numRooms < NUMROOMS)
-//     {
-//         int width = MINROOMWIDTH + (rand() % 7 + 1);
-//         int height = MINROOMHEIGHT + (rand() % 7 + 1);
+void createRooms(struct material **dungeon, struct room rooms[NUMROOMS])
+{
+    int numRooms = 0;
+    while (numRooms < NUMROOMS)
+    {
+        int width = MINROOMWIDTH + (rand() % 7 + 1);
+        int height = MINROOMHEIGHT + (rand() % 7 + 1);
 
-//         int x = (rand() % DUNGEONCOLS) + 1;
-//         int y = (rand() % DUNGEONROWS) + 1;
-//         if (canPlaceRoom(dungeon, x, y, width, height))
-//         {
-//             rooms[numRooms][ROOM_POS_X] = x;
-//             rooms[numRooms][ROOM_POS_Y] = y;
-//             rooms[numRooms][ROOM_SIZE_X] = width;
-//             rooms[numRooms][ROOM_SIZE_Y] = height;
-//             numRooms++;
+        int x = (rand() % DUNGEONCOLS) + 1;
+        int y = (rand() % DUNGEONROWS) + 1;
+        if (canPlaceRoom(dungeon, x, y, width, height))
+        {
+            rooms[numRooms].xpos = x;
+            rooms[numRooms].ypos = y;
+            rooms[numRooms].width = width;
+            rooms[numRooms].height = height;
+            numRooms++;
 
-//             // could be refactored to draw all at once instead of one at a time
-//             drawRoom(dungeon, x, y, width, height);
-//         }
-//     }
-// }
+            // could be refactored to draw all at once instead of one at a time
+            drawRoom(dungeon, x, y, width, height);
+        }
+    }
+}
 
-// void drawRoom(struct material **dungeon, int x, int y, int width, int height)
-// {
-//     // Attempting to follow the column first standard
-//     int col, row = 0;
-//     for (col = x; col < x + width; col++)
-//     {
-//         for (row = y; row < y + height; row++)
-//         {
-//             dungeon[row][col] = '.';
-//         }
-//     }
-// }
+void drawRoom(struct material **dungeon, int x, int y, int width, int height)
+{
+    // Attempting to follow the column first standard
+    int col, row = 0;
+    for (col = x; col < x + width; col++)
+    {
+        for (row = y; row < y + height; row++)
+        {
+            dungeon[row][col].value = '.';
+        }
+    }
+}
 
-//     /*
-//     A better implementation could keep track of which rooms were connected along the way
-//     which would require checking which '.' belongs to which room and only connecting that room once
-//     */
-// void createCooridors(struct material **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]) {
-//     // basic idea is to keep adding to x using the provided formula
-//     // when the origin is equal to the destination then go to
-//     // doing the same for the y values. Also, don't overrite rooms
-//     int x = rooms[roomNum][ROOM_POS_X];
-//     int y = rooms[roomNum][ROOM_POS_Y];
+    /*
+    A better implementation could keep track of which rooms were connected along the way
+    which would require checking which '.' belongs to which room and only connecting that room once
 
-//     int x1 = rooms[roomNum+1][ROOM_POS_X];
-//     int y1 = rooms[roomNum+1][ROOM_POS_Y];
+    also adding a bit of randomness would be cool
+    */
+void createCooridors(struct material **dungeon, int roomNum, struct room rooms[NUMROOMS]) {
+    // basic idea is to keep adding to x using the provided formula
+    // when the origin is equal to the destination then go to
+    // doing the same for the y values. Also, don't overrite rooms
+    int x = rooms[roomNum].xpos;
+    int y = rooms[roomNum].ypos;
 
-//     while (x != x1) {
-//         x += (x1-x) / abs(x1-x);
-//         if ((isValid(dungeon[y][x]))) {
-//             dungeon[y][x] = '#';
-//         }
-//     }
+    int x1 = rooms[roomNum+1].xpos;
+    int y1 = rooms[roomNum+1].ypos;
 
-//     while (y != y1) {
-//         y += (y1-y) / abs(y1-y);
-//         if ((isValid(dungeon[y][x]))) {
-//             dungeon[y][x] = '#';
-//         }
-//     }
+    while (x != x1) {
+        x += (x1-x) / abs(x1-x);
+        if ((isValid(dungeon[y][x].value))) {
+            dungeon[y][x].value = '#';
+        }
+    }
 
-//     if (roomNum < NUMROOMS - 2) {
-//         createCooridors(dungeon, roomNum+1, rooms);
-//     }
-// }
+    while (y != y1) {
+        y += (y1-y) / abs(y1-y);
+        if ((isValid(dungeon[y][x].value))) {
+            dungeon[y][x].value = '#';
+        }
+    }
 
-// void placeStairs(struct material **dungeon, int rooms[NUMROOMS][ROOMDATA]) {
-//     int upX = (rand() % rooms[0][ROOM_SIZE_X]) + rooms[0][ROOM_POS_X];
-//     int upY = (rand() % rooms[0][ROOM_SIZE_Y]) + rooms[0][ROOM_POS_Y];
-//     dungeon[upY][upX] = '<';
+    if (roomNum < NUMROOMS - 2) {
+        createCooridors(dungeon, roomNum+1, rooms);
+    }
+}
 
-//     int downX = (rand() % rooms[NUMROOMS-1][ROOM_SIZE_X]) + rooms[NUMROOMS-1][ROOM_POS_X];
-//     int downY = (rand() % rooms[NUMROOMS-1][ROOM_SIZE_Y]) + rooms[NUMROOMS-1][ROOM_POS_Y];
-//     dungeon[downY][downX] = '>';
-// }
+void placeStairs(struct material **dungeon, struct room rooms[NUMROOMS]) {
+    uint8_t upX = (rand() % rooms[0].width) + rooms[0].xpos;
+    uint8_t upY = (rand() % rooms[0].height) + rooms[0].ypos;
+    dungeon[upY][upX].value = '<';
+
+    uint8_t downX = (rand() % rooms[NUMROOMS-1].width) + rooms[NUMROOMS-1].xpos;
+    uint8_t downY = (rand() % rooms[NUMROOMS-1].height) + rooms[NUMROOMS-1].ypos;
+    dungeon[downY][downX].value = '>';
+}
