@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h> //for uint8_t, etc
 #include <math.h>
 #include <time.h>
 
@@ -16,6 +17,11 @@
 #define ROOM_SIZE_Y 1
 #define ROOM_POS_X 2
 #define ROOM_POS_Y 3
+
+struct material {
+    char value;
+    uint8_t hardness;
+};
 
 void printDungeon(char **dungeon);
 char **allocateDungeon();
@@ -192,6 +198,10 @@ void drawRoom(char **dungeon, int x, int y, int width, int height)
     }
 }
 
+    /*
+    A better implementation could keep track of which rooms were connected along the way
+    which would require checking which '.' belongs to which room and only connecting that room once
+    */
 void createCooridors(char **dungeon, int roomNum, int rooms[NUMROOMS][ROOMDATA]) {
     // basic idea is to keep adding to x using the provided formula
     // when the origin is equal to the destination then go to
