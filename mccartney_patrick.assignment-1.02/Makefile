@@ -6,4 +6,4 @@ generator: generator.c
 #da was sugguested but removed since it created 15 files
 
 clean:
-	rm -f generator *~
+	rm -f generator main *~
