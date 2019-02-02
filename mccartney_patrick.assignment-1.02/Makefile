@@ -1,4 +1,7 @@
-all: generator
+all: generator main
+
+main: main.c
+	gcc -ggdb3 -O0 -Q main.c -o main
 
 generator: generator.c
 	gcc -ggdb3 -O0 -Q generator.c -o generator -lm
