@@ -14,6 +14,7 @@
 #define ROOM_SIZE_Y 1
 #define ROOM_POS_X 2
 #define ROOM_POS_Y 3
+#define NUMSTAIRS 2
 
 struct material
 {
@@ -30,6 +31,11 @@ struct room
     uint8_t height;
 };
 
+struct stair {
+    uint8_t xpos;
+    uint8_t ypos;
+};
+
 void printDungeon(struct material **dungeon);
 struct material **allocateDungeon();
 void drawBlank(struct material **dungeon);
@@ -40,7 +46,7 @@ int isValid(char value);
 int canPlaceRoom(struct material **dungeon, int x, int y, int width, int height);
 void drawRoom(struct material **dungeon, int x, int y, int width, int height);
 void createCooridors(struct material **dungeon, int roomNum, struct room rooms[MAXROOMS]);
-void placeStairs(struct material **dungeon, struct room rooms[MAXROOMS]);
+void placeStairs(struct material **dungeon, struct room rooms[MAXROOMS], struct stair stairs[NUMSTAIRS]);
 
 int main(int argc, char *argv[])
 {
@@ -52,7 +58,8 @@ int main(int argc, char *argv[])
     struct room rooms[MAXROOMS];
     createRooms(dungeon, rooms);
     createCooridors(dungeon, 0, rooms);
-    placeStairs(dungeon, rooms);
+    struct stair stairs[NUMSTAIRS];
+    placeStairs(dungeon, rooms, stairs);
     printDungeon(dungeon);
     freeDungeon(dungeon);
     return 0;
@@ -250,7 +257,7 @@ void createCooridors(struct material **dungeon, int roomNum, struct room rooms[M
     }
 }
 
-void placeStairs(struct material **dungeon, struct room rooms[MAXROOMS])
+void placeStairs(struct material **dungeon, struct room rooms[MAXROOMS], struct stair stairs[NUMSTAIRS])
 {
     uint8_t upX = (rand() % rooms[0].width) + rooms[0].xpos;
     uint8_t upY = (rand() % rooms[0].height) + rooms[0].ypos;
