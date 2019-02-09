@@ -836,7 +836,7 @@ int save(dungeon_t dungeon)
 
   // file marker to denote type of file
   char *filetype = "RLG327-S2019";
-  if (!(fwrite(&filetype, sizeof(filetype), 1, f) == 1))
+  if (!(fwrite(&filetype, sizeof(filetype) - 1, 1, f) == 1))
   {
     fprintf(stderr, "Failed to write to filetype %s to %s\n", filetype, filepath);
     return -1;
@@ -927,8 +927,8 @@ int main(int argc, char *argv[])
 
   UNUSED(in_room);
 
-
-  if (argc == 2 && argv[1] != "--save" && arv[1] != "--load") {
+  if (argc == 2 && argv[1] != "--save" && argv[1] != "--load")
+  {
     seed = atoi(argv[1]);
   }
   else
@@ -946,16 +946,30 @@ int main(int argc, char *argv[])
 
   if (argc > 1)
   {
-    if (argv[1] == "--load")
+    int i;
+    for (i = 0; i < argc; i++)
     {
-      // load the specified dungeon
-    }
-    else if (argv[1] == "--save")
-    {
-      // generate then save dungeon
-      if (save(d))
+      if (argv[i] == "--load")
       {
-        return -1;
+        if (load(d))
+        {
+          fprintf(stderr, "Failed to load dungeon\n");
+
+          return 1;
+        }
+
+        // load the specified dungeon
+      }
+      else if (argv[i] == "--save")
+      {
+
+        // generate then save dungeon
+        if (save(d))
+        {
+          fprintf(stderr, "Failed to save dungeon\n");
+
+          return 1;
+        }
       }
     }
   }
