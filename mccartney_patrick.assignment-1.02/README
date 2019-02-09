@@ -1,0 +1,5 @@
+Uses the professor's solution to assignment 1.01 and modifies it to work for assignment 1.02.
+
+Pass the --save or --load flag (or both, in either order) to save or load from ~/.rlg/dungeon.
+
+When ran, the dungeon being saved/loaded will be displayed and then the program will exit.
