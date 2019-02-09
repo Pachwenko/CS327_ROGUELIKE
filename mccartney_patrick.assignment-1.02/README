@@ -1,4 +1,4 @@
-Uses the professor's solution to assignment 1.01 and modifies it to work for assignment 1.02.
+I started modifying the professor's code for this, but it turned out too troublesome. This is my code.
 
 Pass the --save or --load flag (or both, in either order) to save or load from ~/.rlg/dungeon.
 

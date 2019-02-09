@@ -875,9 +875,8 @@ int save(dungeon_t dungeon)
   char *filepath = malloc(sizeof(home) + sizeof("/.rlg327/dungeon") + 1);
   strcpy(filepath, home);
   strcat(filepath, "/.rlg327/dungeon");
-  printf("DUB: Filepath: %s\n", filepath);
   uint32_t version = 0;
-  uint32_t size = 12 + 4 + 4 + 2 + 1680 + (4 * dungeon.num_rooms) + (numUpStairs * 2) + 1 + (numDownStairs * 2);
+  uint32_t size = 1708 + (4 * dungeon.num_rooms) + (numUpStairs * 2) + (numDownStairs * 2);
   uint8_t playerposition[2] = {0, 0};
 
   FILE *f;
@@ -982,6 +981,90 @@ int save(dungeon_t dungeon)
   }
 
   free(filepath);
+  fclose(f);
+  return 0;
+}
+
+int load(dungeon_t *dungeon)
+{
+  char *home = getenv("HOME");
+  char *filepath = malloc(sizeof(home) + sizeof("/.rlg327/dungeon") + 1);
+  strcpy(filepath, home);
+  strcat(filepath, "/.rlg327/dungeon");
+
+  FILE *f;
+  if ((f = fopen(filepath, "r")) == NULL)
+  {
+    fprintf(stderr, "Error opening file at %s, exiting\n", filepath);
+    return -1;
+  }
+
+  char *filemarker;
+  fread(&filemarker, sizeof("RLG327-S2019") - 1, 1, f);
+
+  uint32_t version;
+  fread(&version, sizeof(version), 1, f);
+  version = be32toh(version);
+
+  uint32_t size;
+  fread(&size, sizeof(size), 1, f);
+  size = be32toh(version);
+
+  uint8_t pposx, pposy = 0;
+  fread(&pposx, sizeof(uint8_t), 1, f);
+  fread(&pposy, sizeof(uint8_t), 1, f);
+
+  // read the dungeon!
+  fread(dungeon, sizeof(uint8_t), 1680, f);
+
+  uint16_t numRooms;
+  fread(&numRooms, sizeof(uint16_t), 1, f);
+  numRooms = be16toh(numRooms);
+  memset(dungeon->rooms, 0, sizeof(dungeon->rooms) * numRooms); //copied from scaeffer's code
+
+
+  int i;
+  for (i = 0; i < numRooms; i++) {
+    uint8_t xpos, ypos, width, height = 0;
+    fread(&xpos, sizeof(uint8_t), 1, f);
+    fread(&ypos, sizeof(uint8_t), 1, f);
+    fread(&width, sizeof(uint8_t), 1, f);
+    fread(&height, sizeof(uint8_t), 1, f);
+
+    dungeon->num_rooms++;
+
+    dungeon->rooms[i].position[dim_x] = xpos; //OVERFLOW ERROR?
+    dungeon->rooms[i].position[dim_y] = ypos;
+    dungeon->rooms[i].size[dim_x] = width;
+    dungeon->rooms[i].size[dim_y] = height;
+  }
+
+  uint16_t numUpStairs;
+  fread(&numUpStairs, sizeof(uint16_t), 1, f);
+  numUpStairs = be16toh(numUpStairs);
+
+  for (i = 0; i < numUpStairs; i++) {
+    uint8_t xpos, ypos;
+    fread(&xpos, sizeof(uint8_t), 1, f);
+    fread(&ypos, sizeof(uint8_t), 1, f);
+
+    dungeon->map[ypos][xpos] = ter_stairs_up;
+  }
+
+  uint16_t numDownStairs;
+  fread(&numDownStairs, sizeof(uint16_t), 1, f);
+  numDownStairs = be16toh(numDownStairs);
+
+  for (i = 0; i < numDownStairs; i++) {
+    uint8_t xpos, ypos;
+    fread(&xpos, sizeof(uint8_t), 1, f);
+    fread(&ypos, sizeof(uint8_t), 1, f);
+
+    dungeon->map[ypos][xpos] = ter_stairs_down;
+  }
+
+  fclose(f);
+  free(filepath);
   return 0;
 }
 
@@ -1016,14 +1099,13 @@ int main(int argc, char *argv[])
     {
       if (!(strcmp(argv[i], "--load")))
       {
-        // if (load(d))
-        // {
-        //   fprintf(stderr, "Failed to load dungeon\n");
+        if (load(&d))
+        {
+          fprintf(stderr, "Failed to load dungeon\n");
 
-        //   return 1;
-        // }
+          return 1;
+        }
 
-        // load the specified dungeon
         render_dungeon(&d);
       }
       else if (!(strcmp(argv[i], "--save")))
