@@ -826,10 +826,6 @@ void init_dungeon(dungeon_t *d)
   empty_dungeon(d);
 }
 
-int getStairs(dungeon_t dungeon, stair_t *stairs, int *up, int *down)
-{
-}
-
 int save(dungeon_t dungeon)
 {
   // Scaheffer's code does not provide a data structure for stairs, so make one now
@@ -875,7 +871,6 @@ int save(dungeon_t dungeon)
   }
   // end retreiving stair info
 
-
   char *home = getenv("HOME");
   char *filepath = malloc(sizeof(home) + sizeof("/.rlg327/dungeon") + 1);
   strcpy(filepath, home);
@@ -920,7 +915,6 @@ int save(dungeon_t dungeon)
     return -1;
   }
 
-  int row, col = 0;
   for (row = 0; row < DUNGEON_Y; row++)
   {
     for (col = 0; col < DUNGEON_X; col++)
@@ -951,28 +945,44 @@ int save(dungeon_t dungeon)
   }
 
   //this implementation sucks but might work down the road nicely
-  for (i = 0; i < numDownStairs; i++)
+  for (i = 0; i < numUpStairs + numDownStairs; i++)
   {
-    if (!(fwrite(&stairs[i]->xpos, sizeof(*stairs[i]->xpos), 1, f)) == 1)
+    if (stairs[i].value == ter_stairs_up)
     {
-      fprintf(stderr, "Failed to write to a down stair %i %i to %s\n", stairs[i].xpos, stairs[i].ypos, filepath);
+      if (!((fwrite(&stairs[i].xpos, sizeof(stairs[i].xpos), 1, f)) == 1))
+      {
+        fprintf(stderr, "Failed to write to a upward stair xpos %i to %s\n", stairs[i].xpos, filepath);
+      }
+      if (!((fwrite(&stairs[i].ypos, sizeof(stairs[i].ypos), 1, f)) == 1))
+      {
+        fprintf(stderr, "Failed to write to a upward stair ypos %i to %s\n", stairs[i].xpos, filepath);
+      }
     }
   }
 
-  // if (!(fwrite(&numDownStairs, sizeof(numDownStairs), 1, f) == 1))
-  // {
-  //   fprintf(stderr, "Failed to write to numDownStairs %i to %s\n", numDownStairs, filepath);
-  //   return -1;
-  // }
+  if (!(fwrite(&numDownStairs, sizeof(numDownStairs), 1, f) == 1))
+  {
+    fprintf(stderr, "Failed to write to numDownStairs %i to %s\n", numDownStairs, filepath);
+    return -1;
+  }
 
-  // for (i = numDownStairs; i < numUpStairs + numDownStairs; i++)
-  // {
-  //   if (!(fwrite(&stairs[i], sizeof(stairs[i]), 1, f)) == 1)
-  //   {
-  //     fprintf(stderr, "Failed to write to an up stair %i %i to %s\n", stairs[i].xpos, stairs[i].ypos, filepath);
-  //   }
-  // }
+  for (i = 0; i < numDownStairs + numDownStairs; i++)
+  {
+    if (stairs[i].value == ter_stairs_down)
+    {
+      if (!((fwrite(&stairs[i].xpos, sizeof(stairs[i].xpos), 1, f)) == 1))
+      {
+        fprintf(stderr, "Failed to write to a down stair xpos %i to %s\n", stairs[i].xpos, filepath);
+      }
+      if (!((fwrite(&stairs[i].ypos, sizeof(stairs[i].ypos), 1, f)) == 1))
+      {
+        fprintf(stderr, "Failed to write to a down stair ypos %i to %s\n", stairs[i].xpos, filepath);
+      }
+    }
+  }
+
   free(filepath);
+  return 0;
 }
 
 int main(int argc, char *argv[])
@@ -983,7 +993,7 @@ int main(int argc, char *argv[])
 
   UNUSED(in_room);
 
-  if (argc == 2 && argv[1] != "--save" && argv[1] != "--load")
+  if (argc == 2 && (!(strcmp(argv[1], "--save")) && (!(strcmp(argv[1], "--load")))))
   {
     seed = atoi(argv[1]);
   }
@@ -998,25 +1008,25 @@ int main(int argc, char *argv[])
 
   init_dungeon(&d);
   gen_dungeon(&d);
-  render_dungeon(&d);
 
   if (argc > 1)
   {
     int i;
-    for (i = 0; i < argc; i++)
+    for (i = 1; i < argc; i++)
     {
-      if (argv[i] == "--load")
+      if (!(strcmp(argv[i], "--load")))
       {
-        if (load(d))
-        {
-          fprintf(stderr, "Failed to load dungeon\n");
+        // if (load(d))
+        // {
+        //   fprintf(stderr, "Failed to load dungeon\n");
 
-          return 1;
-        }
+        //   return 1;
+        // }
 
         // load the specified dungeon
+        render_dungeon(&d);
       }
-      else if (argv[i] == "--save")
+      else if (!(strcmp(argv[i], "--save")))
       {
 
         // generate then save dungeon
@@ -1026,6 +1036,7 @@ int main(int argc, char *argv[])
 
           return 1;
         }
+        render_dungeon(&d);
       }
     }
   }
