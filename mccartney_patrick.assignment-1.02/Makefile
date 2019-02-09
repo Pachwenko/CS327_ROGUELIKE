@@ -1,12 +1,45 @@
-all: generator main
+CC = gcc
+CXX = g++
+ECHO = echo
+RM = rm -f
 
-main: main.c
-	gcc -ggdb3 -O0 -Q main.c -o main
+TERM = "S2019"
 
-generator: generator.c
-	gcc -ggdb3 -O0 -Q generator.c -o generator -lm
+CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
+CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
 
-#da was sugguested but removed since it created 15 files
+LDFLAGS =
+
+BIN = rlg327
+OBJS = rlg327.o heap.o
+
+all: $(BIN) etags
+
+$(BIN): $(OBJS)
+	@$(ECHO) Linking $@
+	@$(CC) $^ -o $@ $(LDFLAGS)
+
+-include $(OBJS:.o=.d)
+
+%.o: %.c
+	@$(ECHO) Compiling $<
+	@$(CC) $(CFLAGS) -MMD -MF $*.d -c $<
+
+%.o: %.cpp
+	@$(ECHO) Compiling $<
+	@$(CXX) $(CXXFLAGS) -MMD -MF $*.d -c $<
+
+.PHONY: all clean clobber etags
 
 clean:
-	rm -f generator main *~
+	@$(ECHO) Removing all generated files
+	@$(RM) *.o $(BIN) *.d TAGS core vgcore.* gmon.out
+	rm -rf diffused.pgm seeded.pgm smoothed.pgm
+
+clobber: clean
+	@$(ECHO) Removing backup files
+	@$(RM) *~ \#* *pgm
+
+etags:
+	@$(ECHO) Updating TAGS
+	@etags *.[ch]
