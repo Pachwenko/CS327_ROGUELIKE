@@ -1,0 +1,5 @@
+Uses the professor's code with modifications to fit the assignment.s
+
+Pass the --save or --load flag (or both, in either order) to save or load from ~/.rlg/dungeon.
+
+When ran, the dungeon being saved/loaded will be displayed and then the program will exit.

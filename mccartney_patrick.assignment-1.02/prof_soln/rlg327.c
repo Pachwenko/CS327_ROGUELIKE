@@ -26,6 +26,8 @@
   _tmp;                          \
 })
 
+
+/* Added to make 1.02 assignment work */
 typedef struct stair
 {
   char value;
@@ -876,8 +878,11 @@ int save(dungeon_t dungeon)
   strcpy(filepath, home);
   strcat(filepath, "/.rlg327/dungeon");
   uint32_t version = 0;
+  version = htobe32(version);
   uint32_t size = 1708 + (4 * dungeon.num_rooms) + (numUpStairs * 2) + (numDownStairs * 2);
-  uint8_t playerposition[2] = {0, 0};
+  size = htobe32(size);
+  uint8_t playerx = dungeon.rooms[0].position[dim_x];
+  uint8_t playery = dungeon.rooms[0].position[dim_y];
 
   FILE *f;
   if ((f = fopen(filepath, "w")) == NULL)
@@ -907,10 +912,9 @@ int save(dungeon_t dungeon)
     return -1;
   }
 
-  //unsure if this will work or if we need to write each position 1 by 1
-  if (!(fwrite(&playerposition, sizeof(playerposition), 1, f) == 1))
+  if (!((fwrite(&playerx, sizeof(playerx), 1, f) == 1) || (fwrite(&playery, sizeof(playery), 1, f) == 1)))
   {
-    fprintf(stderr, "Failed to write the size %i, %i to %s\n", playerposition[0], playerposition[1], filepath);
+    fprintf(stderr, "Failed to write the size %i, %i to %s\n", playerx, playery, filepath);
     return -1;
   }
 
@@ -929,12 +933,10 @@ int save(dungeon_t dungeon)
   int i;
   for (i = 0; i < dungeon.num_rooms; i++)
   {
-    // TODO make sure thos writes in correct order
-    if (!(fwrite(&dungeon.rooms[i], sizeof(dungeon.rooms[i]), 1, f) == 1))
-    {
-      fprintf(stderr, "Failed to write a room to %s\n", filepath);
-      return -1;
-    }
+    fwrite(&dungeon.rooms[i].position[dim_x], sizeof(uint8_t), 1, f);
+    fwrite(&dungeon.rooms[i].position[dim_y], sizeof(uint8_t), 1, f);
+    fwrite(&dungeon.rooms[i].size[dim_x], sizeof(uint8_t), 1, f);
+    fwrite(&dungeon.rooms[i].size[dim_y], sizeof(uint8_t), 1, f);
   }
 
   if (!(fwrite(&numUpStairs, sizeof(numUpStairs), 1, f) == 1))
@@ -1015,7 +1017,14 @@ int load(dungeon_t *dungeon)
   fread(&pposy, sizeof(uint8_t), 1, f);
 
   // read the dungeon!
-  fread(dungeon, sizeof(uint8_t), 1680, f);
+  int row, col = 0;
+  for (row = 0; row < DUNGEON_Y; row++) {
+    for (col = 0; col < DUNGEON_X; col++) {
+      uint8_t hardness;
+      fread(&hardness, sizeof(hardness), 1, f);
+      dungeon->hardness[row][col] = hardness;
+    }
+  }
 
   uint16_t numRooms;
   fread(&numRooms, sizeof(uint16_t), 1, f);
@@ -1071,26 +1080,28 @@ int load(dungeon_t *dungeon)
 int main(int argc, char *argv[])
 {
   dungeon_t d;
-  struct timeval tv;
-  uint32_t seed;
+  // struct timeval tv;
+  // uint32_t seed;
 
   UNUSED(in_room);
 
-  if (argc == 2 && (!(strcmp(argv[1], "--save")) && (!(strcmp(argv[1], "--load")))))
-  {
-    seed = atoi(argv[1]);
-  }
-  else
-  {
-    gettimeofday(&tv, NULL);
-    seed = (tv.tv_usec ^ (tv.tv_sec << 20)) & 0xffffffff;
-  }
+  // if (argc == 2 && (!(strcmp(argv[1], "--save")) && (!(strcmp(argv[1], "--load")))))
+  // {
+  //   seed = atoi(argv[1]);
+  // }
+  // else
+  // {
+  //   gettimeofday(&tv, NULL);
+  //   seed = (tv.tv_usec ^ (tv.tv_sec << 20)) & 0xffffffff;
+  // }
 
-  printf("Using seed: %u\n", seed);
-  srand(seed);
+  // printf("Using seed: %u\n", seed);
+  // srand(seed);
 
   init_dungeon(&d);
   gen_dungeon(&d);
+
+
 
   if (argc > 1)
   {
