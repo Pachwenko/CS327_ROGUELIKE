@@ -1017,14 +1017,16 @@ int load(dungeon_t *dungeon)
   fread(&pposy, sizeof(uint8_t), 1, f);
 
   // read the dungeon!
-  int row, col = 0;
-  for (row = 0; row < DUNGEON_Y; row++) {
-    for (col = 0; col < DUNGEON_X; col++) {
-      uint8_t hardness;
-      fread(&hardness, sizeof(hardness), 1, f);
-      dungeon->hardness[row][col] = hardness;
-    }
-  }
+  fread(dungeon->hardness, sizeof(uint8_t), 1680, f);
+
+  // int row, col = 0;
+  // for (row = 0; row < DUNGEON_Y; row++) {
+  //   for (col = 0; col < DUNGEON_X; col++) {
+  //     uint8_t hardness;
+  //     fread(&hardness, sizeof(hardness), 1, f);
+  //     dungeon->hardness[row][col] = hardness;
+  //   }
+  // }
 
   uint16_t numRooms;
   fread(&numRooms, sizeof(uint16_t), 1, f);
