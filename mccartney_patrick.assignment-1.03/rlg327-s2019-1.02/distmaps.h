@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#include "heap.h"
+
 
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
@@ -63,12 +65,8 @@ typedef struct dungeon
   pair_t pc;
 } dungeon_t;
 
-#include "heap.h"
 
-void generate_distmaps(dungeon_t *d, pair_t playerpos);
-
-
-
+void generate_distmaps(dungeon_t *d);
 
 
 #endif
