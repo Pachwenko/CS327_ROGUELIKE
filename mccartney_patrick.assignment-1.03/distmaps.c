@@ -70,7 +70,7 @@ static int32_t corridor_path_cmp(const void *key, const void *with)
   return ((corridor_path_t *)key)->cost - ((corridor_path_t *)with)->cost;
 }
 
-static int tunneling_dijkstras(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON_X])
+static int tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
@@ -181,7 +181,7 @@ static int tunneling_dijkstras(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON
   return 0;
 }
 
-static void tunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON_X])
+static void tunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   if (tunneling_dijkstras(d, distmap))
   {
@@ -193,7 +193,7 @@ static void tunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON_
   {
     for (x = 0; x < DUNGEON_X; x++)
     {
-      if (y == 0 || y == DUNGEON_Y - 1 || x == 0 || x == DUNGEON_X - 1)
+      if (distmap[y][x] == INT_MAX)
       {
         printf("X");
       }
@@ -210,7 +210,7 @@ static void tunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON_
   }
 }
 
-static int non_tunneling_dijkstras(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON_X])
+static int non_tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
@@ -321,7 +321,7 @@ static int non_tunneling_dijkstras(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUN
   return 0;
 }
 
-static void nontunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON_X])
+static void nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   if (non_tunneling_dijkstras(d, distmap))
   {
@@ -337,7 +337,7 @@ static void nontunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGE
       {
         printf(" ");
       }
-      else if (distmap[y][x] > INT_MAX) {
+      else if (distmap[y][x] > INT_MAX || distmap[y][x] < 0) {
         printf("X");
       }
       else if (y == d->pc[dim_y] && x == d->pc[dim_x])
@@ -346,7 +346,7 @@ static void nontunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGE
       }
       else
       {
-        printf("%u", distmap[y][x] % 10);
+        printf("%d", distmap[y][x] % 10);
       }
     }
     printf("\n");
@@ -356,14 +356,9 @@ static void nontunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGE
 void generate_distmaps(dungeon_t *d)
 {
   // 2d int array takes ~6kb of memory on the stack so it's not too bad
-  uint32_t distmap[DUNGEON_Y][DUNGEON_X];
-  uint32_t distmap2[DUNGEON_Y][DUNGEON_X];
+  int32_t distmap[DUNGEON_Y][DUNGEON_X];
+  int32_t distmap2[DUNGEON_Y][DUNGEON_X];
 
-  uint32_t test = INT_MAX;
-  printf("\n Intmax: %u \n", test);
-  printf("\n testval: %u \n", test + 1);
-  test++;
-  printf("\n testval+1: %u \n", test);
   printf("\n");
   nontunneling_distmap(d, distmap2);
   printf("\n");
