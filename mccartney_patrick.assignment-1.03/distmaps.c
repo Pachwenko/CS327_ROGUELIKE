@@ -70,6 +70,14 @@ static int32_t corridor_path_cmp(const void *key, const void *with)
   return ((corridor_path_t *)key)->cost - ((corridor_path_t *)with)->cost;
 }
 
+
+
+// Modified dijkstra_corridor from rlg327.c
+// Initialized to INT_MAX and adds all points to the heap as long as
+// their map isnt of an immuteable type and hardness isnt 255
+//
+// Sets the distance from every point to the PC's position and stores it
+// in the distmap array
 static int tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
@@ -181,6 +189,9 @@ static int tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_
   return 0;
 }
 
+// Method which calls tunneling_dijkstra and outputs the results to
+// standard output where X values represent infinity/unable to reach
+// also stores distance map in the distmap array
 static void tunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   if (tunneling_dijkstras(d, distmap))
@@ -210,6 +221,12 @@ static void tunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X
   }
 }
 
+// Modified dijkstra_corridor from rlg327.c
+// Initialized to INT_MAX and adds all points to the heap as long as
+// the hardness at that point is 0
+//
+// Sets the distance from every cooridor/room poisition to the PC's position
+// and stores it in the distmap array
 static int non_tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
@@ -321,6 +338,9 @@ static int non_tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNG
   return 0;
 }
 
+// outputs the non-tunneling monster distmap to standard output and stores
+// the distance values in the distmap array. Any infinite value or negative
+// value is output as a "X".
 static void nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   if (non_tunneling_dijkstras(d, distmap))
@@ -352,6 +372,8 @@ static void nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEO
   }
 }
 
+// interface for creating distance maps for tunneling and non-tunneling
+// monsters. Holds the distance map arrays. Only useful for assignment1.03
 void generate_distmaps(dungeon_t *d)
 {
   // 2d int array takes ~6kb of memory on the stack so it's not too bad
