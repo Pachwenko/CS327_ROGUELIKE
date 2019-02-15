@@ -1,50 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
-#include <endian.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <limits.h>
-#include <sys/time.h>
-#include <assert.h>
-#include <errno.h>
 
 #include "heap.h"
-
-#define DUMP_HARDNESS_IMAGES 0
-
-/* Returns true if random float in [0,1] is less than *
- * numerator/denominator.  Uses only integer math.    */
-#define rand_under(numerator, denominator) \
-  (rand() < ((RAND_MAX / denominator) * numerator))
-
-/* Returns random integer in [min, max]. */
-#define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
-#define UNUSED(f) ((void)f)
-
-#define malloc(size) ({          \
-  void *_tmp;                    \
-  assert((_tmp = malloc(size))); \
-  _tmp;                          \
-})
-
-typedef struct corridor_path
-{
-  heap_node_t *hn;
-  uint8_t pos[2];
-  uint8_t from[2];
-  int32_t cost;
-} corridor_path_t;
-
-typedef enum dim
-{
-  dim_x,
-  dim_y,
-  num_dims
-} dim_t;
-
-typedef int8_t pair_t[num_dims];
 
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
@@ -77,6 +36,22 @@ typedef enum __attribute__((__packed__)) terrain_type
   ter_stairs_down
 } terrain_type_t;
 
+typedef struct corridor_path
+{
+  heap_node_t *hn;
+  uint8_t pos[2];
+  int32_t cost;
+} corridor_path_t;
+
+typedef enum dim
+{
+  dim_x,
+  dim_y,
+  num_dims
+} dim_t;
+
+typedef int8_t pair_t[num_dims];
+
 typedef struct room
 {
   pair_t position;
@@ -105,7 +80,7 @@ static int32_t corridor_path_cmp(const void *key, const void *with)
   return ((corridor_path_t *)key)->cost - ((corridor_path_t *)with)->cost;
 }
 
-static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
+static void non_tunneling_monstermap(dungeon_t *d, pair_t to, pair_t from)
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
@@ -132,8 +107,6 @@ static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
       path[y][x].cost = INT_MAX;
     }
   }
-
-  path[from[dim_y]][from[dim_x]].cost = 0;
 
   heap_init(&h, corridor_path_cmp, NULL);
 
@@ -163,15 +136,13 @@ static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
     {
       path[p->pos[dim_y] - 1][p->pos[dim_x]].cost =
           p->cost + hardnesspair(p->pos);
-      path[p->pos[dim_y] - 1][p->pos[dim_x]].from[dim_y] = p->pos[dim_y];
-      path[p->pos[dim_y] - 1][p->pos[dim_x]].from[dim_x] = p->pos[dim_x];
       heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1]
                                            [p->pos[dim_x]]
                                                .hn);
 
       // store cost in your output array
       // actually store both maps in an array
-      // 
+      //
       //
       //
     }
@@ -181,8 +152,6 @@ static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
     {
       path[p->pos[dim_y]][p->pos[dim_x] - 1].cost =
           p->cost + hardnesspair(p->pos);
-      path[p->pos[dim_y]][p->pos[dim_x] - 1].from[dim_y] = p->pos[dim_y];
-      path[p->pos[dim_y]][p->pos[dim_x] - 1].from[dim_x] = p->pos[dim_x];
       heap_decrease_key_no_replace(&h, path[p->pos[dim_y]]
                                            [p->pos[dim_x] - 1]
                                                .hn);
@@ -193,23 +162,38 @@ static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
     {
       path[p->pos[dim_y]][p->pos[dim_x] + 1].cost =
           p->cost + hardnesspair(p->pos);
-      path[p->pos[dim_y]][p->pos[dim_x] + 1].from[dim_y] = p->pos[dim_y];
-      path[p->pos[dim_y]][p->pos[dim_x] + 1].from[dim_x] = p->pos[dim_x];
       heap_decrease_key_no_replace(&h, path[p->pos[dim_y]]
                                            [p->pos[dim_x] + 1]
                                                .hn);
     }
+
+    // check if path at y+1 and x exists in the heap
+    // then compare to see if path at y+1 and x costs more than the current cost of p
     if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) &&
         (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost >
          p->cost + hardnesspair(p->pos)))
     {
-      path[p->pos[dim_y] + 1][p->pos[dim_x]].cost =
-          p->cost + hardnesspair(p->pos);
-      path[p->pos[dim_y] + 1][p->pos[dim_x]].from[dim_y] = p->pos[dim_y];
-      path[p->pos[dim_y] + 1][p->pos[dim_x]].from[dim_x] = p->pos[dim_x];
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1]
-                                           [p->pos[dim_x]]
-                                               .hn);
+
+      // at y+1,  x set the cost equal to the current cost plus the hardness at that point
+      path[p->pos[dim_y] + 1][p->pos[dim_x]].cost = p->cost + hardnesspair(p->pos);
+
+      // TODO Store it in an array such as distmap[DUNGEON_Y][DUNGEON_X]
+
+
+
+
+      // delete it from the heap
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x]].hn);
     }
   }
+}
+
+void generate_distmaps(dungeon_t *d, pair_t playerpos)
+{
+  // make all distmaps in data structures and print them accordingly
+  // TODO call dijkstras on all corridors and store them in an array
+  non_tunneling_monstermap(d, playerpos);
+
+  //TODO call dijstras on all points in the dungeon
+
 }
