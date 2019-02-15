@@ -11,6 +11,7 @@
 #include <errno.h>
 
 #include "heap.h"
+#include "distmaps.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
@@ -144,7 +145,7 @@ static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
     }
     initialized = 1;
   }
-  
+
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
       path[y][x].cost = INT_MAX;
@@ -243,7 +244,7 @@ static void dijkstra_corridor_inv(dungeon_t *d, pair_t from, pair_t to)
     }
     initialized = 1;
   }
-  
+
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
       path[y][x].cost = INT_MAX;
@@ -453,7 +454,7 @@ static int smooth_hardness(dungeon_t *d)
   fwrite(&hardness, sizeof (hardness), 1, out);
   fclose(out);
 #endif
-  
+
   /* Diffuse the vaules to fill the space */
   while (head) {
     x = head->x;
@@ -648,7 +649,7 @@ static void place_stairs(dungeon_t *d)
            (p[dim_x] = rand_range(1, DUNGEON_X - 2)) &&
            ((mappair(p) < ter_floor)                 ||
             (mappair(p) > ter_stairs)))
-      
+
       ;
     mappair(p) = ter_stairs_up;
   } while (rand_under(2, 4));
@@ -662,7 +663,7 @@ static int make_rooms(dungeon_t *d)
     ;
   d->num_rooms = i;
   d->rooms = malloc(sizeof (*d->rooms) * d->num_rooms);
-  
+
   for (i = 0; i < d->num_rooms; i++) {
     d->rooms[i].size[dim_x] = ROOM_MIN_X;
     d->rooms[i].size[dim_y] = ROOM_MIN_Y;
@@ -1038,7 +1039,7 @@ int read_rooms(dungeon_t *d, FILE *f)
 
       exit(-1);
     }
-        
+
 
     /* After reading each room, we need to reconstruct them in the dungeon. */
     for (y = d->rooms[i].position[dim_y];
@@ -1123,7 +1124,7 @@ int read_dungeon(dungeon_t *d, char *file)
 
   fread(&d->pc[dim_x], 1, 1, f);
   fread(&d->pc[dim_y], 1, 1, f);
-  
+
   read_dungeon_map(d, f);
 
   read_rooms(d, f);
@@ -1264,7 +1265,7 @@ int main(int argc, char *argv[])
    * And the final switch, '--image', allows me to create a dungeon *
    * from a PGM image, so that I was able to create those more      *
    * interesting test dungeons for you.                             */
- 
+
  if (argc > 1) {
     for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
       if (argv[i][0] == '-') { /* All switches start with a dash */
@@ -1390,6 +1391,8 @@ int main(int argc, char *argv[])
       free(save_file);
     }
   }
+
+  generate_distmaps(&d);
 
   delete_dungeon(&d);
 

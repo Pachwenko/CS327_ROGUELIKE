@@ -7,16 +7,7 @@
 
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
-#define MIN_ROOMS 6
-#define MAX_ROOMS 10
-#define ROOM_MIN_X 4
-#define ROOM_MIN_Y 3
-#define ROOM_MAX_X 20
-#define ROOM_MAX_Y 15
-#define SAVE_DIR ".rlg327"
-#define DUNGEON_SAVE_FILE "dungeon"
-#define DUNGEON_SAVE_SEMANTIC "RLG327-" TERM
-#define DUNGEON_SAVE_VERSION 0U
+
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
@@ -205,46 +196,46 @@ static void tunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X])
   }
 }
 
-static void nontunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X]) {
-  int y, x;
+// static void nontunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X]) {
+//   int y, x;
 
-  // get the location of all cooridors and pass those to dijkstras
-  // first, figure out how many pair_t's to allocate for our array
-  int numCooridors = 0;
-  for (y = 0; y < DUNGEON_Y; y++) {
-    for (x = 0; x < DUNGEON_X; x++) {
-      if (d->map[y][x] == ter_floor_hall) {
-        numCooridors++;
-      }
-    }
-  }
-  // pair_t cooridors[numCooridors];
-  // int index = 0;
-  // for (y = 0; y < DUNGEON_Y; y++) {
-  //   for (x = 0; x < DUNGEON_X; x++) {
-  //     if (d->map[y][x] == ter_floor_hall) {
-  //       pair_t pos;
-  //       pos[dim_y] = y;
-  //       pos[dim_x] = x;
-  //       if (tunneling_dijkstras(d, distmap)) {
-  //         fprintf(stderr, "Error creating non-tunneling monster's distmap");
-  //       }
-  //       printf("%d", distmap[y][x] % 10);
-  //     } else {
-  //       printf(" ");
-  //     }
-  //   }
-  //   printf("\n");
-  // }
-}
+//   // get the location of all cooridors and pass those to dijkstras
+//   // first, figure out how many pair_t's to allocate for our array
+//   int numCooridors = 0;
+//   for (y = 0; y < DUNGEON_Y; y++) {
+//     for (x = 0; x < DUNGEON_X; x++) {
+//       if (d->map[y][x] == ter_floor_hall) {
+//         numCooridors++;
+//       }
+//     }
+//   }
+//   pair_t cooridors[numCooridors];
+//   int index = 0;
+//   for (y = 0; y < DUNGEON_Y; y++) {
+//     for (x = 0; x < DUNGEON_X; x++) {
+//       if (d->map[y][x] == ter_floor_hall) {
+//         pair_t pos;
+//         pos[dim_y] = y;
+//         pos[dim_x] = x;
+//         if (tunneling_dijkstras(d, distmap)) {
+//           fprintf(stderr, "Error creating non-tunneling monster's distmap");
+//         }
+//         printf("%d", distmap[y][x] % 10);
+//       } else {
+//         printf(" ");
+//       }
+//     }
+//     printf("\n");
+//   }
+// }
 
 void generate_distmaps(dungeon_t *d)
 {
   // make all distmaps in data structures and print them accordingly
   // 2d int array takes ~6kb of memory on the stack so not too bad
   int distmap[DUNGEON_Y][DUNGEON_X];
-  int distmap2[DUNGEON_Y][DUNGEON_X];
+  //int distmap2[DUNGEON_Y][DUNGEON_X];
 
-  //nontunneling_distmap(d, distmap2);
   tunneling_distmap(d, distmap);
+  // nontunneling_distmap(d, distmap2);
 }
