@@ -80,19 +80,16 @@ static int32_t corridor_path_cmp(const void *key, const void *with)
   return ((corridor_path_t *)key)->cost - ((corridor_path_t *)with)->cost;
 }
 
-static int tunneling_dijkstras(dungeon_t *d, pair_t from, int distmap[DUNGEON_Y][DUNGEON_X])
+static int tunneling_dijkstras(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X])
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
   heap_t h;
   uint32_t x, y;
 
-  if (!initialized)
-  {
-    for (y = 0; y < DUNGEON_Y; y++)
-    {
-      for (x = 0; x < DUNGEON_X; x++)
-      {
+  if (!initialized) {
+    for (y = 0; y < DUNGEON_Y; y++) {
+      for (x = 0; x < DUNGEON_X; x++) {
         path[y][x].pos[dim_y] = y;
         path[y][x].pos[dim_x] = x;
       }
@@ -100,26 +97,21 @@ static int tunneling_dijkstras(dungeon_t *d, pair_t from, int distmap[DUNGEON_Y]
     initialized = 1;
   }
 
-  for (y = 0; y < DUNGEON_Y; y++)
-  {
-    for (x = 0; x < DUNGEON_X; x++)
-    {
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
       path[y][x].cost = INT_MAX;
     }
   }
 
+  path[d->pc[dim_y]][d->pc[dim_x]].cost = 0;
+
   heap_init(&h, corridor_path_cmp, NULL);
 
-  for (y = 0; y < DUNGEON_Y; y++)
-  {
-    for (x = 0; x < DUNGEON_X; x++)
-    {
-      if (mapxy(x, y) != ter_wall_immutable)
-      {
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if (mapxy(x, y) != ter_wall_immutable) {
         path[y][x].hn = heap_insert(&h, &path[y][x]);
-      }
-      else
-      {
+      } else {
         path[y][x].hn = NULL;
       }
     }
@@ -181,7 +173,7 @@ static int tunneling_dijkstras(dungeon_t *d, pair_t from, int distmap[DUNGEON_Y]
     }
   }
 
-  // set the distmap now that we have the
+  // set the distmap now that we have it saved
   for (y = 0; y < DUNGEON_Y; y++)
   {
     for (x = 0; x < DUNGEON_X; x++)
@@ -194,18 +186,20 @@ static int tunneling_dijkstras(dungeon_t *d, pair_t from, int distmap[DUNGEON_Y]
 
 static void tunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X])
 {
+  if (tunneling_dijkstras(d, distmap)) {
+    fprintf(stderr, "Error creating tunneling monster's distmap");
+  }
+
   int y, x;
   for (y = 0; y < DUNGEON_Y; y++)
   {
     for (x = 0; x < DUNGEON_X; x++)
     {
-      pair_t pos;
-      pos[dim_y] = y;
-      pos[dim_x] = x;
-      if (tunneling_dijkstras(d, pos, distmap)) {
-        fprintf(stderr, "Error creating tunneling monster's distmap");
+      if (y == 0 || y == DUNGEON_Y - 1 || x == 0 || x == DUNGEON_X - 1) {
+        printf("X");
+      } else {
+        printf("%d", distmap[y][x] % 10);
       }
-      printf("%d", distmap[y][x] % 10);
     }
     printf("\n");
   }
@@ -215,24 +209,30 @@ static void nontunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X]
   int y, x;
 
   // get the location of all cooridors and pass those to dijkstras
-
+  // first, figure out how many pair_t's to allocate for our array
+  int numCooridors = 0;
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
-      if (d->map[y][x] == ter_floor_hall)
+      if (d->map[y][x] == ter_floor_hall) {
+        numCooridors++;
+      }
     }
   }
-
-  for (y = 0; y < DUNGEON_Y; y++)
-  {
-    for (x = 0; x < DUNGEON_X; x++)
-    {
-      pair_t pos;
-      pos[dim_y] = y;
-      pos[dim_x] = x;
-      if (tunneling_dijkstras(d, pos, distmap)) {
-        fprintf(stderr, "Error creating tunneling monster's distmap");
+  pair_t cooridors[numCooridors];
+  int index = 0;
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if (d->map[y][x] == ter_floor_hall) {
+        pair_t pos;
+        pos[dim_y] = y;
+        pos[dim_x] = x;
+        if (tunneling_dijkstras(d, distmap)) {
+          fprintf(stderr, "Error creating non-tunneling monster's distmap");
+        }
+        printf("%d", distmap[y][x] % 10);
+      } else {
+        printf(" ");
       }
-      printf("%d", distmap[y][x] % 10);
     }
     printf("\n");
   }
@@ -243,7 +243,8 @@ void generate_distmaps(dungeon_t *d)
   // make all distmaps in data structures and print them accordingly
   // 2d int array takes ~6kb of memory on the stack so not too bad
   int distmap[DUNGEON_Y][DUNGEON_X];
+  int distmap2[DUNGEON_Y][DUNGEON_X];
 
   tunneling_distmap(d, distmap);
-  nontunneling_distmap(d, distmap);
+  nontunneling_distmap(d, distmap2);
 }
