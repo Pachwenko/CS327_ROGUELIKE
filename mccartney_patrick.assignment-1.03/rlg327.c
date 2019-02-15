@@ -702,8 +702,10 @@ void render_dungeon(dungeon_t *d)
       } else {
         switch (mappair(p)) {
         case ter_wall:
-        case ter_wall_immutable:
           putchar(' ');
+          break;
+        case ter_wall_immutable:
+          putchar('=');
           break;
         case ter_floor:
         case ter_floor_room:
