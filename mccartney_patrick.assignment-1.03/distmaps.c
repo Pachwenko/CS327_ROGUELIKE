@@ -333,11 +333,10 @@ static void nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEO
   {
     for (x = 0; x < DUNGEON_X; x++)
     {
-      if (distmap[y][x] == INT_MAX)
-      {
+      if (d->map[y][x] == ter_wall || d->map[y][x] == ter_wall_immutable) {
         printf(" ");
       }
-      else if (distmap[y][x] > INT_MAX || distmap[y][x] < 0) {
+      else if (distmap[y][x] >= INT_MAX || distmap[y][x] < 0) {
         printf("X");
       }
       else if (y == d->pc[dim_y] && x == d->pc[dim_x])
