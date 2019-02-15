@@ -80,7 +80,7 @@ static int32_t corridor_path_cmp(const void *key, const void *with)
   return ((corridor_path_t *)key)->cost - ((corridor_path_t *)with)->cost;
 }
 
-static int tunneling_dijkstras(dungeon_t *d, pair_t from)
+static int tunneling_dijkstras(dungeon_t *d, pair_t from, int distmap[DUNGEON_Y][DUNGEON_X])
 {
   static corridor_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
@@ -129,86 +129,121 @@ static int tunneling_dijkstras(dungeon_t *d, pair_t from)
   {
     p->hn = NULL;
 
-    // make 4 more of these blocks for the other positions we check
-    if ((path[p->pos[dim_y] - 1][p->pos[dim_x]].hn) &&
-        (path[p->pos[dim_y] - 1][p->pos[dim_x]].cost >
-         p->cost + hardnesspair(p->pos)))
+    // bassically check if the current cost is more than at a nearby position
+    // if so update the cost
+    if ((path[p->pos[dim_y] - 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x]].cost > p->cost + hardnesspair(p->pos)))
     {
-      path[p->pos[dim_y] - 1][p->pos[dim_x]].cost =
-          p->cost + hardnesspair(p->pos);
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1]
-                                           [p->pos[dim_x]]
-                                               .hn);
-
-      // store cost in your output array
-      // actually store both maps in an array
-      //
-      //
-      //
+      // check [y-1][x]
+      path[p->pos[dim_y] - 1][p->pos[dim_x]].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x]].hn);
     }
-    if ((path[p->pos[dim_y]][p->pos[dim_x] - 1].hn) &&
-        (path[p->pos[dim_y]][p->pos[dim_x] - 1].cost >
-         p->cost + hardnesspair(p->pos)))
+    if ((path[p->pos[dim_y]][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y]][p->pos[dim_x] - 1].cost > p->cost + hardnesspair(p->pos)))
     {
-      path[p->pos[dim_y]][p->pos[dim_x] - 1].cost =
-          p->cost + hardnesspair(p->pos);
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]]
-                                           [p->pos[dim_x] - 1]
-                                               .hn);
+      // check [y][x-1]
+      path[p->pos[dim_y]][p->pos[dim_x] - 1].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]][p->pos[dim_x] - 1].hn);
     }
-    if ((path[p->pos[dim_y]][p->pos[dim_x] + 1].hn) &&
-        (path[p->pos[dim_y]][p->pos[dim_x] + 1].cost >
-         p->cost + hardnesspair(p->pos)))
+    if ((path[p->pos[dim_y]][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y]][p->pos[dim_x] + 1].cost > p->cost + hardnesspair(p->pos)))
     {
-      path[p->pos[dim_y]][p->pos[dim_x] + 1].cost =
-          p->cost + hardnesspair(p->pos);
-      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]]
-                                           [p->pos[dim_x] + 1]
-                                               .hn);
+      // check [y][x+1]
+      path[p->pos[dim_y]][p->pos[dim_x] + 1].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y]][p->pos[dim_x] + 1].hn);
     }
-
-    // check if path at y+1 and x exists in the heap
-    // then compare to see if path at y+1 and x costs more than the current cost of p
-    if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) &&
-        (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost >
-         p->cost + hardnesspair(p->pos)))
+    if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost > p->cost + hardnesspair(p->pos)))
     {
-
-      // at y+1,  x set the cost equal to the current cost plus the hardness at that point
+      // check [y+1][x]
       path[p->pos[dim_y] + 1][p->pos[dim_x]].cost = p->cost + hardnesspair(p->pos);
-
-      // TODO Store it in an array such as distmap[DUNGEON_Y][DUNGEON_X]
-
-
-
-
-      // delete it from the heap
       heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x]].hn);
+    }
+    if ((path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost > p->cost + hardnesspair(p->pos)))
+    {
+      // check [y+1][x-1]
+      path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].hn);
+    }
+    if ((path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost > p->cost + hardnesspair(p->pos)))
+    {
+      // check [y+1][x+1]
+      path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn);
+    }
+    if ((path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost + hardnesspair(p->pos)))
+    {
+      // check [y-1][x-1]
+      path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn);
+    }
+    if ((path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost > p->cost + hardnesspair(p->pos)))
+    {
+      // check [y-1][x+1]
+      path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost = p->cost + hardnesspair(p->pos);
+      heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn);
+    }
+  }
+
+  // set the distmap now that we have the
+  for (y = 0; y < DUNGEON_Y; y++)
+  {
+    for (x = 0; x < DUNGEON_X; x++)
+    {
+      distmap[y][x] = path[y][x].cost;
     }
   }
   return 0;
 }
 
-static int tunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X]) {
+static void tunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X])
+{
   int y, x;
-  for (y = 0; y < DUNGEON_Y; y++) {
-    for (x = 0; x < DUNGEON_X; x++) {
+  for (y = 0; y < DUNGEON_Y; y++)
+  {
+    for (x = 0; x < DUNGEON_X; x++)
+    {
       pair_t pos;
       pos[dim_y] = y;
       pos[dim_x] = x;
-      distmap[y][x] = tunneling_dijkstras(d, pos);
+      if (tunneling_dijkstras(d, pos, distmap)) {
+        fprintf(stderr, "Error creating tunneling monster's distmap");
+      }
       printf("%d", distmap[y][x] % 10);
     }
+    printf("\n");
   }
-  return 0;
+}
+
+static void nontunneling_distmap(dungeon_t *d, int distmap[DUNGEON_Y][DUNGEON_X]) {
+  int y, x;
+
+  // get the location of all cooridors and pass those to dijkstras
+
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if (d->map[y][x] == ter_floor_hall)
+    }
+  }
+
+  for (y = 0; y < DUNGEON_Y; y++)
+  {
+    for (x = 0; x < DUNGEON_X; x++)
+    {
+      pair_t pos;
+      pos[dim_y] = y;
+      pos[dim_x] = x;
+      if (tunneling_dijkstras(d, pos, distmap)) {
+        fprintf(stderr, "Error creating tunneling monster's distmap");
+      }
+      printf("%d", distmap[y][x] % 10);
+    }
+    printf("\n");
+  }
 }
 
 void generate_distmaps(dungeon_t *d)
 {
   // make all distmaps in data structures and print them accordingly
-  // TODO call dijkstras on all corridors and store them in an array
+  // 2d int array takes ~6kb of memory on the stack so not too bad
   int distmap[DUNGEON_Y][DUNGEON_X];
 
   tunneling_distmap(d, distmap);
-
+  nontunneling_distmap(d, distmap);
 }
