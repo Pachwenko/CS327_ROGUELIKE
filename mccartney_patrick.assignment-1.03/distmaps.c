@@ -99,7 +99,7 @@ static int tunneling_dijkstras(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGEON
   {
     for (x = 0; x < DUNGEON_X; x++)
     {
-      if (mapxy(x, y) != ter_wall_immutable)
+      if (mapxy(x, y) != ter_wall_immutable && hardnessxy(x, y) != 255)
       {
         path[y][x].hn = heap_insert(&h, &path[y][x]);
       }
@@ -337,13 +337,16 @@ static void nontunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGE
       {
         printf(" ");
       }
+      else if (distmap[y][x] > INT_MAX) {
+        printf("X");
+      }
       else if (y == d->pc[dim_y] && x == d->pc[dim_x])
       {
         printf("@");
       }
       else
       {
-        printf("%d", distmap[y][x] % 10);
+        printf("%u", distmap[y][x] % 10);
       }
     }
     printf("\n");
@@ -352,13 +355,17 @@ static void nontunneling_distmap(dungeon_t *d, uint32_t distmap[DUNGEON_Y][DUNGE
 
 void generate_distmaps(dungeon_t *d)
 {
-  // make all distmaps in data structures and print them accordingly
-  // 2d int array takes ~6kb of memory on the stack so not too bad
+  // 2d int array takes ~6kb of memory on the stack so it's not too bad
   uint32_t distmap[DUNGEON_Y][DUNGEON_X];
   uint32_t distmap2[DUNGEON_Y][DUNGEON_X];
 
-  printf("\n");
-  tunneling_distmap(d, distmap);
+  uint32_t test = INT_MAX;
+  printf("\n Intmax: %u \n", test);
+  printf("\n testval: %u \n", test + 1);
+  test++;
+  printf("\n testval+1: %u \n", test);
   printf("\n");
   nontunneling_distmap(d, distmap2);
+  printf("\n");
+  tunneling_distmap(d, distmap);
 }
