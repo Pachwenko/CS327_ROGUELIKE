@@ -1,0 +1,8 @@
+Assignment 1.03 Based upon Professor Schaeffer's 1.02 solution code.
+
+First output is the dungeon which is loaded in memory (save, load, seed switches all functional).
+Second output is the distance map for non-tunneling monsters.
+Third output is the distance map for tunneling monsters.
+X in the distance maps represents a value of infinity (INT32_MAX / 10). All other values are displayed % 10.
+
+99% of my code is in distmap.c and distmap.h. Only one function is visible to rlg327.c.

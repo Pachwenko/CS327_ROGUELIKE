@@ -7,6 +7,7 @@
 
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
+#define INFINITY 214748364
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
@@ -93,7 +94,7 @@ static int tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_
       {
         path[y][x].pos[dim_y] = y;
         path[y][x].pos[dim_x] = x;
-        path[y][x].cost = INT_MAX;
+        path[y][x].cost = INFINITY;
       }
     }
     initialized = 1;
@@ -204,7 +205,7 @@ static void tunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X
   {
     for (x = 0; x < DUNGEON_X; x++)
     {
-      if (distmap[y][x] == INT_MAX)
+      if (distmap[y][x] == INFINITY)
       {
         printf("X");
       }
@@ -242,7 +243,7 @@ static int non_tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNG
       {
         path[y][x].pos[dim_y] = y;
         path[y][x].pos[dim_x] = x;
-        path[y][x].cost = INT_MAX;
+        path[y][x].cost = INFINITY;
       }
     }
     initialized = 1;
@@ -356,7 +357,7 @@ static void nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEO
       if (d->map[y][x] == ter_wall || d->map[y][x] == ter_wall_immutable) {
         printf(" ");
       }
-      else if (distmap[y][x] >= INT_MAX || distmap[y][x] < 0) {
+      else if (distmap[y][x] == INFINITY) {
         printf("X");
       }
       else if (y == d->pc[dim_y] && x == d->pc[dim_x])
