@@ -11,7 +11,7 @@
 #include <errno.h>
 
 #include "heap.h"
-#include "distmaps.h"
+#include "monsters.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
