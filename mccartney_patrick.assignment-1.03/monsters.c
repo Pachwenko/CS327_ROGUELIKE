@@ -187,6 +187,7 @@ static int tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_
       distmap[y][x] = path[y][x].cost;
     }
   }
+  heap_delete(&h);
   return 0;
 }
 
@@ -336,6 +337,7 @@ static int non_tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNG
       distmap[y][x] = path[y][x].cost;
     }
   }
+  heap_delete(&h);
   return 0;
 }
 
