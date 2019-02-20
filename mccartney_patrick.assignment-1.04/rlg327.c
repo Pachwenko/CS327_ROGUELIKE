@@ -11,7 +11,7 @@
 #include <errno.h>
 
 #include "heap.h"
-#include "distmaps.h"
+#include "monsters.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
@@ -1253,6 +1253,7 @@ int main(int argc, char *argv[])
   do_load = do_save = do_image = do_save_seed = do_save_image = 0;
   do_seed = 1;
   save_file = load_file = NULL;
+  int num_monsters = 0;
 
   /* The project spec requires '--load' and '--save'.  It's common  *
    * to have short and long forms of most switches (assuming you    *
@@ -1276,6 +1277,15 @@ int main(int argc, char *argv[])
           long_arg = 1; /* handle long and short args at the same place.  */
         }
         switch (argv[i][1]) {
+        case 'n':
+          printf("%d\n", num_monsters);
+          if (!long_arg && argv[i][2] || long_arg && strcmp(argv[i], '-nummon')) {
+            if ((argc > i + 1) && argv[i + 1][0] != '-') {
+              num_monsters = (int) strtol(argv[++i], (char **)NULL, 10);
+              printf("%d\n", num_monsters);
+            }
+          }
+          break;
         case 'r':
           if ((!long_arg && argv[i][2]) ||
               (long_arg && strcmp(argv[i], "-rand")) ||
@@ -1306,17 +1316,17 @@ int main(int argc, char *argv[])
           if ((argc > i + 1) && argv[i + 1][0] != '-') {
             /* There is another argument, and it's not a switch, so *
              * we'll save to it.  If it is "seed", we'll save to    *
-	     * <the current seed>.rlg327.  If it is "image", we'll  *
-	     * save to <the current image>.rlg327.                  */
-	    if (!strcmp(argv[++i], "seed")) {
-	      do_save_seed = 1;
-	      do_save_image = 0;
-	    } else if (!strcmp(argv[i], "image")) {
-	      do_save_image = 1;
-	      do_save_seed = 0;
-	    } else {
-	      save_file = argv[i];
-	    }
+	           * <the current seed>.rlg327.  If it is "image", we'll  *
+	           * save to <the current image>.rlg327.                  */
+            if (!strcmp(argv[++i], "seed")) {
+              do_save_seed = 1;
+              do_save_image = 0;
+            } else if (!strcmp(argv[i], "image")) {
+              do_save_image = 1;
+              do_save_seed = 0;
+            } else {
+              save_file = argv[i];
+            }
           }
           break;
         case 'i':
