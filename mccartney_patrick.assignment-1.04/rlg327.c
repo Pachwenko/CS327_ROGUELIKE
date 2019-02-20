@@ -1278,11 +1278,9 @@ int main(int argc, char *argv[])
         }
         switch (argv[i][1]) {
         case 'n':
-          printf("%d\n", num_monsters);
-          if ((!long_arg && argv[i][2]) || (long_arg && strcmp(argv[i], "-nummon"))) {
+          if ((!long_arg && argv[i][2]) || (long_arg && strcmp(argv[i], "--nummon"))) {
             if ((argc > i + 1) && argv[i + 1][0] != '-') {
               num_monsters = (int) strtol(argv[++i], (char **)NULL, 10);
-              printf("%d\n", num_monsters);
             }
           }
           break;
@@ -1405,7 +1403,7 @@ int main(int argc, char *argv[])
   }
 
   generate_distmaps(&d);
-
+  start_routines(&d, num_monsters);
   delete_dungeon(&d);
 
   return 0;

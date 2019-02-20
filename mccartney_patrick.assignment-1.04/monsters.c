@@ -8,6 +8,7 @@
 #define DUNGEON_X 80
 #define DUNGEON_Y 21
 #define INFINITY 214748364
+#define NUM_MOBS 13
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
@@ -385,4 +386,11 @@ void generate_distmaps(dungeon_t *d)
   print_nontunneling_distmap(d, distmap2);
   printf("\n");
   print_tunneling_distmap(d, distmap);
+}
+
+void start_routines(dungeon_t *d, int num_monsters) {
+  int num_mobs = NUM_MOBS;
+  if (!(num_monsters == 0)) {
+    num_mobs = num_monsters;
+  }
 }
