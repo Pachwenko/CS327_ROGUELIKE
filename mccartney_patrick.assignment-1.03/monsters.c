@@ -193,7 +193,7 @@ static int tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_
 // Method which calls tunneling_dijkstra and outputs the results to
 // standard output where X values represent infinity/unable to reach
 // also stores distance map in the distmap array
-static void tunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
+static void print_tunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   if (tunneling_dijkstras(d, distmap))
   {
@@ -342,7 +342,7 @@ static int non_tunneling_dijkstras(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNG
 // outputs the non-tunneling monster distmap to standard output and stores
 // the distance values in the distmap array. Any infinite value or negative
 // value is output as a "X".
-static void nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
+static void print_nontunneling_distmap(dungeon_t *d, int32_t distmap[DUNGEON_Y][DUNGEON_X])
 {
   if (non_tunneling_dijkstras(d, distmap))
   {
@@ -382,7 +382,7 @@ void generate_distmaps(dungeon_t *d)
   int32_t distmap2[DUNGEON_Y][DUNGEON_X];
 
   printf("\n");
-  nontunneling_distmap(d, distmap2);
+  print_nontunneling_distmap(d, distmap2);
   printf("\n");
-  tunneling_distmap(d, distmap);
+  print_tunneling_distmap(d, distmap);
 }
