@@ -442,6 +442,10 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
     mobs[i].loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
     mobs[i].speed = rand_range(5, 20);
     mobs[i].priority = 1000 / mobs[i].speed;
+    mobs[i].attributes[intelligence] = '0';
+    mobs[i].attributes[telepathy] = '0';
+    mobs[i].attributes[tunneling] = '0';
+    mobs[i].attributes[erratic] = '0';
 
 
     //set the type to either a random number or a character
@@ -456,8 +460,6 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
       int num = rand_range(0,1);
       if (num) {
         mobs[i].attributes[j] = '1';
-      } else {
-        mobs[i].attributes[j] = '0';
       }
     }
 
@@ -548,7 +550,7 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
   monster_t *mob;
   while ((mob = (monster_t*) heap_remove_min(&h))) {
     if (mob->priority < 0 || mob->priority >= UINT64_MAX) {
-      //TODO: add method to reset priorities and reinset into the queue
+      //TODO: add method to reset priorities and reinsert them into the queue
     }
     else if ((heap_peek_min(&h) == NULL) && mob->type == '@') {
       printf("\n\n\n YOU WON, CONGRATULATIONS\n\n\n");
@@ -563,9 +565,9 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
       usleep(250000);
     } else {
       // see if they are erratic or not
-      uint8_t is_erratic = 0;
+      //uint8_t is_erratic = 0;
       if (m->attributes[erratic]) {
-        is_erratic = 1;
+        //is_erratic = 1;
       }
       // update pc location if they are telepathic
       if (m->attributes[telepathy]) {
@@ -585,7 +587,7 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
 
 
 
-      mob->priority += 1000 / mob->speed;
+      mob->priority += 1000 / mob->speed; //SEGFAULT HERE
       heap_insert(&h, &mob);
     }
   }
@@ -593,8 +595,8 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
 }
 
 void init_distmaps(dungeon_t *d, int32_t tunneling[DUNGEON_Y][DUNGEON_X], int32_t non_tunneling[DUNGEON_Y][DUNGEON_X]) {
-  tunneling_dijkstras(&d, tunneling);
-  non_tunneling_dijkstras(&d, non_tunneling);
+  tunneling_dijkstras(d, tunneling);
+  non_tunneling_dijkstras(d, non_tunneling);
 }
 
 void start_routines(dungeon_t *d, int num_monsters) {
