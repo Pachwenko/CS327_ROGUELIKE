@@ -14,6 +14,7 @@
 #define MAX_SPEED 20
 #define MIN_SPEED 5
 #define NUM_ATTRIBUTES 4
+#define PC_SPEED 10
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
@@ -100,6 +101,7 @@ typedef struct monster
   uint8_t speed;
   char type;
   heap_node_t *hn;
+  uint64_t priority; // this is to avoid any overflow incase a game goes on for a very long time
 } monster_t;
 
 static int32_t corridor_path_cmp(const void *key, const void *with)
@@ -427,17 +429,19 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   mobs[0].pc_loc[dim_y] = d->pc[dim_y];
   mobs[0].loc[dim_x] = d->pc[dim_x];
   mobs[0].loc[dim_y] = d->pc[dim_y];
-  mobs[0].speed = 10;
+  mobs[0].speed = PC_SPEED;
   mobs[0].type = '@';
+  mobs[0].priority = 0;
 
   int i, j = 0;
   for (i = 1; i < num_monsters; i++) {
     // randomize location, speed, type, and attributes
-    mobs[i].pc_loc[dim_x] = d->pc[dim_x];
-    mobs[i].pc_loc[dim_y] = d->pc[dim_y];
+    mobs[i].pc_loc[dim_x] = UINT8_MAX;
+    mobs[i].pc_loc[dim_y] = UINT8_MAX;
     mobs[i].loc[dim_x] = rand_range(1, DUNGEON_X - 1);
     mobs[i].loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
     mobs[i].speed = rand_range(5, 20);
+    mobs[i].priority = 1000 / mobs[i].speed;
 
 
     //set the type to either a random number or a character
@@ -462,7 +466,7 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
 
 static int32_t monster_cmp(const void *key, const void *with)
 {
-  return ((1000/((monster_t *)key)->speed) - (1000/((monster_t *)with)->speed));
+  return (((monster_t *)key)->priority) - (((monster_t *)with)->priority);
 }
 
 void render(dungeon_t *d, monster_t *m, int num_monsters) {
@@ -520,7 +524,7 @@ void render(dungeon_t *d, monster_t *m, int num_monsters) {
   }
 }
 
-int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
+int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DUNGEON_Y][DUNGEON_X], int32_t non_tunneling[DUNGEON_Y][DUNGEON_X]) {
   // Every character (PC and NPCs) generates an event when it is created.
   // that event has a time, when it will occur
   // (based on the current game turn and the character’s speed)
@@ -543,8 +547,10 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
 
   monster_t *mob;
   while ((mob = (monster_t*) heap_remove_min(&h))) {
-    if ((heap_peek_min(&h) == NULL) && mob->type == '@') {
-      // TODO: Print winning screen
+    if (mob->priority < 0 || mob->priority >= UINT64_MAX) {
+      //TODO: add method to reset priorities and reinset into the queue
+    }
+    else if ((heap_peek_min(&h) == NULL) && mob->type == '@') {
       printf("\n\n\n YOU WON, CONGRATULATIONS\n\n\n");
       return 0;
     }
@@ -552,18 +558,43 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
       // do nothing, I'm lazy to make the PC do stuff
       render(d, m, num_monsters);
       // sleep for 250000 micro seconds
+      mob->priority += 1000 / mob->speed;
+      heap_insert(&h, &mob);
       usleep(250000);
     } else {
-      // do something with the monster based on its attributes
+      // see if they are erratic or not
+      uint8_t is_erratic = 0;
+      if (m->attributes[erratic]) {
+        is_erratic = 1;
+      }
+      // update pc location if they are telepathic
+      if (m->attributes[telepathy]) {
+        m->pc_loc[dim_x] = d->pc[dim_x];
+        m->pc_loc[dim_y] = d->pc[dim_y];
+      }
+      // if they are dummies make them forget the last know PC location
+      if (!(m->attributes[intelligence])) {
+        m->pc_loc[dim_x] = UINT8_MAX;
+      }
+      // now move that monster
 
 
 
 
 
 
+
+
+      mob->priority += 1000 / mob->speed;
+      heap_insert(&h, &mob);
     }
   }
   return 0;
+}
+
+void init_distmaps(dungeon_t *d, int32_t tunneling[DUNGEON_Y][DUNGEON_X], int32_t non_tunneling[DUNGEON_Y][DUNGEON_X]) {
+  tunneling_dijkstras(&d, tunneling);
+  non_tunneling_dijkstras(&d, non_tunneling);
 }
 
 void start_routines(dungeon_t *d, int num_monsters) {
@@ -572,7 +603,10 @@ void start_routines(dungeon_t *d, int num_monsters) {
     num_mobs = num_monsters;
   }
 
+  int32_t tunneling[DUNGEON_Y][DUNGEON_X];
+  int32_t non_tunneling[DUNGEON_Y][DUNGEON_X];
   monster_t mobs[num_mobs];
+
   init_mobs(d, mobs, num_mobs);
-  event_sim(d, mobs, num_mobs);
+  event_sim(d, mobs, num_mobs, tunneling, non_tunneling);
 }
