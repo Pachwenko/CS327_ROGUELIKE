@@ -454,7 +454,6 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
         mobs[i].attributes[j] = '0';
       }
     }
-    printf("Initialized %c:%u, at %u, %u \n", mobs[i].type, mobs[i].speed, mobs[i].loc[dim_x], mobs[i].loc[dim_y]);
 
   }
 }
@@ -482,13 +481,11 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
 
   for (i = 0; i < num_monsters; i++)
   {
-      printf("Put in %c:%u, at %u, %u \n", m[i].type, m[i].speed, m[i].loc[dim_x], m[i].loc[dim_y]);
       m[i].hn = heap_insert(&h, &m[i]);
   }
 
   monster_t *mob;
   while ((mob = (monster_t*) heap_remove_min(&h))) {
-    printf("Took out %c:%u, at %u, %u \n", mob->type, mob->speed, mob->loc[dim_x], mob->loc[dim_y]);
   }
   return 0;
 }
