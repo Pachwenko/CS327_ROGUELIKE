@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include "heap.h"
 
@@ -31,7 +32,8 @@ typedef enum __attribute__((__packed__)) terrain_type
   ter_floor_hall,
   ter_stairs,
   ter_stairs_up,
-  ter_stairs_down
+  ter_stairs_down,
+  mob
 } terrain_type_t;
 
 typedef enum __attribute__((__packed__)) monster_type
@@ -463,6 +465,61 @@ static int32_t monster_cmp(const void *key, const void *with)
   return ((1000/((monster_t *)key)->speed) - (1000/((monster_t *)with)->speed));
 }
 
+void render(dungeon_t *d, monster_t *m, int num_monsters) {
+  pair_t p;
+
+  // put the monsters in the dungeon array and print that boy
+
+  int i = 0;
+  for (i = 0; i < num_monsters; i++) {
+    d->map[m[i].loc[dim_y]][m[i].loc[dim_x]] = mob;
+  }
+
+  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+      if (d->pc[dim_x] == p[dim_x] && d->pc[dim_y] == p[dim_y]) {
+        putchar('@');
+      } else {
+        switch (mappair(p)) {
+        case ter_wall:
+          putchar(' ');
+          break;
+        case ter_wall_immutable:
+          putchar('=');
+          break;
+        case ter_floor:
+        case ter_floor_room:
+          putchar('.');
+          break;
+        case ter_floor_hall:
+          putchar('#');
+          break;
+        case ter_debug:
+          putchar('*');
+          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+          break;
+        case ter_stairs_up:
+          putchar('<');
+          break;
+        case ter_stairs_down:
+          putchar('>');
+          break;
+        case mob:
+          for (i = 0; i < num_monsters; i++) {
+            if ((m[i].loc[dim_y] == p[dim_y]) && (m[i].loc[dim_x] == p[dim_x])) {
+              putchar(m[i].type);
+              break;
+            }
+          }
+        default:
+          break;
+        }
+      }
+    }
+    putchar('\n');
+  }
+}
+
 int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
   // Every character (PC and NPCs) generates an event when it is created.
   // that event has a time, when it will occur
@@ -486,6 +543,25 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
 
   monster_t *mob;
   while ((mob = (monster_t*) heap_remove_min(&h))) {
+    if ((heap_peek_min(&h) == NULL) && mob->type == '@') {
+      // TODO: Print winning screen
+      printf("\n\n\n YOU WON, CONGRATULATIONS\n\n\n");
+      return 0;
+    }
+    else if (mob->type == '@') {
+      // do nothing, I'm lazy to make the PC do stuff
+      render(d, m, num_monsters);
+      // sleep for 250000 micro seconds
+      usleep(250000);
+    } else {
+      // do something with the monster based on its attributes
+
+
+
+
+
+
+    }
   }
   return 0;
 }

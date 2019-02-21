@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <sys/time.h>
+#include <unistd.h>
 
 #include "heap.h"
 
