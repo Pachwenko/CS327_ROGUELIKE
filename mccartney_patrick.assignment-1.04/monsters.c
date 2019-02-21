@@ -440,9 +440,9 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
 
     //set the type to either a random number or a character
     if (rand_range(0,1)) {
-      mobs[i].type = rand_range(0, 9);
+      mobs[i].type = rand_range(48, 57);
     } else {
-      mobs[i].type = (rand()%(90-65))+65; // between A and Z
+      mobs[i].type = rand_range(65, 90); // between A and Z
     }
 
     //sets the monster's attributes to either a 0 or 1
