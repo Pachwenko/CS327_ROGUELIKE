@@ -424,7 +424,8 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   pair_t pc;
   pc[dim_x] = d->pc[dim_x];
   pc[dim_y] = d->pc[dim_y];
-  *mobs[0].loc = *pc;
+  mobs[0].pc_loc[dim_x] = pc[dim_x];
+  mobs[0].pc_loc[dim_y] = pc[dim_y];
   mobs[0].speed = 10;
   mobs[0].type = '@';
 
@@ -434,8 +435,10 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
     pair_t location;
     location[dim_x] = rand_range(1, DUNGEON_X - 1);
     location[dim_y] = rand_range(1, DUNGEON_Y - 1);
-    *mobs[i].loc = *location;
-    *mobs[i].pc_loc = *pc;
+    mobs[i].loc[dim_x] = location[dim_x];
+    mobs[i].loc[dim_y] = location[dim_y];
+    mobs[i].pc_loc[dim_x] = pc[dim_x];
+    mobs[i].pc_loc[dim_y] = pc[dim_y];
     mobs[i].speed = rand_range(5, 20);
 
     //set the type to either a random number or a character
@@ -472,7 +475,6 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
   //
   // Each time a character’s move event is removed from the queue, that character gets to move,
   // and a new move event is placed in the queue for its next turn.
-  printf("nummobs = %d\n", num_monsters);
 
   heap_t h;
   uint32_t i;
@@ -481,15 +483,12 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
 
   for (i = 0; i < num_monsters; i++)
   {
-      printf("Put in %c:%u, at %u, %u \n", m[i].type, m[i].speed, m[i].loc[dim_x], m[i].loc[dim_y]);
+      //printf("Put in %c:%u, at %u, %u \n", m[i].type, m[i].speed, m[i].loc[dim_x], m[i].loc[dim_y]);
       m[i].hn = heap_insert(&h, &m[i]);
   }
 
-  printf("\n\n");
-
   monster_t *mob;
   while ((mob = (monster_t*) heap_remove_min(&h))) {
-    printf("Took out %c:%u, at %u, %u \n", mob->type, mob->speed, mob->loc[dim_x], mob->loc[dim_y]);
   }
   return 0;
 }
