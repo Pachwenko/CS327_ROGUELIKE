@@ -432,6 +432,10 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   mobs[0].speed = PC_SPEED;
   mobs[0].type = '@';
   mobs[0].priority = 0;
+  mobs[0].attributes[intelligence] = '0';
+  mobs[0].attributes[telepathy] = '0';
+  mobs[0].attributes[tunneling] = '0';
+  mobs[0].attributes[erratic] = '0';
 
   int i, j = 0;
   for (i = 1; i < num_monsters; i++) {
@@ -472,71 +476,51 @@ static int32_t monster_cmp(const void *key, const void *with)
 }
 
 void render(dungeon_t *d, monster_t *m, int num_monsters) {
-  pair_t p;
 
-  // put the monsters in the dungeon array and print that boy
-
-  int i = 0;
-  for (i = 0; i < num_monsters; i++) {
-    d->map[m[i].loc[dim_y]][m[i].loc[dim_x]] = mob;
-  }
-
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (d->pc[dim_x] == p[dim_x] && d->pc[dim_y] == p[dim_y]) {
-        putchar('@');
-      } else {
-        switch (mappair(p)) {
+  int i, y, x = 0;
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      char toPut;
+        switch (d->map[y][x]) {
         case ter_wall:
-          putchar(' ');
+          toPut = ' ';
           break;
         case ter_wall_immutable:
-          putchar('=');
+          toPut = '=';
           break;
         case ter_floor:
         case ter_floor_room:
-          putchar('.');
+          toPut = '.';
           break;
         case ter_floor_hall:
-          putchar('#');
+          toPut = '#';
           break;
         case ter_debug:
-          putchar('*');
-          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+          toPut = '*';
+          fprintf(stderr, "Debug character at %d, %d\n", y, x);
           break;
         case ter_stairs_up:
-          putchar('<');
+          toPut = '<';
           break;
         case ter_stairs_down:
-          putchar('>');
+          toPut = '>';
           break;
-        case mob:
-          for (i = 0; i < num_monsters; i++) {
-            if ((m[i].loc[dim_y] == p[dim_y]) && (m[i].loc[dim_x] == p[dim_x])) {
-              putchar(m[i].type);
-              break;
-            }
-          }
         default:
+          toPut = ' ';
           break;
         }
+      for (i = 0; i < num_monsters; i++) {
+        if (m[i].loc[dim_y] == y && m[i].loc[dim_x] == x) {
+          toPut = m[i].type;
+        }
       }
+      putchar(toPut);
     }
     putchar('\n');
   }
 }
 
 int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DUNGEON_Y][DUNGEON_X], int32_t non_tunneling[DUNGEON_Y][DUNGEON_X]) {
-  // Every character (PC and NPCs) generates an event when it is created.
-  // that event has a time, when it will occur
-  // (based on the current game turn and the character’s speed)
-  // and goes in a priority queue,prioritized on the event time.
-  // Each character’s move event occurs every floor(1000/speed) turns
-  // integer math, so this is just a normal division;
-  //
-  // Each time a character’s move event is removed from the queue, that character gets to move,
-  // and a new move event is placed in the queue for its next turn.
-
   heap_t h;
   uint32_t i;
 
@@ -561,36 +545,42 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
       render(d, m, num_monsters);
       // sleep for 250000 micro seconds
       mob->priority += 1000 / mob->speed;
-      heap_insert(&h, &mob);
+      mob->hn = heap_insert(&h, mob);
       usleep(250000);
     } else {
       // see if they are erratic or not
       //uint8_t is_erratic = 0;
-      if (m->attributes[erratic]) {
+      if (mob->attributes[erratic]) {
+        // if erratic there is only a 50% chance they will move in the
+        // desired direction
         //is_erratic = 1;
       }
       // update pc location if they are telepathic
-      if (m->attributes[telepathy]) {
-        m->pc_loc[dim_x] = d->pc[dim_x];
-        m->pc_loc[dim_y] = d->pc[dim_y];
+      if (mob->attributes[telepathy]) {
+        // if telepathic they can see the pc no matter what
+        mob->pc_loc[dim_x] = d->pc[dim_x];
+        mob->pc_loc[dim_y] = d->pc[dim_y];
       }
       // if they are dummies make them forget the last know PC location
-      if (!(m->attributes[intelligence])) {
-        m->pc_loc[dim_x] = UINT8_MAX;
+      if (!(mob->attributes[intelligence])) {
+        mob->pc_loc[dim_x] = UINT8_MAX;
       }
       // now move that monster
+      mob->loc[dim_x]++;
+      mob->loc[dim_y]--;
 
-
-
-
-
-
-
-
-      mob->priority += 1000 / mob->speed; //SEGFAULT HERE
-      heap_insert(&h, &mob);
+      // if mob is out obounds then kill it
+      if (mob->loc[dim_x] > DUNGEON_X - 1 || mob->loc[dim_x] < 2) {
+        mob->hn = NULL;
+      } else if (mob->loc[dim_y] > DUNGEON_Y - 1 || mob->loc[dim_y] < 2) {
+        mob->hn = NULL;
+      } else {
+        mob->priority += 1000 / mob->speed;
+        mob->hn = heap_insert(&h, mob);
+      }
     }
   }
+  heap_delete(&h);
   return 0;
 }
 
