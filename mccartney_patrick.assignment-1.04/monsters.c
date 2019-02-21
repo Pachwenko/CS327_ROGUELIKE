@@ -421,25 +421,22 @@ void generate_distmaps(dungeon_t *d)
 
 void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   //first monster is the player
-  pair_t pc;
-  pc[dim_x] = d->pc[dim_x];
-  pc[dim_y] = d->pc[dim_y];
-  mobs[0].pc_loc[dim_x] = pc[dim_x];
-  mobs[0].pc_loc[dim_y] = pc[dim_y];
+  mobs[0].pc_loc[dim_x] = d->pc[dim_x];
+  mobs[0].pc_loc[dim_y] = d->pc[dim_y];
+  mobs[0].loc[dim_x] = d->pc[dim_x];
+  mobs[0].loc[dim_y] = d->pc[dim_y];
   mobs[0].speed = 10;
   mobs[0].type = '@';
 
   int i, j = 0;
   for (i = 1; i < num_monsters; i++) {
     // randomize location, speed, type, and attributes
-    pair_t location;
-    location[dim_x] = rand_range(1, DUNGEON_X - 1);
-    location[dim_y] = rand_range(1, DUNGEON_Y - 1);
-    mobs[i].loc[dim_x] = location[dim_x];
-    mobs[i].loc[dim_y] = location[dim_y];
-    mobs[i].pc_loc[dim_x] = pc[dim_x];
-    mobs[i].pc_loc[dim_y] = pc[dim_y];
+    mobs[i].pc_loc[dim_x] = d->pc[dim_x];
+    mobs[i].pc_loc[dim_y] = d->pc[dim_y];
+    mobs[i].loc[dim_x] = rand_range(1, DUNGEON_X - 1);
+    mobs[i].loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
     mobs[i].speed = rand_range(5, 20);
+
 
     //set the type to either a random number or a character
     if (rand_range(0,1)) {
@@ -457,6 +454,8 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
         mobs[i].attributes[j] = '0';
       }
     }
+    printf("Initialized %c:%u, at %u, %u \n", mobs[i].type, mobs[i].speed, mobs[i].loc[dim_x], mobs[i].loc[dim_y]);
+
   }
 }
 
@@ -483,12 +482,13 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
 
   for (i = 0; i < num_monsters; i++)
   {
-      //printf("Put in %c:%u, at %u, %u \n", m[i].type, m[i].speed, m[i].loc[dim_x], m[i].loc[dim_y]);
+      printf("Put in %c:%u, at %u, %u \n", m[i].type, m[i].speed, m[i].loc[dim_x], m[i].loc[dim_y]);
       m[i].hn = heap_insert(&h, &m[i]);
   }
 
   monster_t *mob;
   while ((mob = (monster_t*) heap_remove_min(&h))) {
+    printf("Took out %c:%u, at %u, %u \n", mob->type, mob->speed, mob->loc[dim_x], mob->loc[dim_y]);
   }
   return 0;
 }
