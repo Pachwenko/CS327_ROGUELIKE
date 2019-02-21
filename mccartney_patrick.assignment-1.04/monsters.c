@@ -9,11 +9,17 @@
 #define DUNGEON_Y 21
 #define INFINITY 214748364
 #define NUM_MOBS 13
+#define PC_SPEED 10
+#define MAX_SPEED 20
+#define MIN_SPEED 5
+#define NUM_ATTRIBUTES 4
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
 #define hardnesspair(pair) (d->hardness[pair[dim_y]][pair[dim_x]])
 #define hardnessxy(x, y) (d->hardness[y][x])
+/* Returns random integer in [min, max]. */
+#define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
 
 typedef enum __attribute__((__packed__)) terrain_type
 {
@@ -27,6 +33,23 @@ typedef enum __attribute__((__packed__)) terrain_type
   ter_stairs_up,
   ter_stairs_down
 } terrain_type_t;
+
+typedef enum __attribute__((__packed__)) monster_type
+{
+  mob_human,
+  mob_nonhuman,
+  mob_giant,
+  mob_dragon,
+  player
+} mob_type_t;
+
+typedef enum __attribute__((__packed__)) attribute_type
+{ // if none of
+  intelligence,
+  telepathy,
+  tunneling,
+  erratic
+} attribute_type_t;
 
 typedef struct corridor_path
 {
@@ -67,12 +90,20 @@ typedef struct dungeon
   pair_t pc;
 } dungeon_t;
 
+typedef struct monster
+{
+  pair_t loc;
+  pair_t pc_loc;
+  char attributes[NUM_ATTRIBUTES];
+  uint8_t speed;
+  char type;
+  heap_node_t *hn;
+} monster_t;
+
 static int32_t corridor_path_cmp(const void *key, const void *with)
 {
   return ((corridor_path_t *)key)->cost - ((corridor_path_t *)with)->cost;
 }
-
-
 
 // Modified dijkstra_corridor from rlg327.c
 // Initialized to INT_MAX and adds all points to the heap as long as
@@ -388,9 +419,88 @@ void generate_distmaps(dungeon_t *d)
   print_tunneling_distmap(d, distmap);
 }
 
+void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
+  //first monster is the player
+  pair_t pc;
+  pc[dim_x] = d->pc[dim_x];
+  pc[dim_y] = d->pc[dim_y];
+  *mobs[0].loc = *pc;
+  mobs[0].speed = 10;
+  mobs[0].type = '@';
+
+  int i, j = 0;
+  for (i = 1; i < num_monsters; i++) {
+    // randomize location, speed, type, and attributes
+    pair_t location;
+    location[dim_x] = rand_range(1, DUNGEON_X - 1);
+    location[dim_y] = rand_range(1, DUNGEON_Y - 1);
+    *mobs[i].loc = *location;
+    *mobs[i].pc_loc = *pc;
+    mobs[i].speed = rand_range(5, 20);
+
+    //set the type to either a random number or a character
+    if (rand_range(0,1)) {
+      mobs[i].type = rand_range(0, 9);
+    } else {
+      mobs[i].type = (rand()%(90-65))+65; // between A and Z
+    }
+
+    //sets the monster's attributes to either a 0 or 1
+    for (j = 0; j < NUM_ATTRIBUTES; j++) {
+      int num = rand_range(0,1);
+      if (num) {
+        mobs[i].attributes[j] = '1';
+      } else {
+        mobs[i].attributes[j] = '0';
+      }
+    }
+  }
+}
+
+static int32_t monster_cmp(const void *key, const void *with)
+{
+  return ((1000/((monster_t *)key)->speed) - (1000/((monster_t *)with)->speed));
+}
+
+int event_sim(dungeon_t *d, monster_t *m, int num_monsters) {
+  // Every character (PC and NPCs) generates an event when it is created.
+  // that event has a time, when it will occur
+  // (based on the current game turn and the character’s speed)
+  // and goes in a priority queue,prioritized on the event time.
+  // Each character’s move event occurs every floor(1000/speed) turns
+  // integer math, so this is just a normal division;
+  //
+  // Each time a character’s move event is removed from the queue, that character gets to move,
+  // and a new move event is placed in the queue for its next turn.
+  printf("nummobs = %d\n", num_monsters);
+
+  heap_t h;
+  uint32_t i;
+
+  heap_init(&h, monster_cmp, NULL);
+
+  for (i = 0; i < num_monsters; i++)
+  {
+      printf("Put in %c:%u, at %u, %u \n", m[i].type, m[i].speed, m[i].loc[dim_x], m[i].loc[dim_y]);
+      m[i].hn = heap_insert(&h, &m[i]);
+  }
+
+  printf("\n\n");
+
+  monster_t *mob;
+  while ((mob = (monster_t*) heap_remove_min(&h))) {
+    printf("Took out %c:%u, at %u, %u \n", mob->type, mob->speed, mob->loc[dim_x], mob->loc[dim_y]);
+  }
+  return 0;
+}
+
 void start_routines(dungeon_t *d, int num_monsters) {
   int num_mobs = NUM_MOBS;
-  if (!(num_monsters == 0)) {
+  if (num_monsters != 0) {
     num_mobs = num_monsters;
   }
+
+  monster_t mobs[num_mobs];
+  init_mobs(d, mobs, num_mobs);
+  event_sim(d, mobs, num_mobs);
 }

@@ -1376,7 +1376,7 @@ int main(int argc, char *argv[])
     d.pc[dim_y] = d.rooms[0].position[dim_y];
   }
 
-  render_dungeon(&d);
+  // render_dungeon(&d);
 
   if (do_save) {
     if (do_save_seed) {
@@ -1402,7 +1402,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  generate_distmaps(&d);
+  //generate_distmaps(&d);
   start_routines(&d, num_monsters);
   delete_dungeon(&d);
 
