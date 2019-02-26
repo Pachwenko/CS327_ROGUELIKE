@@ -1228,7 +1228,8 @@ void usage(char *name)
 {
   fprintf(stderr,
           "Usage: %s [-r|--rand <seed>] [-l|--load [<file>]]\n"
-          "          [-s|--save [<file>]] [-i|--image <pgm file>]\n",
+          "          [-s|--save [<file>]] [-i|--image <pgm file>]\n"
+          "          [-n]--nummon <number>\n",
           name);
 
   exit(-1);
