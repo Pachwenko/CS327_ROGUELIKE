@@ -423,6 +423,16 @@ void generate_distmaps(dungeon_t *d)
   print_tunneling_distmap(d, distmap);
 }
 
+int try_to_place_mob(dungeon_t *d, monster_t *mob) {
+  mob->loc[dim_x] = rand_range(1, DUNGEON_X - 1);
+  mob->loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
+
+  if (d->hardness[mob->loc[dim_x]][mob->loc[dim_y]]) {
+    return 1;
+  }
+  return 0;
+}
+
 void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   //first monster is the player
   mobs[0].pc_loc[dim_x] = d->pc[dim_x];
@@ -442,15 +452,15 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
     // randomize location, speed, type, and attributes
     mobs[i].pc_loc[dim_x] = UINT8_MAX;
     mobs[i].pc_loc[dim_y] = UINT8_MAX;
-    mobs[i].loc[dim_x] = rand_range(1, DUNGEON_X - 1);
-    mobs[i].loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
+    while (try_to_place_mob(d, &mobs[i])) {
+
+    }
     mobs[i].speed = rand_range(5, 20);
     mobs[i].priority = 1000 / mobs[i].speed;
     mobs[i].attributes[intelligence] = '0';
     mobs[i].attributes[telepathy] = '0';
     mobs[i].attributes[tunneling] = '0';
     mobs[i].attributes[erratic] = '0';
-
 
     //set the type to either a random number or a character
     if (rand_range(0,1)) {
@@ -520,6 +530,26 @@ void render(dungeon_t *d, monster_t *m, int num_monsters) {
   }
 }
 
+void move_monster(dungeon_t *d, monster_t *mob) {
+  // move in a straight line to the last known pc location
+  // if last known pc location is null, just move randomly
+
+  // move to last known pc location
+  if (mob->pc_loc[dim_x] != UINT8_MAX && mob->pc_loc[dim_y] != UINT8_MAX) {
+    if (mob->attributes[tunneling]) {
+      // move in a straight line to the pc's last known location
+
+    } else {
+      // if the path is blocked then just do nothing for now
+
+    }
+  } else {
+    // just move randomly
+
+  }
+
+}
+
 int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DUNGEON_Y][DUNGEON_X], int32_t non_tunneling[DUNGEON_Y][DUNGEON_X]) {
   heap_t h;
   uint32_t i;
@@ -548,13 +578,6 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
       mob->hn = heap_insert(&h, mob);
       usleep(250000);
     } else {
-      // see if they are erratic or not
-      //uint8_t is_erratic = 0;
-      if (mob->attributes[erratic]) {
-        // if erratic there is only a 50% chance they will move in the
-        // desired direction
-        //is_erratic = 1;
-      }
       // update pc location if they are telepathic
       if (mob->attributes[telepathy]) {
         // if telepathic they can see the pc no matter what
@@ -566,8 +589,7 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
         mob->pc_loc[dim_x] = UINT8_MAX;
       }
       // now move that monster
-      mob->loc[dim_x]++;
-      mob->loc[dim_y]--;
+      move_monster(d, mob);
 
       // if mob is out obounds then kill it
       if (mob->loc[dim_x] > DUNGEON_X - 1 || mob->loc[dim_x] < 2) {
@@ -597,7 +619,7 @@ void start_routines(dungeon_t *d, int num_monsters) {
 
   int32_t tunneling[DUNGEON_Y][DUNGEON_X];
   int32_t non_tunneling[DUNGEON_Y][DUNGEON_X];
-  monster_t mobs[num_mobs];
+  monster_t *mobs = malloc(sizeof(monster_t) * num_mobs);
 
   init_mobs(d, mobs, num_mobs);
   event_sim(d, mobs, num_mobs, tunneling, non_tunneling);
