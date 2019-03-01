@@ -15,6 +15,13 @@
 #define MIN_SPEED 5
 #define NUM_ATTRIBUTES 4
 #define PC_SPEED 10
+#define NPC_SMART   0x00000001
+#define NPC_TELE    0x00000002
+#define NPC_TUNNEL  0x00000004
+#define NPC_ERRATIC 0x00000008
+
+
+#define has_characteristic(character, bit) ((character)->characteristics & NPC_##bit)
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
@@ -97,9 +104,9 @@ typedef struct monster
 {
   pair_t loc;
   pair_t pc_loc;
-  char attributes[NUM_ATTRIBUTES];
+  int characteristics;
+  char symbol;
   uint8_t speed;
-  char type;
   heap_node_t *hn;
   uint64_t priority; // this is to avoid any overflow incase a game goes on for a very long time
 } monster_t;
@@ -423,16 +430,6 @@ void generate_distmaps(dungeon_t *d)
   print_tunneling_distmap(d, distmap);
 }
 
-int try_to_place_mob(dungeon_t *d, monster_t *mob) {
-  mob->loc[dim_x] = rand_range(1, DUNGEON_X - 1);
-  mob->loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
-
-  if (d->hardness[mob->loc[dim_x]][mob->loc[dim_y]]) {
-    return 1;
-  }
-  return 0;
-}
-
 void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   //first monster is the player
   mobs[0].pc_loc[dim_x] = d->pc[dim_x];
@@ -440,43 +437,40 @@ void init_mobs(dungeon_t *d, monster_t *mobs, int num_monsters) {
   mobs[0].loc[dim_x] = d->pc[dim_x];
   mobs[0].loc[dim_y] = d->pc[dim_y];
   mobs[0].speed = PC_SPEED;
-  mobs[0].type = '@';
   mobs[0].priority = 0;
-  mobs[0].attributes[intelligence] = '0';
-  mobs[0].attributes[telepathy] = '0';
-  mobs[0].attributes[tunneling] = '0';
-  mobs[0].attributes[erratic] = '0';
+  mobs[0].characteristics = 0;
+  char symbols[] = "0123456789abcdef";
+  mobs[0].symbol =  '@';
 
-  int i, j = 0;
+  int i = 0;
   for (i = 1; i < num_monsters; i++) {
     // randomize location, speed, type, and attributes
     mobs[i].pc_loc[dim_x] = UINT8_MAX;
     mobs[i].pc_loc[dim_y] = UINT8_MAX;
-    while (try_to_place_mob(d, &mobs[i])) {
-
-    }
     mobs[i].speed = rand_range(5, 20);
     mobs[i].priority = 1000 / mobs[i].speed;
-    mobs[i].attributes[intelligence] = '0';
-    mobs[i].attributes[telepathy] = '0';
-    mobs[i].attributes[tunneling] = '0';
-    mobs[i].attributes[erratic] = '0';
+    mobs[i].characteristics = rand() % 16;
+    mobs[i].symbol =  symbols[mobs[i].characteristics];
 
-    //set the type to either a random number or a character
-    if (rand_range(0,1)) {
-      mobs[i].type = rand_range(48, 57);
-    } else {
-      mobs[i].type = rand_range(65, 90); // between A and Z
-    }
+    uint8_t was_placed = 0;
+    while (!was_placed) {
+       mobs[i].loc[dim_x] = rand_range(1, DUNGEON_X - 1);
+       mobs[i].loc[dim_y] = rand_range(1, DUNGEON_Y - 1);
 
-    //sets the monster's attributes to either a 0 or 1
-    for (j = 0; j < NUM_ATTRIBUTES; j++) {
-      int num = rand_range(0,1);
-      if (num) {
-        mobs[i].attributes[j] = '1';
+      if (d->hardness[mobs[i].loc[dim_y]][mobs[i].loc[dim_x]] == 0 || has_characteristic(&mobs[i], TUNNEL)) {
+        was_placed = 1;
       }
     }
+  }
 
+  int counter = 0;
+  for (i = 0; i < num_monsters; i++) {
+    if (has_characteristic(&mobs[i], TUNNEL)) {
+      counter++;
+    }
+  }
+  if (counter == num_monsters) {
+    printf("ALL MOBS CAN TUNNEL, WATCH OUT\n");
   }
 }
 
@@ -521,7 +515,7 @@ void render(dungeon_t *d, monster_t *m, int num_monsters) {
         }
       for (i = 0; i < num_monsters; i++) {
         if (m[i].loc[dim_y] == y && m[i].loc[dim_x] == x) {
-          toPut = m[i].type;
+          toPut = m[i].symbol;
         }
       }
       putchar(toPut);
@@ -529,23 +523,146 @@ void render(dungeon_t *d, monster_t *m, int num_monsters) {
     putchar('\n');
   }
 }
+void end_game(int pc_won, dungeon_t *d, monster_t *mobs, heap_t *heap) {
+  if (pc_won) {
+    printf(
+      "\n                                       o\n"
+      "                                      $\"\"$o\n"
+      "                                     $\"  $$\n"
+      "                                      $$$$\n"
+      "                                      o \"$o\n"
+      "                                     o\"  \"$\n"
+      "                oo\"$$$\"  oo$\"$ooo   o$    \"$    ooo\"$oo  $$$\"o\n"
+      "   o o o o    oo\"  o\"      \"o    $$o$\"     o o$\"\"  o$      \"$  "
+      "\"oo   o o o o\n"
+      "   \"$o   \"\"$$$\"   $$         $      \"   o   \"\"    o\"         $"
+      "   \"o$$\"    o$$\n"
+      "     \"\"o       o  $          $\"       $$$$$       o          $  ooo"
+      "     o\"\"\n"
+      "        \"o   $$$$o $o       o$        $$$$$\"       $o        \" $$$$"
+      "   o\"\n"
+      "         \"\"o $$$$o  oo o  o$\"         $$$$$\"        \"o o o o\"  "
+      "\"$$$  $\n"
+      "           \"\" \"$\"     \"\"\"\"\"            \"\"$\"            \""
+      "\"\"      \"\"\" \"\n"
+      "            \"oooooooooooooooooooooooooooooooooooooooooooooooooooooo$\n"
+      "             \"$$$$\"$$$$\" $$$$$$$\"$$$$$$ \" \"$$$$$\"$$$$$$\"  $$$\""
+      "\"$$$$\n"
+      "              $$$oo$$$$   $$$$$$o$$$$$$o\" $$$$$$$$$$$$$$ o$$$$o$$$\"\n"
+      "              $\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
+      "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"$\n"
+      "              $\"                                                 \"$\n"
+      "              $\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\""
+      "$\"$\"$\"$\"$\"$\"$\"$\n"
+      "                                   You win!\n\n"
+      );
+  } else {
+    printf(
+      "\n\n\n\n                /\"\"\"\"\"/\"\"\"\"\"\"\".\n"
+      "               /     /         \\             __\n"
+      "              /     /           \\            ||\n"
+      "             /____ /   Rest in   \\           ||\n"
+      "            |     |    Pieces     |          ||\n"
+      "            |     |               |          ||\n"
+      "            |     |   A. Luser    |          ||\n"
+      "            |     |               |          ||\n"
+      "            |     |     * *   * * |         _||_\n"
+      "            |     |     *\\/* *\\/* |        | TT |\n"
+      "            |     |     *_\\_  /   ...\"\"\"\"\"\"| |"
+      "| |.\"\"....\"\"\"\"\"\"\"\".\"\"\n"
+      "            |     |         \\/..\"\"\"\"\"...\"\"\""
+      "\\ || /.\"\"\".......\"\"\"\"...\n"
+      "            |     |....\"\"\"\"\"\"\"........\"\"\"\"\""
+      "\"^^^^\".......\"\"\"\"\"\"\"\"..\"\n"
+      "            |......\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"......"
+      "..\"\"\"\"\"....\"\"\"\"\"..\"\"...\"\"\".\n\n"
+      "            You're dead.  Better luck in the next life.\n\n\n"
+      );
+  }
+  d = NULL;
+  free(mobs);
+  heap_delete(heap);
+  exit(0);
+}
 
-void move_monster(dungeon_t *d, monster_t *mob) {
+void move_monster(heap_t *heap, dungeon_t *d, monster_t *mob, int num_monsters, monster_t *all_mobs, int32_t tunneling[DUNGEON_Y][DUNGEON_X], int32_t non_tunneling[DUNGEON_Y][DUNGEON_X]) {
   // move in a straight line to the last known pc location
   // if last known pc location is null, just move randomly
 
+  uint8_t xpos = 0;
+  uint8_t ypos = 0;
   // move to last known pc location
   if (mob->pc_loc[dim_x] != UINT8_MAX && mob->pc_loc[dim_y] != UINT8_MAX) {
-    if (mob->attributes[tunneling]) {
+    if (has_characteristic(mob, TUNNEL)) {
+      // when they are tunneling
       // move in a straight line to the pc's last known location
+      if (d->pc[dim_x] > mob->loc[dim_x]) {
+        xpos++;
+      } else if (d->pc[dim_x] < mob->loc[dim_x]) {
+        xpos--;
+      }
 
+      if (d->pc[dim_y] > mob->loc[dim_y]) {
+        ypos++;
+      } else if (d->pc[dim_y] < mob->loc[dim_y]) {
+        ypos--;
+      }
+
+      mob->loc[dim_y] += ypos;
+      mob->loc[dim_x] += xpos;
+      d->map[mob->loc[dim_y]][mob->loc[dim_x]] = ter_floor_hall;
     } else {
+      // when they are NOT tunneling
       // if the path is blocked then just do nothing for now
+      if (mob->pc_loc[dim_x] > mob->loc[dim_x] && d->hardness[mob->loc[dim_y]][mob->loc[dim_x+1]] == 0) {
+        xpos++;
+      } else if (mob->pc_loc[dim_x] < mob->loc[dim_x] && d->hardness[mob->loc[dim_y]][mob->loc[dim_x-1]] == 0) {
+        xpos--;
+      }
 
+      if (mob->pc_loc[dim_y] > mob->loc[dim_y] && d->hardness[mob->loc[dim_y+1]][mob->loc[dim_x]] == 0) {
+        ypos++;
+      } else if (mob->pc_loc[dim_y] < mob->loc[dim_y] && d->hardness[mob->loc[dim_y-1]][mob->loc[dim_x]] == 0) {
+        ypos--;
+      }
+      if (xpos || ypos) {
+        // only do something if they actually moved
+        mob->loc[dim_y] += ypos;
+        mob->loc[dim_x] += xpos;
+        d->map[mob->loc[dim_y]][mob->loc[dim_x]] = ter_floor_hall;
+      }
     }
   } else {
-    // just move randomly
+    // just move randomly cause they haven't seen the PC
+    if (has_characteristic(mob, TUNNEL)) {
+      xpos = rand_range(-1, 1);
+      ypos = rand_range(-1, 1);
+      if (xpos || ypos) {
+        mob->loc[dim_y] += ypos;
+        mob->loc[dim_x] += xpos;
+        d->map[mob->loc[dim_y]][mob->loc[dim_x]] = ter_floor_hall;
+      }
+    } else {
+      if (rand_range(0,1) && d->hardness[mob->loc[dim_y]][mob->loc[dim_x+1]] == 0) {
+        xpos++;
+      } else if (rand_range(0,1) && d->hardness[mob->loc[dim_y]][mob->loc[dim_x-1]] == 0) {
+        xpos--;
+      }
 
+      if (rand_range(0,1) && d->hardness[mob->loc[dim_y+1]][mob->loc[dim_x]] == 0) {
+        ypos++;
+      } else if (rand_range(0,1) && d->hardness[mob->loc[dim_y-1]][mob->loc[dim_x]] == 0) {
+        ypos--;
+      }
+      if (xpos || ypos) {
+        mob->loc[dim_y] += ypos;
+        mob->loc[dim_x] += xpos;
+        d->map[mob->loc[dim_y]][mob->loc[dim_x]] = ter_floor_hall;
+      }
+    }
+  }
+  if (mob->loc[dim_y] == d->pc[dim_y] && mob->loc[dim_x] == d->pc[dim_x]) {
+    end_game(0, d, all_mobs, heap);
   }
 
 }
@@ -566,30 +683,20 @@ int event_sim(dungeon_t *d, monster_t *m, int num_monsters, int32_t tunneling[DU
     if (mob->priority < 0 || mob->priority >= UINT64_MAX) {
       //TODO: add method to reset priorities and reinsert them into the queue
     }
-    else if ((heap_peek_min(&h) == NULL) && mob->type == '@') {
-      printf("\n\n\n YOU WON, CONGRATULATIONS\n\n\n");
+    else if ((heap_peek_min(&h) == NULL) && mob->symbol == '@') {
+      end_game(1, d, m, &h);
       return 0;
     }
-    else if (mob->type == '@') {
+    else if (mob->symbol == '@') {
       // do nothing, I'm lazy to make the PC do stuff
       render(d, m, num_monsters);
       // sleep for 250000 micro seconds
       mob->priority += 1000 / mob->speed;
       mob->hn = heap_insert(&h, mob);
-      usleep(250000);
+      usleep(850000);
     } else {
-      // update pc location if they are telepathic
-      if (mob->attributes[telepathy]) {
-        // if telepathic they can see the pc no matter what
-        mob->pc_loc[dim_x] = d->pc[dim_x];
-        mob->pc_loc[dim_y] = d->pc[dim_y];
-      }
-      // if they are dummies make them forget the last know PC location
-      if (!(mob->attributes[intelligence])) {
-        mob->pc_loc[dim_x] = UINT8_MAX;
-      }
       // now move that monster
-      move_monster(d, mob);
+      move_monster(&h, d, mob, num_monsters, m, tunneling, non_tunneling);
 
       // if mob is out obounds then kill it
       if (mob->loc[dim_x] > DUNGEON_X - 1 || mob->loc[dim_x] < 2) {

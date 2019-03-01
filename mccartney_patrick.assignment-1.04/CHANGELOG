@@ -1,4 +1,6 @@
-a248350 2019-02-21 | debugged event simulator, need to add monster routines still (HEAD -> master, origin/master, origin/HEAD)
+5bbeb94 2019-02-27 | started work on reverted code, need to add tunneling and non-tunneling behaviors (HEAD -> master, origin/master, origin/HEAD)
+fc3041c 2019-02-26 | added readme and changelog, added correct useage for nummon on user error
+a248350 2019-02-21 | debugged event simulator, need to add monster routines still
 f4deb4e 2019-02-21 | segfault detected line 590 monsters.c
 a78894a 2019-02-21 | ready to make monsters move
 7770130 2019-02-21 | added function to render new dungeon with monsters

@@ -2,7 +2,7 @@ Assignment 1.04 based on my submission for 1.03 which just adds onto monster.c a
 
 Useage:
 make
-./rlg327 --nummon 22 --load
+./rlg327 --nummon 22 --load /path/to/file
 
 Save also works and correct useage is printed if incorrect values are passed.
 The routine is started automatically.
