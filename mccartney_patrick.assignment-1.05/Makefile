@@ -8,7 +8,7 @@ TERM = "\"S2019\""
 CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
 CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
 
-LDFLAGS = 
+LDFLAGS = -lncurses
 
 BIN = rlg327
 OBJS = rlg327.o heap.o dungeon.o path.o utils.o character.o \

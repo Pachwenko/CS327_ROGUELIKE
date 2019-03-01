@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "pc.h"
@@ -73,6 +74,14 @@ void usage(char *name)
   exit(-1);
 }
 
+void io_init_ierminal(void) {
+    initscr(); // returns a window struct but its not needed for us
+    raw(); // turns on unbuffered IO - rather than standard IO
+    noecho(); // doesnt print typed letters to terminal when typed
+    curs_set(0); // sets curser to be invisible with the vale 0
+    keypad(stdscr, TRUE); // turns on the keypad
+}
+
 int main(int argc, char *argv[])
 {
   dungeon_t d;
@@ -85,10 +94,10 @@ int main(int argc, char *argv[])
   char *load_file;
   char *pgm_file;
   uint32_t delay = 33000;
-  
+
   /* Quiet a false positive from valgrind. */
   memset(&d, 0, sizeof (d));
-  
+
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
   do_load = do_save = do_image = do_save_seed = do_save_image = 0;
@@ -109,7 +118,7 @@ int main(int argc, char *argv[])
    * And the final switch, '--image', allows me to create a dungeon *
    * from a PGM image, so that I was able to create those more      *
    * interesting test dungeons for you.                             */
- 
+
  if (argc > 1) {
     for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
       if (argv[i][0] == '-') { /* All switches start with a dash */
@@ -225,10 +234,17 @@ int main(int argc, char *argv[])
   /* Ignoring PC position in saved dungeons.  Not a bug. */
   config_pc(&d);
   gen_monsters(&d);
+  io_init_ierminal();
 
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     render_dungeon(&d);
     do_moves(&d);
+    /**********************************************
+     *
+     *
+     *  TODO: Get player's input here instead of usleeping
+     *
+     * *******************************************/
     if (delay) {
       usleep(delay);
     }
@@ -269,6 +285,6 @@ int main(int argc, char *argv[])
   pc_delete(d.pc.pc);
 
   delete_dungeon(&d);
-
+  endwin();
   return 0;
 }
