@@ -245,10 +245,69 @@ int main(int argc, char *argv[])
      *  TODO: Get player's input here instead of usleeping
      *
      * *******************************************/
-    if (delay) {
-      usleep(delay);
+    int input = getch();
+    switch (input) {
+      case KEY_UP:
+      case 8:
+      case 'k':
+        // move UP
+        break;
+      case KEY_PPAGE:
+      case 9:
+      case 'u':
+        // move UP-RIGHT
+        break;
+      case KEY_RIGHT:
+      case 6:
+      case 'l':
+        // move RIGHT
+        break;
+      case KEY_NPAGE:
+      case 3:
+      case 'n':
+        // move DOWN-RIGHT
+        break;
+      case KEY_DOWN:
+      case 2:
+      case 'j':
+        // move DOWN
+        break;
+      case KEY_END:
+      case 1:
+      case 'b':
+        // move DOWN-LEFT
+        break;
+      case KEY_LEFT:
+      case 4:\
+      case 'h':
+        //move LEFT
+      case KEY_HOME:
+      case 7:
+      case 'y':
+        // move UP-LEFT
+        break;
+      case '<':
+        // try to go down the stair (if it exists)
+        break;
+      case '>':
+        // try to go up the stair (if it exists)
+        break;
+      case KEY_B2:
+      case ' ':
+      case '.':
+        // rest for this turn
+        break;
+      case 'm':
+        // create a loop untill player presses escape
+        // display a list of monsters relative to the player
+        // handle up and down arrows in this loop
+        break;
+      case 'Q':
+        // quit the game
+        break;
+      }
     }
-  }
+
 
   render_dungeon(&d);
 

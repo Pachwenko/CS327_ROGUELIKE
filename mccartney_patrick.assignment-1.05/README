@@ -1,0 +1,3 @@
+Assignment 1.05 by Patrick McCartney based on solution to 1.04 by Professor Scheaffer
+
+Uses ncurses to get input from the user for each turn, prints to a 24x81 window

@@ -627,7 +627,7 @@ void render_dungeon(dungeon_t *d)
   clear(); //clears whatever is currently on the screen
   pair_t p;
 
-  mvprintw(0, 0, "\n");
+  mvprintw(0, 0, "Player Location: (%d, %d)\n", d->pc.position[dim_y], d->pc.position[dim_x]);
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
       char toPut;
@@ -646,10 +646,10 @@ void render_dungeon(dungeon_t *d)
         case ter_floor_hall:
           toPut = '#';
           break;
-        case ter_debug:
-          toPut = '*';
-          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
-          break;
+        // case ter_debug:
+        //   toPut = '*';
+        //   fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+        //   break;
         case ter_stairs_up:
           toPut = '<';
           break;
