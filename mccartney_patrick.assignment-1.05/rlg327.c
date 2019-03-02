@@ -234,7 +234,8 @@ int main(int argc, char *argv[])
   /* Ignoring PC position in saved dungeons.  Not a bug. */
   config_pc(&d);
   gen_monsters(&d);
-  io_init_ierminal();
+  /* Initialize the terminal with ncurses - as shown in class */
+  io_init_ierminal(); 
 
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     render_dungeon(&d);
