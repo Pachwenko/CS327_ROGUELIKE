@@ -235,79 +235,12 @@ int main(int argc, char *argv[])
   config_pc(&d);
   gen_monsters(&d);
   /* Initialize the terminal with ncurses - as shown in class */
-  io_init_ierminal(); 
+  io_init_ierminal();
 
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     render_dungeon(&d);
     do_moves(&d);
-    /**********************************************
-     *
-     *
-     *  TODO: Get player's input here instead of usleeping
-     *
-     * *******************************************/
-    int input = getch();
-    switch (input) {
-      case KEY_UP:
-      case 8:
-      case 'k':
-        // move UP
-        break;
-      case KEY_PPAGE:
-      case 9:
-      case 'u':
-        // move UP-RIGHT
-        break;
-      case KEY_RIGHT:
-      case 6:
-      case 'l':
-        // move RIGHT
-        break;
-      case KEY_NPAGE:
-      case 3:
-      case 'n':
-        // move DOWN-RIGHT
-        break;
-      case KEY_DOWN:
-      case 2:
-      case 'j':
-        // move DOWN
-        break;
-      case KEY_END:
-      case 1:
-      case 'b':
-        // move DOWN-LEFT
-        break;
-      case KEY_LEFT:
-      case 4:\
-      case 'h':
-        //move LEFT
-      case KEY_HOME:
-      case 7:
-      case 'y':
-        // move UP-LEFT
-        break;
-      case '<':
-        // try to go down the stair (if it exists)
-        break;
-      case '>':
-        // try to go up the stair (if it exists)
-        break;
-      case KEY_B2:
-      case ' ':
-      case '.':
-        // rest for this turn
-        break;
-      case 'm':
-        // create a loop untill player presses escape
-        // display a list of monsters relative to the player
-        // handle up and down arrows in this loop
-        break;
-      case 'Q':
-        // quit the game
-        break;
-      }
-    }
+  }
 
 
   render_dungeon(&d);
