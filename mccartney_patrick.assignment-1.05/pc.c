@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "move.h"
 #include "path.h"
+#include "npc.h"
 
 void pc_delete(pc_t *pc)
 {
@@ -53,13 +54,48 @@ void config_pc(dungeon_t *d)
 
 /**
  *
- *  Gets the next position for the pc
+ *
+ *  Checks if the PC is standing on a stair and generates a new dungeon is they are.
+ *
+ *
  *
  */
+int enter_stairs(dungeon_t *d, char stair) {
+  if ((d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up && stair == '<')
+    || (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_down && stair == '>')) {
+    // generate a new dungeon, but first delete all the old stuff.
+    delete_dungeon(d);
+    pc_delete(d->pc.pc);
+
+    init_dungeon(d);
+    gen_dungeon(d);
+    config_pc(d);
+    gen_monsters(d);
+    return 0;
+  }
+  return 1;
+}
+
+int display_monsters(dungeon_t *d) {
+  // clear the screen
+  int input;
+  while (1) {
+    input = getch();
+    if (input == 27) {
+      break;
+    }
+
+    // check if input is up or down, keep displaying the current monsters
+    // on lines x { 1-22}
+
+
+  }
+}
+
+
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
   dir[dim_y] = dir[dim_x] = 0;
-
   int input = getch();
   mvprintw(0,0, "you pressed: %c", input);
   switch (input)
@@ -108,6 +144,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
   case 'h':
     //move LEFT
     dir[dim_x]--;
+    break;
   case KEY_HOME:
   case 7:
   case 'y':
@@ -117,28 +154,30 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
     break;
   case '<':
     // try to go down the stair (if it exists)
+    enter_stairs(d, '<');
     break;
   case '>':
     // try to go up the stair (if it exists)
+    enter_stairs(d, '>');
     break;
   case KEY_B2:
+  case 5:
   case ' ':
   case '.':
     // rest for this turn
     break;
   case 'm':
-    // create a loop untill player presses escape
-    // display a list of monsters relative to the player
-    // handle up and down arrows in this loop
+    display_monsters(d);
+    pc_next_pos(d, dir);
     break;
   case 'Q':
     // quit the game
     d->pc.alive = 0;
     break;
+  default:
+    // when a incorrect option is selected, try again
+    pc_next_pos(d, dir);
   }
-
-  
-
   return 0;
 }
 

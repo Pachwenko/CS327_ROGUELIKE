@@ -121,13 +121,13 @@ void do_moves(dungeon_t *d)
     pc_next_pos(d, next);
     next[dim_x] += c->position[dim_x];
     next[dim_y] += c->position[dim_y];
-    if (d->hardness[next[dim_y]][next[dim_x]] == 0)
+    if (hardnesspair(next) == 0)
     {
+      // dont let the user tunnel through walls, if they try just waste their move
       move_character(d, c, next);
+      dijkstra(d);
+      dijkstra_tunnel(d);
     }
-
-    dijkstra(d);
-    dijkstra_tunnel(d);
   }
 }
 
