@@ -59,13 +59,9 @@ void config_pc(dungeon_t *d)
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
   dir[dim_y] = dir[dim_x] = 0;
-  /**********************************************
-     *
-     *
-     *  TODO: Get player's input here instead of usleeping
-     *
-     * *******************************************/
+
   int input = getch();
+  mvprintw(0,0, "you pressed: %c", input);
   switch (input)
   {
   case KEY_UP:
@@ -141,8 +137,9 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
     break;
   }
 
-  // now double check that the entered move is actually valid
-return 0;
+  
+
+  return 0;
 }
 
 uint32_t pc_in_room(dungeon_t *d, uint32_t room)
