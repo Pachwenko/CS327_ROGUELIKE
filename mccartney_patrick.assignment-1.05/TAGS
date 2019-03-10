@@ -34,54 +34,54 @@ typedef enum dim 7,190
 } dim_t;11,238
 typedef int8_t pair_t[pair_t13,248
 
-dungeon.c,1561
+dungeon.c,1563
 #define DUMP_HARDNESS_IMAGES 19,325
-typedef struct corridor_path 21,357
-  heap_node_t *hn;hn22,388
-  uint8_t pos[pos23,407
-  uint8_t from[from24,425
-  int32_t cost;25,444
-} corridor_path_t;26,460
-static uint32_t adjacent_to_room(46,877
-static uint32_t is_open_space(54,1138
-static int32_t corridor_path_cmp(59,1237
-static void dijkstra_corridor(63,1387
-static void dijkstra_corridor_inv(162,5122
-#define hardnesspair_inv(215,6442
-static int connect_two_rooms(265,9113
-static int create_cycle(284,9765
-static int connect_rooms(326,11330
-int gaussian[gaussian339,11523
-typedef struct queue_node 347,11679
-  int x,348,11707
-  int x, y;348,11707
-  struct queue_node *next;next349,11719
-} queue_node_t;350,11746
-static int smooth_hardness(352,11763
-static int empty_dungeon(511,16032
-static int place_rooms(530,16408
-static void place_stairs(567,17595
-static int make_rooms(589,18224
-int gen_dungeon(612,18785
-void render_dungeon(625,18947
-void delete_dungeon(672,20136
-void init_dungeon(679,20270
-int write_dungeon_map(686,20427
-int write_rooms(699,20656
-uint16_t count_up_stairs(721,21128
-uint16_t count_down_stairs(737,21379
-int write_stairs(753,21634
-uint32_t calculate_dungeon_size(785,22389
-int write_dungeon(796,22860
-int read_dungeon_map(862,24415
-int read_stairs(885,25013
-int read_rooms(908,25490
-int read_dungeon(966,27408
-int read_pgm(1047,29283
-void render_hardness_map(1132,31686
-void render_movement_cost_map(1155,32209
-void render_distance_map(1177,32714
-void render_tunnel_distance_map(1216,33748
+typedef struct corridor_path21,357
+  heap_node_t *hn;hn23,388
+  uint8_t pos[pos24,407
+  uint8_t from[from25,425
+  int32_t cost;26,444
+} corridor_path_t;27,460
+static uint32_t adjacent_to_room(47,877
+static uint32_t is_open_space(55,1138
+static int32_t corridor_path_cmp(60,1237
+static void dijkstra_corridor(65,1385
+static void dijkstra_corridor_inv(186,5302
+#define hardnesspair_inv(253,6684
+static int connect_two_rooms(309,9408
+static int create_cycle(328,10060
+static int connect_rooms(373,11635
+int gaussian[gaussian387,11830
+typedef struct queue_node394,11969
+  int x,396,11997
+  int x, y;396,11997
+  struct queue_node *next;next397,12009
+} queue_node_t;398,12036
+static int smooth_hardness(400,12053
+static int empty_dungeon(583,16420
+static int place_rooms(605,16808
+static void place_stairs(649,18012
+static int make_rooms(673,18613
+int gen_dungeon(699,19183
+void render_dungeon(713,19347
+void delete_dungeon(765,20570
+void init_dungeon(772,20703
+int write_dungeon_map(779,20859
+int write_rooms(794,21093
+uint16_t count_up_stairs(817,21567
+uint16_t count_down_stairs(836,21830
+int write_stairs(855,22097
+uint32_t calculate_dungeon_size(893,22876
+int write_dungeon(904,23346
+int read_dungeon_map(976,24883
+int read_stairs(1005,25515
+int read_rooms(1030,25996
+int read_dungeon(1092,27756
+int read_pgm(1184,29631
+void render_hardness_map(1286,32095
+void render_movement_cost_map(1312,32626
+void render_distance_map(1342,33177
+void render_tunnel_distance_map(1390,34271
 
 dungeon.h,1591
 # define DUNGEON_H2,18
@@ -207,9 +207,9 @@ move.c,167
 void do_combat(17,250
 void move_character(32,576
 void do_moves(51,1063
-void dir_nearest_wall(134,3300
-uint32_t against_wall(148,3719
-uint32_t in_corner(160,4191
+void dir_nearest_wall(134,3367
+uint32_t against_wall(148,3786
+uint32_t in_corner(160,4258
 
 move.h,104
 # define MOVE_H2,15
@@ -303,13 +303,15 @@ path.h,93
 # define HARDNESS_PER_TURN 4,32
 typedef struct dungeon dungeon_t;6,63
 
-pc.c,157
-void pc_delete(11,155
-uint32_t pc_is_alive(19,217
-void place_pc(24,279
-void config_pc(34,706
-uint32_t pc_next_pos(59,1174
-uint32_t pc_in_room(145,2578
+pc.c,213
+void pc_delete(12,172
+uint32_t pc_is_alive(20,234
+void place_pc(25,296
+void config_pc(35,723
+int enter_stairs(63,1247
+int display_monsters(79,1715
+uint32_t pc_next_pos(97,1987
+uint32_t pc_in_room(185,3456
 
 pc.h,99
 # define PC_H2,13
@@ -319,10 +321,10 @@ typedef struct pc 10,105
 
 rlg327.c,146
 const char *victory victory14,215
-const char *tombstone tombstone45,1786
-void usage(66,2837
-void io_init_ierminal(77,3121
-int main(85,3465
+const char *tombstone tombstone45,1844
+void usage(66,2933
+void io_init_ierminal(77,3217
+int main(86,3598
 
 utils.c,25
 int makedirectory(9,124

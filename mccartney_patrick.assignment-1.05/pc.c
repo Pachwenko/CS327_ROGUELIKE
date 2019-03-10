@@ -90,6 +90,7 @@ int display_monsters(dungeon_t *d) {
 
 
   }
+  return 0;
 }
 
 
@@ -97,7 +98,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
   dir[dim_y] = dir[dim_x] = 0;
   int input = getch();
-  mvprintw(0,0, "you pressed: %c", input);
+  mvprintw(DUNGEON_Y+2, 0, "you pressed: %c", input);
   switch (input)
   {
   case KEY_UP:

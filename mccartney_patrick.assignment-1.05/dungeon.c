@@ -715,7 +715,7 @@ void render_dungeon(dungeon_t *d)
   clear(); //clears whatever is currently on the screen
   pair_t p;
 
-  //mvprintw(0, 0, "Player Location: (%d, %d)\n", d->pc.position[dim_y], d->pc.position[dim_x]);
+  mvprintw(0, 0, "Player Location: (%d, %d)", d->pc.position[dim_y], d->pc.position[dim_x]);
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++)
   {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++)
@@ -754,13 +754,11 @@ void render_dungeon(dungeon_t *d)
           break;
         }
       }
-      mvaddch(p[dim_y], p[dim_x], toPut);
+      mvaddch(p[dim_y] + 1, p[dim_x], toPut);
     }
-    //mvprintw(0, 0, "\n");
   }
-  mvprintw(0, 22, "\n");
-  mvprintw(0, 23, "\n");
-  endwin();
+  // mvprintw(DUNGEON_Y + 2, 0, "\n");
+  // mvprintw(DUNGEON_Y + 3, 0, "\n");
   refresh();
 }
 
