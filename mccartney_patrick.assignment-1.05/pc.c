@@ -9,6 +9,10 @@
 #include "path.h"
 #include "npc.h"
 
+// to catch ctrl+c input, https://stackoverflow.com/questions/9750588/how-to-get-ctrl-shift-or-alt-with-getch-ncurses
+#define CTRL(c) ((c) & 037)
+
+
 void pc_delete(pc_t *pc)
 {
   if (pc)
@@ -77,6 +81,12 @@ int enter_stairs(dungeon_t *d, char stair)
   return 1;
 }
 
+/**
+ *
+ *
+ * Iterates though the dungeon and creates an array of npcs/monsters
+ *
+ */
 character_t **getMonsters(dungeon_t *d)
 {
   int index, y, x = 0;
@@ -95,47 +105,109 @@ character_t **getMonsters(dungeon_t *d)
   return mobs;
 }
 
-// clear the screen and display monster positions
-void list_mobs(character_t *mobs[], int start, int end) {
+/**
+ *
+ * clears the screen and display monster positions from start to end
+ * on line 1-21
+ *
+ */
+void list_mobs(character_t *mobs[], int start, int end, dungeon_t *d)
+{
   clear();
   int i;
   // displaying the current monsters on lines x { 1-22 }
+  mvprintw(0,0, "           Number of monsters: %d", d->num_monsters - 1);
   int y = 1;
   int ymax = 22;
-  for (i = start; i < end && mobs[i] && y < ymax; i++, y++) {
-    mvprintw(y, 0, "Theres a monster! Located at: (%d, %d)",
-      mobs[i]->position[dim_y], mobs[i]->position[dim_x]);
+  for (i = start; i < end && mobs[i] && y < ymax; i++, y++)
+  {
+    int ydif = mobs[i]->position[dim_y] - d->pc.position[dim_y];
+    int xdif = mobs[i]->position[dim_x] - d->pc.position[dim_x];
+    char *ydir;
+    char *xdir;
+    if (ydif < 0) {
+      ydir = "south";
+      ydif = ydif * -1;
+    } else {
+      ydir = "north";
+    }
+    if (xdif < 0) {
+      xdir = "west";
+      xdif = xdif * -1;
+    } else {
+      xdir = "east";
+    }
+    mvprintw(y, 0, "           %c (%3d %5s, %3d %5s) #%d",
+             mobs[i]->symbol, ydif, ydir, xdif, xdir, i);
   }
   refresh();
 }
 
+
+/**
+ *
+ *  Interface to use when displaying the list of monsters.
+ *
+ */
 int display_monsters(dungeon_t *d)
 {
   // first, get the monsters into an array we can use to display
   character_t **mobs = getMonsters(d);
-  // display starting at 0
-  if (d->num_monsters > 21) {
-    list_mobs(mobs, 0, 21);
-  } else {
-    list_mobs(mobs, 0, d->num_monsters);
+  // display mob list starting at 0
+  int listStart = 0;
+  int listEnd = d->num_monsters;
+  int allowScrolling = 0;
+  if (d->num_monsters > 21)
+  {
+    listEnd = 21;
+    allowScrolling = 1;
   }
+  list_mobs(mobs, listStart, listEnd, d);
   int input;
   while (1)
   {
     input = getch();
-    if (input == 27)
+    switch (input)
     {
+    case KEY_UP:
+    case 8:
+    case 'k':
+      // move the list backwards
+      if (allowScrolling && listStart > 0) {
+        mvprintw(23,0, "DOING SCROLL BACKWARDZ");
+        listStart--;
+        listEnd--;
+        list_mobs(mobs, listStart, listEnd, d);
+      }
+      break;
+    case 27:
+    case CTRL('c'):
+      render_dungeon(d);
+      return 0;
+      break;
+    case KEY_DOWN:
+    case 2:
+    case 'j':
+      // move the list forwards
+      if (allowScrolling && listEnd < d->num_monsters) {
+        mvprintw(23,0, "DOING SCROLL FORWARDZ");
+        listStart++;
+        listEnd++;
+        list_mobs(mobs, listStart, listEnd, d);
+      }
       break;
     }
-
-    // check if input is up or down, keep
-
-
   }
   render_dungeon(d);
   return 0;
 }
 
+/**
+ *
+ *
+ * Code originally by Sheaffer, but modified to use NCurses instead of putchar
+ *
+ */
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
   dir[dim_y] = dir[dim_x] = 0;

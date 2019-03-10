@@ -1,3 +1,6 @@
 Assignment 1.05 by Patrick McCartney based on solution to 1.04 by Professor Scheaffer
 
-Uses ncurses to get input from the user for each turn, prints to a 24x81 window
+Uses ncurses to get input from the user for each turn and print to a 24x81 window
+
+Displays the PC position on the first line, line 23 displays the incorrect key (if incorrect input is given).
+Required keys are implemented, but note that exiting from monster list takes a few seconds for some odd reason.
