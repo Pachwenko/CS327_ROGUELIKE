@@ -60,9 +60,10 @@ void config_pc(dungeon_t *d)
  *
  *
  */
-int enter_stairs(dungeon_t *d, char stair) {
-  if ((d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up && stair == '<')
-    || (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_down && stair == '>')) {
+int enter_stairs(dungeon_t *d, char stair)
+{
+  if ((d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up && stair == '<') || (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_down && stair == '>'))
+  {
     // generate a new dungeon, but first delete all the old stuff.
     delete_dungeon(d);
     pc_delete(d->pc.pc);
@@ -76,29 +77,70 @@ int enter_stairs(dungeon_t *d, char stair) {
   return 1;
 }
 
-int display_monsters(dungeon_t *d) {
-  // clear the screen
+character_t **getMonsters(dungeon_t *d)
+{
+  int index, y, x = 0;
+  character_t **mobs = malloc(sizeof(character_t) * d->num_monsters);
+  for (y = 0; y < DUNGEON_Y; y++)
+  {
+    for (x = 0; x < DUNGEON_X; x++)
+    {
+      if (d->character[y][x] && d->character[y][x]->npc)
+      {
+        mobs[index] = d->character[y][x];
+        index++;
+      }
+    }
+  }
+  return mobs;
+}
+
+// clear the screen and display monster positions
+void list_mobs(character_t *mobs[], int start, int end) {
+  clear();
+  int i;
+  // displaying the current monsters on lines x { 1-22 }
+  int y = 1;
+  int ymax = 22;
+  for (i = start; i < end && mobs[i] && y < ymax; i++, y++) {
+    mvprintw(y, 0, "Theres a monster! Located at: (%d, %d)",
+      mobs[i]->position[dim_y], mobs[i]->position[dim_x]);
+  }
+  refresh();
+}
+
+int display_monsters(dungeon_t *d)
+{
+  // first, get the monsters into an array we can use to display
+  character_t **mobs = getMonsters(d);
+  // display starting at 0
+  if (d->num_monsters > 21) {
+    list_mobs(mobs, 0, 21);
+  } else {
+    list_mobs(mobs, 0, d->num_monsters);
+  }
   int input;
-  while (1) {
+  while (1)
+  {
     input = getch();
-    if (input == 27) {
+    if (input == 27)
+    {
       break;
     }
 
-    // check if input is up or down, keep displaying the current monsters
-    // on lines x { 1-22}
+    // check if input is up or down, keep
 
 
   }
+  render_dungeon(d);
   return 0;
 }
-
 
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
   dir[dim_y] = dir[dim_x] = 0;
   int input = getch();
-  mvprintw(DUNGEON_Y+2, 0, "you pressed: %c", input);
+  mvprintw(DUNGEON_Y + 2, 0, "you pressed: %c", input);
   switch (input)
   {
   case KEY_UP:
