@@ -15,5 +15,5 @@ Requires NCurses
 
 ```bash
 make
-./main
+./rlg327
 ```
