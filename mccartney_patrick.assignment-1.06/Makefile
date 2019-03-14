@@ -6,7 +6,7 @@ RM = rm -f
 TERM = "\"S2019\""
 
 CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
+CXXFLAGS = -Wall -fpermissive -ggdb -funroll-loops -DTERM=$(TERM)
 
 LDFLAGS = -lncurses
 
@@ -18,7 +18,7 @@ all: $(BIN) etags
 
 $(BIN): $(OBJS)
 	@$(ECHO) Linking $@
-	@$(CC) $^ -o $@ $(LDFLAGS)
+	@$(CXX) $^ -o $@ $(LDFLAGS)
 
 -include $(OBJS:.o=.d)
 

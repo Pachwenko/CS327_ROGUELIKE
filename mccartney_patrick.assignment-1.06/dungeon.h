@@ -4,6 +4,7 @@
 # include "heap.h"
 # include "dims.h"
 # include "character.h"
+# include "character.cpp"
 
 #define DUNGEON_X              80
 #define DUNGEON_Y              21
@@ -62,8 +63,8 @@ typedef struct dungeon {
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
-  character_t *character[DUNGEON_Y][DUNGEON_X];
-  character_t pc;
+  character *chars[DUNGEON_Y][DUNGEON_X];
+  character pc;
   heap_t events;
   uint16_t num_monsters;
   uint16_t max_monsters;
