@@ -12,11 +12,11 @@
 /* Returns random integer in [min, max]. */
 # define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
 
-// #define malloc(size) ({
-//   void *_tmp;
-//   assert((_tmp = malloc(size)));
-//   _tmp;                          
-// })
+#define malloc(size) ({          \
+  void *_tmp;                    \
+  assert((_tmp = malloc(size))); \
+  _tmp;                          \
+})
 
 #define UNUSED(f) ((void) f)
 

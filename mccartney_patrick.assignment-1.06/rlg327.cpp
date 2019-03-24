@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   dungeon_t d;
   time_t seed;
   struct timeval tv;
-  int i;
+  uint32_t i;
   uint32_t do_load, do_save, do_seed, do_image, do_save_seed, do_save_image;
   uint32_t long_arg;
   char *save_file;
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
     if (do_save_seed)
     {
       /* 10 bytes for number, plus dot, extention and null terminator. */
-      save_file = (char*) malloc(18);
+      save_file = malloc(18);
       sprintf(save_file, "%ld.rlg327", seed);
     }
     if (do_save_image)
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
       else
       {
         /* Extension of 3 characters longer than image extension + null. */
-        save_file = (char*) malloc(strlen(pgm_file) + 4);
+        save_file = malloc(strlen(pgm_file) + 4);
         strcpy(save_file, pgm_file);
         strcpy(strchr(save_file, '.') + 1, "rlg327");
       }
