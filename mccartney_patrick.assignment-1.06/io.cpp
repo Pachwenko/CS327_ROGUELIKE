@@ -158,8 +158,8 @@ void io_display_hardness(dungeon_t *d)
 
 static int compare_monster_distance(const void *v1, const void *v2)
 {
-  const character_t *const *c1 = v1;
-  const character_t *const *c2 = v2;
+  const character_t *const *c1 = (const character_t* const*) v1;
+  const character_t *const *c2 = (const character_t* const*) v2;
 
   return (dungeon->pc_distance[(*c1)->position[dim_y]][(*c1)->position[dim_x]] -
           dungeon->pc_distance[(*c2)->position[dim_y]][(*c2)->position[dim_x]]);
@@ -170,7 +170,7 @@ static character_t *io_nearest_visible_monster(dungeon_t *d)
   character_t **c, *n;
   uint32_t x, y, count, i;
 
-  c = malloc(d->num_monsters * sizeof (*c));
+  c = (character_t**) malloc(d->num_monsters * sizeof (*c));
 
   /* Get a linear list of monsters */
   for (count = 0, y = 1; y < DUNGEON_Y - 1; y++) {
@@ -370,7 +370,7 @@ static void io_list_monsters_display(dungeon_t *d,
   uint32_t i;
   char (*s)[40]; /* pointer to array of 40 char */
 
-  s = malloc(count * sizeof (*s));
+  s = (char(*)[40]) malloc(count * sizeof (*s));
 
   mvprintw(3, 19, " %-40s ", "");
   /* Borrow the first element of our array for this string: */
@@ -417,7 +417,7 @@ static void io_list_monsters(dungeon_t *d)
   character_t **c;
   uint32_t x, y, count;
 
-  c = malloc(d->num_monsters * sizeof (*c));
+  c = (character_t **) malloc(d->num_monsters * sizeof (*c));
 
   /* Get a linear list of monsters */
   for (count = 0, y = 1; y < DUNGEON_Y - 1; y++) {
