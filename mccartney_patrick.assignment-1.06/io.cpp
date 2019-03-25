@@ -56,7 +56,7 @@ void io_queue_message(const char *format, ...)
   io_message_t *tmp;
   va_list ap;
 
-  if (!(tmp = malloc(sizeof (*tmp)))) {
+  if (!(tmp = (io_message_t*) malloc(sizeof (*tmp)))) {
     perror("malloc");
     exit(1);
   }
@@ -259,7 +259,7 @@ void io_display(dungeon_t *d)
     mvprintw(22, 55, "NONE.");
     attroff(COLOR_PAIR(COLOR_BLUE));
   }
-           
+
 
   io_print_message_queue(0, 0);
 
