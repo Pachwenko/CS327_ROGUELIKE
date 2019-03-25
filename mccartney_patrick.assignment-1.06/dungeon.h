@@ -16,7 +16,7 @@
 #define VISUAL_RANGE           15
 #define PC_SPEED               10
 #define NPC_MIN_SPEED          5
-#define NPC_MAX_SPEED          15
+#define NPC_MAX_SPEED          20
 #define MAX_MONSTERS           15
 #define SAVE_DIR               ".rlg327"
 #define DUNGEON_SAVE_FILE      "dungeon"
@@ -75,18 +75,15 @@ typedef struct dungeon {
    * information from the current event.                                   */
   uint32_t time;
   uint32_t is_new;
+  uint32_t quit;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
+void new_dungeon(dungeon_t *d);
 void delete_dungeon(dungeon_t *d);
 int gen_dungeon(dungeon_t *d);
-void render_dungeon(dungeon_t *d);
 int write_dungeon(dungeon_t *d, char *file);
 int read_dungeon(dungeon_t *d, char *file);
 int read_pgm(dungeon_t *d, char *pgm);
-void render_distance_map(dungeon_t *d);
-void render_tunnel_distance_map(dungeon_t *d);
-void render_hardness_map(dungeon_t *d);
-void render_movement_cost_map(dungeon_t *d);
 
 #endif
