@@ -79,16 +79,16 @@ int main(int argc, char *argv[])
   dungeon_t d;
   time_t seed;
   struct timeval tv;
-  uint32_t i;
+  int i;
   uint32_t do_load, do_save, do_seed, do_image, do_save_seed, do_save_image;
   uint32_t long_arg;
   char *save_file;
   char *load_file;
   char *pgm_file;
-  
+
   /* Quiet a false positive from valgrind. */
   memset(&d, 0, sizeof (d));
-  
+
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
   do_load = do_save = do_image = do_save_seed = do_save_image = 0;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
    * And the final switch, '--image', allows me to create a dungeon *
    * from a PGM image, so that I was able to create those more      *
    * interesting test dungeons for you.                             */
- 
+
  if (argc > 1) {
     for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
       if (argv[i][0] == '-') { /* All switches start with a dash */
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
   if (do_save) {
     if (do_save_seed) {
        /* 10 bytes for number, plus dot, extention and null terminator. */
-      save_file = malloc(18);
+      save_file = (char*) malloc(18);
       sprintf(save_file, "%ld.rlg327", seed);
     }
     if (do_save_image) {
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 	do_save_image = 0;
       } else {
 	/* Extension of 3 characters longer than image extension + null. */
-	save_file = malloc(strlen(pgm_file) + 4);
+	save_file = (char*) malloc(strlen(pgm_file) + 4);
 	strcpy(save_file, pgm_file);
 	strcpy(strchr(save_file, '.') + 1, "rlg327");
       }

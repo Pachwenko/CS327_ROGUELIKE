@@ -6,10 +6,8 @@ RM = rm -f
 TERM = "\"S2019\""
 
 CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-#CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-CXXFLAGS = -fpermissive -Wsign-compare -ggdb -funroll-loops -DTERM=$(TERM)
-# fpermissive and Wsign-compare are added just to ensure compilation and runtime
-# before translation to c++ and should be removed later
+CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
+#CXXFLAGS = -fpermissive -Wsign-compare -ggdb -funroll-loops -DTERM=$(TERM)
 
 LDFLAGS = -lncurses
 
