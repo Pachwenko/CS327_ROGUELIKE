@@ -1,17 +1,27 @@
-# roguelike-text-game
+# Terminal Based Roguelike in C and C++
 
-The roguelike console game for Com S 327 at Iowa State University. Built in C with Ncurses
+A roguelike game for Com S 327 at Iowa State University. Built in C and C++ with Ncurses.
 
-Each folder represents the first to last assignment which halfway through transition from C to C++.
-Each assignment builds on the last so the code may be viewed as a story.
+Each folder represents the first to last assignment which halfway through transitions from C to C++. The last assignment in C is 1.05, all subequent assignments are in C++.
+Each assignment builds on the last so the code may be viewed as a story through commit logs.
 
 ## Dependencies
 
-Built with GCC 8.0 on Unix systems (Slackware, Fedora, Ubuntu, etc.)
-Requires NCurses
+### GCC and G++ To compile or make .c and .cpp files respectively
+
+GCC-8 (for Ubuntu, sudo apt install gcc)
+G++-8 (for Ubuntu, sudo apt install g++)
+
+Alternatively, install the "build-essential" package.
+
+### NCurses
+
+For Ubuntu, sudo apt install libncurses5-dev
+
+There are more if desired such as debugging packages and can be found with "apt-cache search libncurses".
 
 
-## How to build
+## How to Build and Run
 
 ```bash
 make
