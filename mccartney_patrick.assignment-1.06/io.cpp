@@ -478,6 +478,7 @@ uint32_t io_teleport_pc(dungeon_t *d)
       /*        Use this spot as the destination   */
       if (check_bounds(dest))
       {
+        d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = NULL;
         *d->pc.position = *dest;
         *d->character[dest[dim_y]][dest[dim_x]] = d->pc;
         keep_asking = 0;
@@ -490,9 +491,9 @@ uint32_t io_teleport_pc(dungeon_t *d)
     case 'k':
     case KEY_UP:
       io_display(d);
-      dest[dim_y]++;
+      dest[dim_y]--;
       if (!check_bounds(dest)) {
-        dest[dim_y]--;
+        dest[dim_y]++;
       }
       mvprintw(dest[dim_y], dest[dim_x], "*");
       break;
@@ -500,9 +501,9 @@ uint32_t io_teleport_pc(dungeon_t *d)
     case 'j':
     case KEY_DOWN:
       io_display(d);
-      dest[dim_y]--;
+      dest[dim_y]++;
       if (!check_bounds(dest)) {
-        dest[dim_y]++;
+        dest[dim_y]--;
       }
       mvprintw(dest[dim_y], dest[dim_x], "*");
       break;
