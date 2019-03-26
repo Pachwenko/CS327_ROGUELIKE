@@ -5,10 +5,10 @@
 
 # include "dims.h"
 
-typedef struct dungeon dungeon_t;
-typedef struct npc npc_t;
-typedef struct pc pc_t;
-typedef struct dice_t dice_t;
+class dungeon_t;
+class npc_t;
+class pc_t;
+class dice_t;
 
 typedef enum kill_type {
   kill_direct,

@@ -42,12 +42,14 @@ typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_stairs_down
 } terrain_type_t;
 
-typedef struct room {
+class room_t {
+  public:
   pair_t position;
   pair_t size;
-} room_t;
+};
 
-typedef struct dungeon {
+class dungeon_t {
+  public:
   uint32_t num_rooms;
   room_t *rooms;
   uint8_t display_fog;
@@ -78,7 +80,7 @@ typedef struct dungeon {
   uint32_t time;
   uint32_t is_new;
   uint32_t quit;
-} dungeon_t;
+};
 
 void init_dungeon(dungeon_t *d);
 void new_dungeon(dungeon_t *d);
