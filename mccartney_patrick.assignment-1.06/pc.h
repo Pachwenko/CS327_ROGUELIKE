@@ -4,10 +4,12 @@
 # include <stdint.h>
 
 # include "dims.h"
+# include "character.h"
+
 
 class dungeon_t;
 
-class pc_t {
+class pc_t : public character_t {
 };
 
 void pc_delete(pc_t *pc);
