@@ -652,7 +652,7 @@ int fogOWar_init(dungeon_t *d) {
       d->fog_of_war[y][x] = ter_wall;
     }
   }
-
+  d->display_fog = 1;
   return 0;
 }
 

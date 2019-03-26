@@ -197,7 +197,14 @@ static character_t *io_nearest_visible_monster(dungeon_t *d)
   return n;
 }
 
-void io_display(dungeon_t *d)
+/**
+ *
+ *  This is a copy of io_display but rendering
+ * fog of war instead.
+ *
+ *
+ */
+void io_display_fog(dungeon_t *d)
 {
   uint32_t y, x;
   character_t *c;
@@ -275,11 +282,14 @@ void io_display_monster_list(dungeon_t *d)
   getch();
 }
 
-uint32_t io_teleport_pc(dungeon_t *d)
-{
-  /* Just for fun. */
+/**
+ *
+ * Teleports to a random spot on the map
+ *
+ *
+ */
+int io_teleport_random(dungeon_t *d) {
   pair_t dest;
-
   do {
     dest[dim_x] = rand_range(1, DUNGEON_X - 2);
     dest[dim_y] = rand_range(1, DUNGEON_Y - 2);
@@ -294,10 +304,143 @@ uint32_t io_teleport_pc(dungeon_t *d)
   if (mappair(dest) < ter_floor) {
     mappair(dest) = ter_floor;
   }
+  return 0;
+}
+
+void io_display(dungeon_t *d)
+{
+  if (d->display_fog) {
+    io_display_fog(d);
+    return;
+  }
+  uint32_t y, x;
+  character_t *c;
+
+  clear();
+  for (y = 0; y < 21; y++) {
+    for (x = 0; x < 80; x++) {
+      if (d->character[y][x]) {
+        mvaddch(y + 1, x, d->character[y][x]->symbol);
+      } else {
+        switch (d->map[y][x]) {
+        case ter_wall:
+        case ter_wall_immutable:
+          mvaddch(y + 1, x, ' ');
+          break;
+        case ter_floor:
+        case ter_floor_room:
+          mvaddch(y + 1, x, '.');
+          break;
+        case ter_floor_hall:
+          mvaddch(y + 1, x, '#');
+          break;
+        case ter_debug:
+          mvaddch(y + 1, x, '*');
+          break;
+        case ter_stairs_up:
+          mvaddch(y + 1, x, '<');
+          break;
+        case ter_stairs_down:
+          mvaddch(y + 1, x, '>');
+          break;
+        default:
+ /* Use zero as an error symbol, since it stands out somewhat, and it's *
+  * not otherwise used.                                                 */
+          mvaddch(y + 1, x, '0');
+        }
+      }
+    }
+  }
+
+  mvprintw(23, 1, "PC position is (%2d,%2d).",
+           d->pc.position[dim_x], d->pc.position[dim_y]);
+  mvprintw(22, 1, "%d known %s.", d->num_monsters,
+           d->num_monsters > 1 ? "monsters" : "monster");
+  mvprintw(22, 30, "Nearest visible monster: ");
+  if ((c = io_nearest_visible_monster(d))) {
+    attron(COLOR_PAIR(COLOR_RED));
+    mvprintw(22, 55, "%c at %d %c by %d %c.",
+             c->symbol,
+             abs(c->position[dim_y] - d->pc.position[dim_y]),
+             ((c->position[dim_y] - d->pc.position[dim_y]) <= 0 ?
+              'N' : 'S'),
+             abs(c->position[dim_x] - d->pc.position[dim_x]),
+             ((c->position[dim_x] - d->pc.position[dim_x]) <= 0 ?
+              'W' : 'E'));
+    attroff(COLOR_PAIR(COLOR_RED));
+  } else {
+    attron(COLOR_PAIR(COLOR_BLUE));
+    mvprintw(22, 55, "NONE.");
+    attroff(COLOR_PAIR(COLOR_BLUE));
+  }
+
+
+  io_print_message_queue(0, 0);
+
+  refresh();
+}
+
+
+/**
+ *
+ *
+ * Teleports to either a random location (if user presses r)
+ * or to the location the user selects
+ *
+ */
+uint32_t io_teleport_pc(dungeon_t *d)
+{
+  pair_t dest;
+  dest[dim_x] = rand_range(1, DUNGEON_X - 2);
+  dest[dim_y] = rand_range(1, DUNGEON_Y - 2);
+
+  uint8_t original_fog = d->display_fog;
+  d->display_fog = 0;
+  io_display(d);
+
+  int keep_asking = 1;
+  // poll for input
+  while (keep_asking) {
+    int input = getch();
+    switch (input) {
+      case 'r':
+        /*        Do it randomly and exit             */
+        io_teleport_random(d);
+        keep_asking = 0;
+        break;
+      case 't':
+        /*        Use this spot as the destination   */
+        if (dest)
+        keep_asking = 0;
+        break;
+      case '8':
+      case 'k':
+      case KEY_UP:
+        //fail_code = move_pc(d, 8);
+        break;
+      case '6':
+      case 'l':
+      case KEY_RIGHT:
+        //fail_code = move_pc(d, 6);
+        break;
+      case '2':
+      case 'j':
+      case KEY_DOWN:
+        //fail_code = move_pc(d, 2);
+        break;
+      case '4':
+      case 'h':
+      case KEY_LEFT:
+        //fail_code = move_pc(d, 4);
+        break;
+    }
+  }
+
 
   dijkstra(d);
   dijkstra_tunnel(d);
-
+  d->display_fog = original_fog;
+  io_display(d);
   return 0;
 }
 /* Adjectives to describe our monsters */
@@ -535,6 +678,18 @@ void io_handle_input(dungeon_t *d)
     case 'm':
       io_list_monsters(d);
       fail_code = 1;
+      break;
+    case 'f':
+      /* Toggle fog display                                             */
+      if (d->display_fog) {
+        d->display_fog = 0;
+      } else {
+        d->display_fog = 1;
+      }
+      io_display(d);
+      break;
+    case 't':
+      io_teleport_pc(d);
       break;
     case 'q':
       /* Demonstrate use of the message queue.  You can use this for *
