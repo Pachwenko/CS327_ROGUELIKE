@@ -243,10 +243,10 @@ void io_display_fog(dungeon_t *d)
     {
       if (d->character[y][x] && can_see(d, &d->pc, d->character[y][x]))
       {
-        if (can_change_color() && d->character[y][x]->symbol == '@') {
-          start_color();
-          init_color(COLOR_RED, 1000, 0, 0);
-          mvaddch(y + 1, x, d->character[y][x]->symbol);
+        if (d->character[y][x]->symbol == '@') {
+          attron(COLOR_PAIR(COLOR_RED));
+          mvaddch(y + 1, x, '@');
+          attroff(COLOR_PAIR(COLOR_RED));
         } else {
           mvaddch(y + 1, x, d->character[y][x]->symbol);
         }
