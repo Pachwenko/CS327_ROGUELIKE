@@ -614,6 +614,48 @@ static int make_rooms(dungeon_t *d)
   return 0;
 }
 
+/**
+ *
+ *
+ * Updates the area around the pc in a 3x3 area
+ *
+ */
+int update_fog(dungeon_t *d) {
+  uint8_t y = d->pc.position[dim_y];
+  uint8_t x = d->pc.position[dim_x];
+
+  d->fog_of_war[y][x] = d->map[y][x];
+
+  d->fog_of_war[y+1][x] = d->map[y+1][x];
+  d->fog_of_war[y+1][x-1] = d->map[y+1][x-1];
+  d->fog_of_war[y+1][x+1] = d->map[y+1][x+1];
+
+  d->fog_of_war[y  ][x+1] = d->map[y][x+1];
+  d->fog_of_war[y  ][x-1] = d->map[y][x-1];
+
+  d->fog_of_war[y-1][x+1] = d->map[y-1][x+1];
+  d->fog_of_war[y-1][x] = d->map[y-1][x];
+  d->fog_of_war[y-1][x-1] = d->map[y-1][x-1];
+  return 0;
+}
+
+/**
+ *
+ * Sets fog of war to all walls except for
+ * the spaces around the player
+ *
+ */
+int fogOWar_init(dungeon_t *d) {
+  int y, x;
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      d->fog_of_war[y][x] = ter_wall;
+    }
+  }
+
+  return 0;
+}
+
 int gen_dungeon(dungeon_t *d)
 {
   empty_dungeon(d);

@@ -177,6 +177,7 @@ void do_moves(dungeon_t *d)
     e->c = NULL;
     event_delete(e);
     io_handle_input(d);
+    update_fog(d);
   }
 }
 

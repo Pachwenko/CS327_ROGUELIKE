@@ -51,6 +51,7 @@ typedef struct dungeon {
   uint32_t num_rooms;
   room_t *rooms;
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
+  terrain_type_t fog_of_war[DUNGEON_Y][DUNGEON_X];
   /* Since hardness is usually not used, it would be expensive to pull it *
    * into cache every time we need a map cell, so we store it in a        *
    * parallel array, rather than using a structure to represent the       *
@@ -63,7 +64,6 @@ typedef struct dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   character_t *character[DUNGEON_Y][DUNGEON_X];
-  character_t *fog_of_war[DUNGEON_Y][DUNGEON_X];
   character_t pc;
   heap_t events;
   uint16_t num_monsters;
@@ -81,6 +81,8 @@ typedef struct dungeon {
 
 void init_dungeon(dungeon_t *d);
 void new_dungeon(dungeon_t *d);
+int fogOWar_init(dungeon_t *d);
+int update_fog(dungeon_t *d);
 void delete_dungeon(dungeon_t *d);
 int gen_dungeon(dungeon_t *d);
 int write_dungeon(dungeon_t *d, char *file);

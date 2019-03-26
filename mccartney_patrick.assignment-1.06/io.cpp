@@ -205,10 +205,10 @@ void io_display(dungeon_t *d)
   clear();
   for (y = 0; y < 21; y++) {
     for (x = 0; x < 80; x++) {
-      if (d->character[y][x]) {
+      if (d->character[y][x]  && can_see(d, &d->pc, d->character[y][x])) {
         mvaddch(y + 1, x, d->character[y][x]->symbol);
       } else {
-        switch (mapxy(x, y)) {
+        switch (d->fog_of_war[y][x]) {
         case ter_wall:
         case ter_wall_immutable:
           mvaddch(y + 1, x, ' ');
