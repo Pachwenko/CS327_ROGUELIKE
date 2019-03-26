@@ -243,7 +243,13 @@ void io_display_fog(dungeon_t *d)
     {
       if (d->character[y][x] && can_see(d, &d->pc, d->character[y][x]))
       {
-        mvaddch(y + 1, x, d->character[y][x]->symbol);
+        if (can_change_color() && d->character[y][x]->symbol == '@') {
+          start_color();
+          init_color(COLOR_RED, 1000, 0, 0);
+          mvaddch(y + 1, x, d->character[y][x]->symbol);
+        } else {
+          mvaddch(y + 1, x, d->character[y][x]->symbol);
+        }
       }
       else
       {
@@ -480,7 +486,7 @@ uint32_t io_teleport_pc(dungeon_t *d)
       {
         d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = NULL;
         *d->pc.position = *dest;
-        *d->character[dest[dim_y]][dest[dim_x]] = d->pc;
+        d->character[dest[dim_y]][dest[dim_x]] = &d->pc;
         keep_asking = 0;
       }
       else {
