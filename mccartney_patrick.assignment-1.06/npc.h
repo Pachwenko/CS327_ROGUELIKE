@@ -42,7 +42,7 @@
   ((character)->npc->characteristics & NPC_##bit)
 
 typedef struct dungeon dungeon_t;
-typedef struct character character_t;
+class character_t;
 typedef uint32_t npc_characteristics_t;
 
 typedef struct npc {
