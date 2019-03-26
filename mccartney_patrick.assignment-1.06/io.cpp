@@ -366,7 +366,13 @@ void io_display(dungeon_t *d)
     {
       if (d->character[y][x])
       {
-        mvaddch(y + 1, x, d->character[y][x]->symbol);
+        if (d->character[y][x]->symbol == '@') {
+          attron(COLOR_PAIR(COLOR_RED));
+          mvaddch(y + 1, x, '@');
+          attroff(COLOR_PAIR(COLOR_RED));
+        } else {
+          mvaddch(y + 1, x, d->character[y][x]->symbol);
+        }
       }
       else
       {
