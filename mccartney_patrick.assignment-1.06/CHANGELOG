@@ -1,4 +1,11 @@
-097f682 2019-03-25 | fixed bug with input handling (HEAD -> master, origin/master, origin/HEAD)
+ae8590f 2019-03-26 | now uses inheritance for pc and npc subtypes (HEAD -> master, origin/master, origin/HEAD)
+ca833b8 2019-03-26 | now uses classes instead of structs
+06104b7 2019-03-26 | began converting structs to classes
+03b894c 2019-03-26 | fixed bug on initial screen not showing visible areas
+9537d8b 2019-03-26 | Debugged color on pc
+8b6ff18 2019-03-26 | added vscode to gitignore
+1cdd056 2019-03-26 | added color to player
+097f682 2019-03-25 | fixed bug with input handling
 c5d5f54 2019-03-25 | started debugging teleport mechanic
 3693118 2019-03-25 | random teleport works, fog of war is now toggleable
 058b6d3 2019-03-25 | fog of war now works but is not toggleable
