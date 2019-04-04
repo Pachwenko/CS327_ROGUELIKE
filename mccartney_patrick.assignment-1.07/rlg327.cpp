@@ -115,7 +115,7 @@ int parse_monster_file()
   char *filepath = (char *)malloc(strlen(homepath) + strlen(file_loc) + 1);
   strcat(filepath, homepath);
   strcat(filepath, file_loc);
-  printf("%s\n", filepath);
+  //printf("%s\n", filepath);
 
   ifstream f(filepath); // a input file stream
   string s;
@@ -180,15 +180,56 @@ int parse_monster_file()
       //cout << mobs[index].abilities << endl;
     }
     else if (first_token.compare("SPEED") == 0) {
-      
+      // to parse, eat the first string and the following space
+      // eat the first string up to the +, that is the base
+      // eat the next string untill 'd', that is the number of rolls
+      // eat the last number which is number of sides
+      s = s.substr(end_first_token); // eat first token cause we want the dice data
+
+      string rolls = s.substr(0, s.find_first_of("+"));
+      s = s.substr(s.find_first_of("+")+1);
+      mobs[index].speed.rolls = stoi(rolls);
+
+      string base = s.substr(0, s.find_first_of("d"));
+      s = s.substr(s.find_first_of("d")+1);
+      mobs[index].speed.base = stoi(base);
+
+      string sides = s;
+      mobs[index].speed.sides = stoi(sides);
+
       got_speed = 1;
       //TODO: get speed dice
     }
     else if (first_token.compare("DAM") == 0) {
+      s = s.substr(end_first_token); // eat first token cause we want the dice data
+
+      string rolls = s.substr(0, s.find_first_of("+"));
+      s = s.substr(s.find_first_of("+")+1);
+      mobs[index].damage.rolls = stoi(rolls);
+
+      string base = s.substr(0, s.find_first_of("d"));
+      s = s.substr(s.find_first_of("d")+1);
+      mobs[index].damage.base = stoi(base);
+
+      string sides = s;
+      mobs[index].damage.sides = stoi(sides);
       got_dam = 1;
       //TODO get damage dice
     }
     else if (first_token.compare("HP") == 0) {
+      s = s.substr(end_first_token); // eat first token cause we want the dice data
+
+      string rolls = s.substr(0, s.find_first_of("+"));
+      s = s.substr(s.find_first_of("+")+1);
+      mobs[index].hp.rolls = stoi(rolls);
+
+      string base = s.substr(0, s.find_first_of("d"));
+      s = s.substr(s.find_first_of("d")+1);
+      mobs[index].hp.base = stoi(base);
+
+      string sides = s;
+      mobs[index].hp.sides = stoi(sides);
+
       got_hp = 1;
       //TODO get hp dice
     }
@@ -223,11 +264,12 @@ int parse_monster_file()
     cout << mobs[i].desc;
     cout << mobs[i].symbol << endl;
     cout << mobs[i].color << endl;
-    cout << mobs[i].speed.original << endl;
+    cout << mobs[i].speed.rolls << "+" << mobs[i].speed.base << "d" << mobs[i].speed.sides << endl;
     cout << mobs[i].abilities << endl;
-    cout << mobs[i].hp.original << endl;
-    cout << mobs[i].damage.original << endl;
+    cout << mobs[i].hp.rolls << "+" << mobs[i].hp.base << "d" << mobs[i].hp.sides << endl;;
+    cout << mobs[i].damage.rolls << "+" << mobs[i].damage.base << "d" << mobs[i].damage.sides << endl;
     cout << mobs[i].rarity << endl;
+    printf("\n");
   }
   f.close();
   return 0;
