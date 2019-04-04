@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream> //file streaming
 #include <string>
+#include <vector>
 
 #include "dungeon.h"
 #include "pc.h"
@@ -131,6 +132,7 @@ int parse_monster_file()
 
   string first_token;
   monster_desc mobs[100];
+  vector<monster_desc> mobz;
 
   while (f.is_open() && getline(f, s))
   {
@@ -142,6 +144,8 @@ int parse_monster_file()
 
     if (s.compare("BEGIN MONSTER") == 0 && !is_reading_newmob)
     {
+      monster_desc newmob;
+      mobz.push_back(newmob);
       // new mob so malloc space for another one
       //printf("began new monster\n");
       is_reading_newmob = 1;
