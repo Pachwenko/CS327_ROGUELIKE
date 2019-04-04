@@ -83,7 +83,6 @@ void usage(char *name)
 
 class dice {
   public:
-  string original;
   int base;
   int rolls;
   int sides;
@@ -181,17 +180,15 @@ int parse_monster_file()
       //cout << mobs[index].abilities << endl;
     }
     else if (first_token.compare("SPEED") == 0) {
-      mobs[index].speed.original = s.substr(end_first_token);
+      
       got_speed = 1;
       //TODO: get speed dice
     }
     else if (first_token.compare("DAM") == 0) {
-      mobs[index].damage.original = s.substr(end_first_token);
       got_dam = 1;
       //TODO get damage dice
     }
     else if (first_token.compare("HP") == 0) {
-      mobs[index].hp.original = s.substr(end_first_token);
       got_hp = 1;
       //TODO get hp dice
     }
