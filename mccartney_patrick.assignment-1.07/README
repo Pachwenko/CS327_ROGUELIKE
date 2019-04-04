@@ -1,0 +1,2 @@
+Uses rlg327.cpp to read ~/.rlg327/monster_desc.txt
+Reads from the file and prints to stdout then exits.

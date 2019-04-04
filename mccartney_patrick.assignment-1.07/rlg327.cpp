@@ -14,7 +14,8 @@
 #include "utils.h"
 #include "io.h"
 
-using namespace std; // so we dont have to type std:: in front of everyting
+using namespace std;
+
 
 const char *victory =
     "\n                                       o\n"
@@ -96,14 +97,41 @@ int demo_io(char *filepath)
   getline(f, s); //gets line 5
   cout << s << endl;
 
-  f >> s;                  // does NOT consume the space
-  cout << s << endl;       //prints line
-  f >> s;                  // does NOT consume the newline
-  cout << s << endl;       //prints 6
-  f.get();                 // gets the newline
-  cout << f.get() << endl; // prints and gets the EOF
+  // use "f >> s;" to get the first token, can define what the delimitter is
 
   return 0;
+}
+
+
+class dice {
+  public:
+  int base;
+  int rolls;
+  int sides;
+};
+
+class monster_desc {
+  public:
+  string name;
+  char symbol;
+  string color;
+  string desc;
+  dice speed;
+  dice damage;
+  dice hp;
+  int rarity;
+  string abilities;
+};
+
+int is_mob_complete(monster_desc mob) {
+ if (mob.name.length() > 0 && mob.symbol != '\0' && mob.color.length() > 0
+    && mob.desc.length() > 0 && mob.speed.base != '\0' && mob.speed.rolls != '\0'
+    && mob.speed.sides != '\0' && mob.damage.base != '\0' && mob.damage.rolls != '\0'
+    && mob.damage.sides != '\0' && mob.hp.base != '\0' && mob.hp.rolls != '\0'
+    && mob.hp.sides != '\0' && mob.rarity != '\0' && mob.abilities.length() > 0) {
+   return 1;
+ }
+ return 0;
 }
 
 int parse_monster_file()
@@ -118,14 +146,101 @@ int parse_monster_file()
   ifstream f(filepath); // a input file stream
   string s;
   getline(f, s);
-  if (s.compare("RLG327 MONSTER DESCRIPTION 1")) {
+  if (s.compare("RLG327 MONSTER DESCRIPTION 1"))
+  {
     fprintf(stderr, "First line of file is not \"RLG327 MONSTER DESCRIPTION 1\" Exiting\n");
     return 1;
+  }
+
+  int index = 0;
+  int is_reading_newmob = 0;
+  string first_token;
+  monster_desc mobs[100];
+
+  while (f.is_open() && getline(f, s))
+  {
+    cout << s << endl;
+    int end_first_token = s.find_first_of(" \t")+1;
+    first_token = s.substr(0, end_first_token);
+    //cout << "first token is: " << first_token << endl;
+
+
+    if (s.compare("BEGIN MONSTER") == 0 && !is_reading_newmob)
+    {
+      // new mob so malloc space for another one
+      printf("began new monster\n");
+      is_reading_newmob = 1;
+    }
+    else if (s.length() == 0)
+    {
+      printf("newline\n");
+    }
+    else if (s.compare("END") == 0) {
+      is_reading_newmob = 0;
+      if (is_mob_complete(mobs[index])) {
+        index++;
+      } else {
+        printf("found a bad entry, mob number: %d\n", index);
+        // TODO: resent mob at current index
+      }
+    }
+    else if (first_token.compare("NAME") == 0) {
+      mobs[index].name = s.substr(end_first_token, s.length());
+      cout << "mob name: " << mobs[index].name << endl;
+    }
+    else if (first_token.compare("SYMB") == 0) {
+      mobs[index].symbol = s.back();
+      printf("symbol is: %c\n", s.back());
+    }
+    else if (first_token.compare("COLOR") == 0) {
+      mobs[index].color = s.substr(end_first_token, s.length());
+      printf("Colors are: %S\n", mobs[index].color);
+    }
+    else if (first_token.compare("ABIL") == 0) {
+      mobs[index].abilities = s.substr(end_first_token, s.length());
+      printf("abilities: %S", s.substr(end_first_token, s.length()));
+    }
+    else if (first_token.compare("SPEED") == 0) {
+      printf("Speed is: %S\n", s);
+      //TODO: get speed dice
+    }
+    else if (first_token.compare("DAM") == 0) {
+      printf("Damage: %S\n", s);
+      //TODO get damage dice
+    }
+    else if (first_token.compare("HP") == 0) {
+      printf("HP: %S\n", s);
+      //TODO get hp dice
+    }
+    else if (first_token.compare("RRTY") == 0) {
+      string rarity = s.substr(end_first_token, s.length());
+      mobs[index].rarity = stoi(rarity);
+    }
+    else if (first_token.compare("DESC") == 0) {
+      // iterate untill hitting a line with only a period on it
+      while (s.compare(".")) {
+        mobs[index].desc.append(s);
+        string temp;
+        getline(f, temp);
+        if (temp.length() > 77) {
+          fprintf(stderr, "Character desc is over 78 characters wide\n");
+          break;
+        } else {
+          s = temp;
+        }
+      }
+    }
   }
 
   // get the first token of the line
   // and run through each case with a switch
   //
+
+  int i;
+  for (i = 0; i < index; i++) {
+    //TODO: print the monster desc
+  }
+  f.close();
   return 0;
 }
 
