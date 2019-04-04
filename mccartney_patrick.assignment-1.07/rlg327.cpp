@@ -80,28 +80,6 @@ void usage(char *name)
   exit(-1);
 }
 
-int demo_io(char *filepath)
-{
-  ifstream f(filepath);
-  string s;
-
-  getline(f, s); //gets line 2
-  cout << s << endl;
-
-  getline(f, s); //gets line 3
-  cout << s << endl;
-
-  getline(f, s); //gets line 4 (which is empty, only containing a newline)
-  cout << s << endl;
-
-  getline(f, s); //gets line 5
-  cout << s << endl;
-
-  // use "f >> s;" to get the first token, can define what the delimitter is
-
-  return 0;
-}
-
 
 class dice {
   public:
@@ -123,15 +101,6 @@ class monster_desc {
   int rarity;
   string abilities;
 };
-
-int is_mob_complete(monster_desc mob) {
- if (mob.name.length() > 0 && mob.color.length() > 0
-    && mob.desc.length() > 0  && mob.abilities.length() > 0) {
-   return 1;
- }
- cout << "bad mob. " << mob.name << mob.color << mob.desc << mob.abilities << endl;
- return 0;
-}
 
 /**
  *
@@ -158,8 +127,9 @@ int parse_monster_file()
     return 1;
   }
 
-  int index = 0;
-  int is_reading_newmob = 0;
+  int index, is_reading_newmob, got_name, got_symb, got_color, got_abil,
+    got_speed, got_dam, got_hp, got_rrty, got_desc = 0;
+
   string first_token;
   monster_desc mobs[100];
 
@@ -183,46 +153,52 @@ int parse_monster_file()
     }
     else if (s.compare("END") == 0) {
       is_reading_newmob = 0;
-      // if (is_mob_complete(mobs[index])) {
-      //   index++;
-      // } else {
-      //   printf("found a bad entry, mob number: %d\n", index);
-      //   // TODO: resent mob at current index
-      // }
-      index++;
-      break;
+      if (got_name && got_symb && got_color && got_abil && got_speed && got_dam
+        && got_hp && got_rrty && got_desc) {
+        index++;
+      }
+      got_name, got_symb, got_color, got_abil, got_speed, got_dam, got_hp,
+          got_rrty, got_desc = 0;
     }
     else if (first_token.compare("NAME") == 0) {
       mobs[index].name = s.substr(end_first_token);
+      got_name = 1;
       //cout << "mob name: " << mobs[index].name << endl;
     }
     else if (first_token.compare("SYMB") == 0) {
       mobs[index].symbol = s.back();
+      got_symb = 1;
       //printf("symbol is: %c\n", s.back());
     }
     else if (first_token.compare("COLOR") == 0) {
       mobs[index].color = s.substr(end_first_token);
+      got_color = 1;
       //cout << mobs[index].color << endl;
     }
     else if (first_token.compare("ABIL") == 0) {
       mobs[index].abilities = s.substr(end_first_token);
+      got_abil = 1;
       //cout << mobs[index].abilities << endl;
     }
     else if (first_token.compare("SPEED") == 0) {
       mobs[index].speed.original = s.substr(end_first_token);
+      got_speed = 1;
       //TODO: get speed dice
     }
     else if (first_token.compare("DAM") == 0) {
       mobs[index].damage.original = s.substr(end_first_token);
+      got_dam = 1;
       //TODO get damage dice
     }
     else if (first_token.compare("HP") == 0) {
       mobs[index].hp.original = s.substr(end_first_token);
+      got_hp = 1;
       //TODO get hp dice
     }
     else if (first_token.compare("RRTY") == 0) {
       string rarity = s.substr(end_first_token);
       mobs[index].rarity = stoi(rarity);
+      got_rrty = 1;
       //cout << mobs[index].rarity << endl;
     }
     else if (first_token.compare("DESC") == 0) {
@@ -240,6 +216,7 @@ int parse_monster_file()
         mobs[index].desc.append(s);
         mobs[index].desc.append("\n");
       }
+      got_desc = 1;
     }
   }
 
