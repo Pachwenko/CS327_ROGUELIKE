@@ -105,6 +105,7 @@ int demo_io(char *filepath)
 
 class dice {
   public:
+  string original;
   int base;
   int rolls;
   int sides;
@@ -124,16 +125,21 @@ class monster_desc {
 };
 
 int is_mob_complete(monster_desc mob) {
- if (mob.name.length() > 0 && mob.symbol != '\0' && mob.color.length() > 0
-    && mob.desc.length() > 0 && mob.speed.base != '\0' && mob.speed.rolls != '\0'
-    && mob.speed.sides != '\0' && mob.damage.base != '\0' && mob.damage.rolls != '\0'
-    && mob.damage.sides != '\0' && mob.hp.base != '\0' && mob.hp.rolls != '\0'
-    && mob.hp.sides != '\0' && mob.rarity != '\0' && mob.abilities.length() > 0) {
+ if (mob.name.length() > 0 && mob.color.length() > 0
+    && mob.desc.length() > 0  && mob.abilities.length() > 0) {
    return 1;
  }
+ cout << "bad mob. " << mob.name << mob.color << mob.desc << mob.abilities << endl;
  return 0;
 }
 
+/**
+ *
+ *  Reads the file and stores the needed information using the
+ *  classes created. After doing so it reads all mobs and prints them
+ *  to standard out in the order specified in the assignment pdf
+ *
+ */
 int parse_monster_file()
 {
   char *homepath = getenv("HOME");
@@ -159,86 +165,95 @@ int parse_monster_file()
 
   while (f.is_open() && getline(f, s))
   {
-    cout << s << endl;
+    //cout << s << endl;
     int end_first_token = s.find_first_of(" \t")+1;
-    first_token = s.substr(0, end_first_token);
+    first_token = s.substr(0, end_first_token-1);
     //cout << "first token is: " << first_token << endl;
 
 
     if (s.compare("BEGIN MONSTER") == 0 && !is_reading_newmob)
     {
       // new mob so malloc space for another one
-      printf("began new monster\n");
+      //printf("began new monster\n");
       is_reading_newmob = 1;
     }
     else if (s.length() == 0)
     {
-      printf("newline\n");
+      //printf("newline\n");
     }
     else if (s.compare("END") == 0) {
       is_reading_newmob = 0;
-      if (is_mob_complete(mobs[index])) {
-        index++;
-      } else {
-        printf("found a bad entry, mob number: %d\n", index);
-        // TODO: resent mob at current index
-      }
+      // if (is_mob_complete(mobs[index])) {
+      //   index++;
+      // } else {
+      //   printf("found a bad entry, mob number: %d\n", index);
+      //   // TODO: resent mob at current index
+      // }
+      index++;
+      break;
     }
     else if (first_token.compare("NAME") == 0) {
-      mobs[index].name = s.substr(end_first_token, s.length());
-      cout << "mob name: " << mobs[index].name << endl;
+      mobs[index].name = s.substr(end_first_token);
+      //cout << "mob name: " << mobs[index].name << endl;
     }
     else if (first_token.compare("SYMB") == 0) {
       mobs[index].symbol = s.back();
-      printf("symbol is: %c\n", s.back());
+      //printf("symbol is: %c\n", s.back());
     }
     else if (first_token.compare("COLOR") == 0) {
-      mobs[index].color = s.substr(end_first_token, s.length());
-      printf("Colors are: %S\n", mobs[index].color);
+      mobs[index].color = s.substr(end_first_token);
+      //cout << mobs[index].color << endl;
     }
     else if (first_token.compare("ABIL") == 0) {
-      mobs[index].abilities = s.substr(end_first_token, s.length());
-      printf("abilities: %S", s.substr(end_first_token, s.length()));
+      mobs[index].abilities = s.substr(end_first_token);
+      //cout << mobs[index].abilities << endl;
     }
     else if (first_token.compare("SPEED") == 0) {
-      printf("Speed is: %S\n", s);
+      mobs[index].speed.original = s.substr(end_first_token);
       //TODO: get speed dice
     }
     else if (first_token.compare("DAM") == 0) {
-      printf("Damage: %S\n", s);
+      mobs[index].damage.original = s.substr(end_first_token);
       //TODO get damage dice
     }
     else if (first_token.compare("HP") == 0) {
-      printf("HP: %S\n", s);
+      mobs[index].hp.original = s.substr(end_first_token);
       //TODO get hp dice
     }
     else if (first_token.compare("RRTY") == 0) {
-      string rarity = s.substr(end_first_token, s.length());
+      string rarity = s.substr(end_first_token);
       mobs[index].rarity = stoi(rarity);
+      //cout << mobs[index].rarity << endl;
     }
     else if (first_token.compare("DESC") == 0) {
       // iterate untill hitting a line with only a period on it
       while (s.compare(".")) {
-        mobs[index].desc.append(s);
         string temp;
         getline(f, temp);
         if (temp.length() > 77) {
           fprintf(stderr, "Character desc is over 78 characters wide\n");
           break;
         } else {
+
           s = temp;
         }
+        mobs[index].desc.append(s);
+        mobs[index].desc.append("\n");
       }
     }
   }
 
-  // get the first token of the line
-  // and run through each case with a switch
-  //
-
   int i;
   for (i = 0; i < index; i++) {
-    //TODO: print the monster desc
+    cout << mobs[i].name << endl;
+    cout << mobs[i].desc;
+    cout << mobs[i].symbol << endl;
+    cout << mobs[i].color << endl;
+    cout << mobs[i].speed.original << endl;
+    cout << mobs[i].abilities << endl;
+    cout << mobs[i].hp.original << endl;
+    cout << mobs[i].damage.original << endl;
+    cout << mobs[i].rarity << endl;
   }
   f.close();
   return 0;
