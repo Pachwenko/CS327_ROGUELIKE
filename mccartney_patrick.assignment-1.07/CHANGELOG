@@ -1,5 +1,6 @@
-59391d9 2019-04-04 | got something working and added readme (HEAD -> master)
-fcc03e3 2019-04-03 | began reading file input from /home/pachwenko/.rlg327/monster_desc.txt (origin/master, origin/HEAD)
+cd1867c 2019-04-04 | got mostly working now, output is fully correct (HEAD -> master, origin/master, origin/HEAD)
+59391d9 2019-04-04 | got something working and added readme
+fcc03e3 2019-04-03 | began reading file input from /home/pachwenko/.rlg327/monster_desc.txt
 e8dc1de 2019-04-03 | removed unneeded files
 3adb00d 2019-04-02 | started 1.07
 ae8590f 2019-03-26 | now uses inheritance for pc and npc subtypes
