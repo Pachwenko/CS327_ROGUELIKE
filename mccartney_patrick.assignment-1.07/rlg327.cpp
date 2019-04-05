@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream> //file streaming
 #include <string>
+#include <vector>
 
 #include "dungeon.h"
 #include "pc.h"
@@ -80,32 +81,9 @@ void usage(char *name)
   exit(-1);
 }
 
-int demo_io(char *filepath)
-{
-  ifstream f(filepath);
-  string s;
-
-  getline(f, s); //gets line 2
-  cout << s << endl;
-
-  getline(f, s); //gets line 3
-  cout << s << endl;
-
-  getline(f, s); //gets line 4 (which is empty, only containing a newline)
-  cout << s << endl;
-
-  getline(f, s); //gets line 5
-  cout << s << endl;
-
-  // use "f >> s;" to get the first token, can define what the delimitter is
-
-  return 0;
-}
-
 
 class dice {
   public:
-  string original;
   int base;
   int rolls;
   int sides;
@@ -124,15 +102,6 @@ class monster_desc {
   string abilities;
 };
 
-int is_mob_complete(monster_desc mob) {
- if (mob.name.length() > 0 && mob.color.length() > 0
-    && mob.desc.length() > 0  && mob.abilities.length() > 0) {
-   return 1;
- }
- cout << "bad mob. " << mob.name << mob.color << mob.desc << mob.abilities << endl;
- return 0;
-}
-
 /**
  *
  *  Reads the file and stores the needed information using the
@@ -147,7 +116,7 @@ int parse_monster_file()
   char *filepath = (char *)malloc(strlen(homepath) + strlen(file_loc) + 1);
   strcat(filepath, homepath);
   strcat(filepath, file_loc);
-  printf("%s\n", filepath);
+  //printf("%s\n", filepath);
 
   ifstream f(filepath); // a input file stream
   string s;
@@ -158,10 +127,12 @@ int parse_monster_file()
     return 1;
   }
 
-  int index = 0;
-  int is_reading_newmob = 0;
+  int index, is_reading_newmob, got_name, got_symb, got_color, got_abil,
+    got_speed, got_dam, got_hp, got_rrty, got_desc = 0;
+
   string first_token;
   monster_desc mobs[100];
+  vector<monster_desc> mobz;
 
   while (f.is_open() && getline(f, s))
   {
@@ -173,6 +144,8 @@ int parse_monster_file()
 
     if (s.compare("BEGIN MONSTER") == 0 && !is_reading_newmob)
     {
+      monster_desc newmob;
+      mobz.push_back(newmob);
       // new mob so malloc space for another one
       //printf("began new monster\n");
       is_reading_newmob = 1;
@@ -183,46 +156,91 @@ int parse_monster_file()
     }
     else if (s.compare("END") == 0) {
       is_reading_newmob = 0;
-      // if (is_mob_complete(mobs[index])) {
-      //   index++;
-      // } else {
-      //   printf("found a bad entry, mob number: %d\n", index);
-      //   // TODO: resent mob at current index
-      // }
-      index++;
-      break;
+      if (got_name && got_symb && got_color && got_abil && got_speed && got_dam
+        && got_hp && got_rrty && got_desc) {
+        index++;
+      }
+      got_name, got_symb, got_color, got_abil, got_speed, got_dam, got_hp,
+          got_rrty, got_desc = 0;
     }
     else if (first_token.compare("NAME") == 0) {
       mobs[index].name = s.substr(end_first_token);
+      got_name = 1;
       //cout << "mob name: " << mobs[index].name << endl;
     }
     else if (first_token.compare("SYMB") == 0) {
       mobs[index].symbol = s.back();
+      got_symb = 1;
       //printf("symbol is: %c\n", s.back());
     }
     else if (first_token.compare("COLOR") == 0) {
       mobs[index].color = s.substr(end_first_token);
+      got_color = 1;
       //cout << mobs[index].color << endl;
     }
     else if (first_token.compare("ABIL") == 0) {
       mobs[index].abilities = s.substr(end_first_token);
+      got_abil = 1;
       //cout << mobs[index].abilities << endl;
     }
     else if (first_token.compare("SPEED") == 0) {
-      mobs[index].speed.original = s.substr(end_first_token);
+      // to parse, eat the first string and the following space
+      // eat the first string up to the +, that is the base
+      // eat the next string untill 'd', that is the number of rolls
+      // eat the last number which is number of sides
+      s = s.substr(end_first_token); // eat first token cause we want the dice data
+
+      string rolls = s.substr(0, s.find_first_of("+"));
+      s = s.substr(s.find_first_of("+")+1);
+      mobs[index].speed.rolls = stoi(rolls);
+
+      string base = s.substr(0, s.find_first_of("d"));
+      s = s.substr(s.find_first_of("d")+1);
+      mobs[index].speed.base = stoi(base);
+
+      string sides = s;
+      mobs[index].speed.sides = stoi(sides);
+
+      got_speed = 1;
       //TODO: get speed dice
     }
     else if (first_token.compare("DAM") == 0) {
-      mobs[index].damage.original = s.substr(end_first_token);
+      s = s.substr(end_first_token); // eat first token cause we want the dice data
+
+      string rolls = s.substr(0, s.find_first_of("+"));
+      s = s.substr(s.find_first_of("+")+1);
+      mobs[index].damage.rolls = stoi(rolls);
+
+      string base = s.substr(0, s.find_first_of("d"));
+      s = s.substr(s.find_first_of("d")+1);
+      mobs[index].damage.base = stoi(base);
+
+      string sides = s;
+      mobs[index].damage.sides = stoi(sides);
+      got_dam = 1;
       //TODO get damage dice
     }
     else if (first_token.compare("HP") == 0) {
-      mobs[index].hp.original = s.substr(end_first_token);
+      s = s.substr(end_first_token); // eat first token cause we want the dice data
+
+      string rolls = s.substr(0, s.find_first_of("+"));
+      s = s.substr(s.find_first_of("+")+1);
+      mobs[index].hp.rolls = stoi(rolls);
+
+      string base = s.substr(0, s.find_first_of("d"));
+      s = s.substr(s.find_first_of("d")+1);
+      mobs[index].hp.base = stoi(base);
+
+      string sides = s;
+      mobs[index].hp.sides = stoi(sides);
+
+      got_hp = 1;
       //TODO get hp dice
     }
     else if (first_token.compare("RRTY") == 0) {
       string rarity = s.substr(end_first_token);
       mobs[index].rarity = stoi(rarity);
+      got_rrty = 1;
       //cout << mobs[index].rarity << endl;
     }
     else if (first_token.compare("DESC") == 0) {
@@ -240,6 +258,7 @@ int parse_monster_file()
         mobs[index].desc.append(s);
         mobs[index].desc.append("\n");
       }
+      got_desc = 1;
     }
   }
 
@@ -249,11 +268,12 @@ int parse_monster_file()
     cout << mobs[i].desc;
     cout << mobs[i].symbol << endl;
     cout << mobs[i].color << endl;
-    cout << mobs[i].speed.original << endl;
+    cout << mobs[i].speed.rolls << "+" << mobs[i].speed.base << "d" << mobs[i].speed.sides << endl;
     cout << mobs[i].abilities << endl;
-    cout << mobs[i].hp.original << endl;
-    cout << mobs[i].damage.original << endl;
+    cout << mobs[i].hp.rolls << "+" << mobs[i].hp.base << "d" << mobs[i].hp.sides << endl;;
+    cout << mobs[i].damage.rolls << "+" << mobs[i].damage.base << "d" << mobs[i].damage.sides << endl;
     cout << mobs[i].rarity << endl;
+    printf("\n");
   }
   f.close();
   return 0;
