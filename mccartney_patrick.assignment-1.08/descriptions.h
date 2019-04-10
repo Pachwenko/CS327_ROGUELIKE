@@ -52,6 +52,10 @@ class monster_description {
                           rarity(0)
   {
   }
+
+  /*  my method */
+  int generate_monster();
+
   void set(const std::string &name,
            const std::string &description,
            const char symbol,
@@ -81,6 +85,11 @@ class object_description {
                          artifact(false), rarity(0)
   {
   }
+
+  /* my methods ----- */
+  int generate_object();
+
+
   void set(const std::string &name,
            const std::string &description,
            const object_type_t type,

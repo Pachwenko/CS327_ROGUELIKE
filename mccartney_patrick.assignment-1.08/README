@@ -1,0 +1,5 @@
+Uses Schaeffers code frm 1.07.
+Modifies the files dungeon, descriptions, io.cpp, rlg327. Includes comments to help point out where actual changes were made.
+
+Basic functionaly, but now generates monsters and objects based on input text files.
+Only generates 1 artifact or 1 boss monster per playthrough, all others are random and may contain duplicates.

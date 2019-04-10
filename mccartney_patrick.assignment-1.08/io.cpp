@@ -199,6 +199,22 @@ static character *io_nearest_visible_monster(dungeon *d)
   return n;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// TODO: Modify both display functions to display first a character or player
+// If none, display object, and if no objects display the dungeon material
+
 void io_display(dungeon *d)
 {
   uint32_t y, x;
@@ -276,7 +292,7 @@ void io_display(dungeon *d)
     mvprintw(22, 55, "NONE.");
     attroff(COLOR_PAIR(COLOR_BLUE));
   }
-  
+
   io_print_message_queue(0, 0);
 
   refresh();
@@ -344,7 +360,7 @@ void io_display_no_fog(dungeon *d)
     mvprintw(22, 55, "NONE.");
     attroff(COLOR_PAIR(COLOR_BLUE));
   }
-  
+
   io_print_message_queue(0, 0);
 }
 
@@ -402,7 +418,7 @@ uint32_t io_teleport_pc(dungeon *d)
         break;
       default:
         break;
-      }      
+      }
     }
 
     mvaddch(dest[dim_y] + 1, dest[dim_x], actual);
@@ -491,7 +507,7 @@ uint32_t io_teleport_pc(dungeon *d)
 
   if (charpair(dest) && charpair(dest) != d->PC) {
     io_queue_message("Teleport failed.  Destination occupied.");
-  } else {  
+  } else {
     d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = NULL;
     d->character_map[dest[dim_y]][dest[dim_x]] = d->PC;
 
