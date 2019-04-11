@@ -6,13 +6,13 @@ RM = rm -f
 TERM = "\"S2019\""
 
 CFLAGS = -Wall -Werror -ggdb3 -funroll-loops -DTERM=$(TERM)
-CXXFLAGS = -Wall -Werror -ggdb3 -funroll-loops -DTERM=$(TERM)
+CXXFLAGS = -ggdb3 -funroll-loops -DTERM=$(TERM)
 
 LDFLAGS = -lncurses
 
 BIN = rlg327
 OBJS = rlg327.o heap.o dungeon.o path.o utils.o character.o \
-       event.o move.o npc.o pc.o io.o descriptions.o dice.o
+       event.o move.o npc.o pc.o io.o
 
 all: $(BIN) etags
 
