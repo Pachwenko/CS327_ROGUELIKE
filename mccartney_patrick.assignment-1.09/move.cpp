@@ -150,7 +150,8 @@ void do_combat(dungeon *d, character *atk, character *def)
  * to an adjacent cell, if none available jus swap their positions
  *
  *
- *
+ * Only add items to the PC's inventory if the inventory is not full
+ * Max items in inventory: 9
  *
  *
  *

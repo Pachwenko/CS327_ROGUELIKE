@@ -991,7 +991,6 @@ int promt_carry_slot(dungeon *d, int *selection) {
   return 0;
 }
 
-
 /**
  *
  * Creates a promt for equipment slots and stores selection
