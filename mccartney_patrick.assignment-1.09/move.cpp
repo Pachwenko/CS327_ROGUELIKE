@@ -16,6 +16,35 @@
 #include "io.h"
 #include "npc.h"
 
+
+
+
+
+
+
+/**
+ *
+ *
+ *
+ *  Changes to be made: roll dice damage for NPC
+ *  Roll dice damage for PC AFTER adding up the dice rolls
+ *  for equipment. SUbtract the damage done to the defender's health
+ *  if defenders health is < 0 then its DEAD
+ *
+ *
+ *  Check if the killed defender is a BOSS, if so then the
+ *  player was won the game. If dead defender is the PC,
+ *  then trigger game over (losing screen)
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 void do_combat(dungeon *d, character *atk, character *def)
 {
   int can_see_atk, can_see_def;
@@ -56,7 +85,7 @@ void do_combat(dungeon *d, character *atk, character *def)
   if (def->alive) {
     def->alive = 0;
     charpair(def->position) = NULL;
-    
+
     if (def != d->PC) {
       d->num_monsters--;
     } else {
@@ -111,6 +140,24 @@ void do_combat(dungeon *d, character *atk, character *def)
     }
   }
 }
+
+
+/**
+ *
+ *
+ * Changes to be made: Pick up items if the character is the PC
+ * When NPC tried to move onto another NPC, move that existing NPC
+ * to an adjacent cell, if none available jus swap their positions
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
 void move_character(dungeon *d, character *c, pair_t next)
 {

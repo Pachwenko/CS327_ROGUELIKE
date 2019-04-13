@@ -988,6 +988,7 @@ static void io_list_monsters(dungeon *d)
  */
 int promt_carry_slot(dungeon *d, int *selection) {
 
+  return 0;
 }
 
 
@@ -999,26 +1000,27 @@ int promt_carry_slot(dungeon *d, int *selection) {
  *
  */
 int promt_equipment_slot(dungeon *d, char *selection) {
-
+  return 0;
 }
 
 int list_inventory(dungeon *d) {
-
+  return 0;
 }
 
 int list_equipment(dungeon *d) {
-
+  return 0;
 }
 
 int inspect_item(dungeon *d) {
-
+  return 0;
 }
 
 int look_at_monster(dungeon *d) {
-  int key;
+  int key = 0;
   while (key != ESCAPE) {
     // do similar to teleport displaying a * as the player moves it around
   }
+  return 0;
 }
 
 /**
