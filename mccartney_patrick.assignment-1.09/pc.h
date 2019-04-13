@@ -6,6 +6,7 @@
 # include "dims.h"
 # include "character.h"
 # include "dungeon.h"
+#define PC_HEALTH 1000
 
 class pc : public character {
  public:
