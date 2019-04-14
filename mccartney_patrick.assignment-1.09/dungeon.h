@@ -1,9 +1,12 @@
 #ifndef DUNGEON_H
 # define DUNGEON_H
 
+# include <vector>
+
 # include "heap.h"
 # include "dims.h"
 # include "character.h"
+# include "descriptions.h"
 
 #define DUNGEON_X              80
 #define DUNGEON_Y              21
@@ -23,6 +26,8 @@
 #define DUNGEON_SAVE_FILE      "dungeon"
 #define DUNGEON_SAVE_SEMANTIC  "RLG327-" TERM
 #define DUNGEON_SAVE_VERSION   0U
+#define MONSTER_DESC_FILE      "monster_desc.txt"
+#define OBJECT_DESC_FILE       "object_desc.txt"
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
@@ -30,6 +35,8 @@
 #define hardnessxy(x, y) (d->hardness[y][x])
 #define charpair(pair) (d->character_map[pair[dim_y]][pair[dim_x]])
 #define charxy(x, y) (d->character_map[y][x])
+#define objpair(pair) (d->objmap[pair[dim_y]][pair[dim_x]])
+#define objxy(x, y) (d->objmap[y][x])
 
 enum __attribute__ ((__packed__)) terrain_type {
   ter_debug,
@@ -50,9 +57,15 @@ typedef struct room {
 } room_t;
 
 class pc;
+class object;
 
 class dungeon {
  public:
+  dungeon() : num_rooms(0), rooms(0), map{ter_wall}, hardness{0},
+              pc_distance{0}, pc_tunnel{0}, character_map{0}, PC(0),
+              num_monsters(0), max_monsters(0), character_sequence_number(0),
+              time(0), is_new(0), quit(0), monster_descriptions(),
+              object_descriptions() {}
   uint32_t num_rooms;
   room_t *rooms;
   terrain_type map[DUNGEON_Y][DUNGEON_X];
@@ -68,11 +81,14 @@ class dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   character *character_map[DUNGEON_Y][DUNGEON_X];
+  object *objmap[DUNGEON_Y][DUNGEON_X];
   pc *PC;
   heap_t events;
   uint16_t num_monsters;
   uint16_t max_monsters;
-  uint32_t character_sequence_number;
+  uint16_t num_objects;
+  uint16_t max_objects;
+   uint32_t character_sequence_number;
   /* Game time isn't strictly necessary.  It's implicit in the turn number *
    * of the most recent thing removed from the event queue; however,       *
    * including it here--and keeping it up to date--provides a measure of   *
@@ -81,6 +97,8 @@ class dungeon {
   uint32_t time;
   uint32_t is_new;
   uint32_t quit;
+  std::vector<monster_description> monster_descriptions;
+  std::vector<object_description> object_descriptions;
 };
 
 void init_dungeon(dungeon *d);
@@ -93,5 +111,7 @@ int read_dungeon(dungeon *d, char *file);
 int read_pgm(dungeon *d, char *pgm);
 void render_distance_map(dungeon *d);
 void render_tunnel_distance_map(dungeon *d);
+void init_dungeon(dungeon *d);
+void pc_see_object(character *the_pc, object *o);
 
 #endif
