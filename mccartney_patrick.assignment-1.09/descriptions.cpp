@@ -122,14 +122,14 @@ static inline void eat_whitespace(std::ifstream &f)
 {
   while (isspace(f.peek())) {
     f.get();
-  }  
+  }
 }
 
 static inline void eat_blankspace(std::ifstream &f)
 {
   while (isblank(f.peek())) {
     f.get();
-  }  
+  }
 }
 
 static uint32_t parse_name(std::ifstream &f,

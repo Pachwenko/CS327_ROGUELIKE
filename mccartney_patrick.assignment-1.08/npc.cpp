@@ -43,7 +43,7 @@ void gen_monsters(dungeon *d)
   for (i = 0; i < d->num_monsters; i++) {
     m = new npc;
     memset(m, 0, sizeof (*m));
-    
+
     do {
       room = rand_range(1, d->num_rooms - 1);
       p[dim_y] = rand_range(d->rooms[room].position[dim_y],
