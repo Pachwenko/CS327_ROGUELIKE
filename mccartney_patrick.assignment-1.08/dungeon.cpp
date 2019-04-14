@@ -615,15 +615,38 @@ static int make_rooms(dungeon *d)
 }
 
 
+
+
+
+
 /**
  *
  * Places objects in our dungeon, the monsters are generated inside npc.cpp
- *
+ * "Load at least 10 objects per dungeon level."
  */
 int place_objects(dungeon *d) {
-
+  int num_objects = 15;
+  int num_placed = 0;
+  while (num_placed < 0) {
+    int rand_num = rand() % d->object_descriptions.size;
+    object_description o = d->object_descriptions.at(rand_num);
+    if (!o.artifact || (o.artifact && !o.was_placed)) {
+      // try to place our object and if there isnt a object already there
+      // update our object array at that position so we can render the thing
+      int xrand = rand_range(1, DUNGEON_X - 1);
+      int yrand = rand_range(1, DUNGEON_Y - 1);
+      if (!d->objects[yrand][xrand]) {
+        //place it
+        d->objects[yrand][xrand] = &o;
+        o.was_placed = true;
+        num_placed++;
+      }
+    } else {
+      // try again
+    }
+  }
+  return 0;
 }
-
 
 
 /**

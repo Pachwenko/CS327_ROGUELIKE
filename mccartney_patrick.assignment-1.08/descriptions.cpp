@@ -131,14 +131,6 @@ extern const char object_symbol[] = {
     '%',  /* objtype_CONTAINER */
 };
 
-static int generate_npc() {
-
-}
-
-static int generate_object() {
-
-}
-
 static inline void eat_whitespace(std::ifstream &f)
 {
   while (isspace(f.peek()))

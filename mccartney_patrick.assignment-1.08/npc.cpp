@@ -37,7 +37,7 @@ static uint32_t max_monster_cells(dungeon *d)
  *
  *
  * TODO: Generate based on descriptions factory
- *
+ *  
  *
  *
  */
