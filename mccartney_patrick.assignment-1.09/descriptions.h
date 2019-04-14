@@ -8,8 +8,10 @@
 # include "dice.h"
 # include "npc.h"
 
-class dungeon;
 
+
+class dungeon;
+// some comment here
 uint32_t parse_descriptions(dungeon *d);
 uint32_t print_descriptions(dungeon *d);
 uint32_t destroy_descriptions(dungeon *d);
