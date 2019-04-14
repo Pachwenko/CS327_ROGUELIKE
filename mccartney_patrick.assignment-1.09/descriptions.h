@@ -42,7 +42,6 @@ typedef enum object_type {
 extern const char object_symbol[];
 class npc;
 
-
 class monster_description {
  private:
   std::string name, description;
@@ -96,27 +95,17 @@ public:
   friend npc;
 };
 
-
-class object {
-  public:
-  object_description *original;
-  char symbol;
-  int was_placed;
-  int is_unique;
-  dice damage;
-  uint32_t color;
-};
-
 class object_description {
  private:
   std::string name, description;
+  object_type_t type;
+  uint32_t color;
   dice hit, damage, dodge, defence, weight, speed, attribute, value;
+  bool artifact;
   uint32_t rarity;
   uint32_t num_generated;
   uint32_t num_found;
  public:
-  object_type_t type;
-  uint32_t color;
   object_description() : name(),    description(), type(objtype_no_type),
                          color(0),  hit(),         damage(),
                          dodge(),   defence(),     weight(),
@@ -125,9 +114,6 @@ class object_description {
                          num_found(0)
   {
   }
-<<<<<<< HEAD:mccartney_patrick.assignment-1.08/descriptions.h
-
-=======
   inline bool can_be_generated()
   {
     return !artifact || (artifact && !num_generated && !num_found);
@@ -136,7 +122,6 @@ class object_description {
   {
     return rarity > (unsigned) (rand() % 100);
   }
->>>>>>> 2b9b80b249057f6df5406a439f92442d3f9edfb2:mccartney_patrick.assignment-1.09/descriptions.h
   void set(const std::string &name,
            const std::string &description,
            const object_type_t type,
@@ -154,8 +139,6 @@ class object_description {
   std::ostream &print(std::ostream &o);
   /* Need all these accessors because otherwise there is a *
    * circular dependancy that is difficult to get around.  */
-  bool artifact;
-  bool was_placed;
   inline const std::string &get_name() const { return name; }
   inline const std::string &get_description() const { return description; }
   inline const object_type_t get_type() const { return type; }
