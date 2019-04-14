@@ -531,22 +531,22 @@ static void io_list_monsters_display(878,24489
 static void io_list_monsters(946,27070
 #define ESCAPE 979,27844
 int promt_carry_slot(989,28015
-int promt_equipment_slot(1002,28224
-int list_inventory(1006,28295
-int list_equipment(1010,28343
-int inspect_item(1014,28391
-int look_at_monster(1018,28437
-void io_handle_input(1062,29555
+int promt_equipment_slot(1001,28223
+int list_inventory(1005,28294
+int list_equipment(1009,28342
+int inspect_item(1013,28390
+int look_at_monster(1017,28436
+void io_handle_input(1061,29554
 
 move.cpp,237
-void do_combat(19,283
-void move_character(115,3994
-void do_moves(136,4570
-void dir_nearest_wall(201,6602
-uint32_t against_wall(213,7013
-uint32_t in_corner(225,7497
-static void new_dungeon_level(243,8121
-uint32_t move_pc(259,8411
+void do_combat(48,720
+void move_character(163,4763
+void do_moves(184,5339
+void dir_nearest_wall(249,7371
+uint32_t against_wall(261,7782
+uint32_t in_corner(273,8266
+static void new_dungeon_level(291,8890
+uint32_t move_pc(307,9180
 
 npc.cpp,1541
 static uint32_t max_monster_cells(13,193
