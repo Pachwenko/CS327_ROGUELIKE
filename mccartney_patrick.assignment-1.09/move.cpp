@@ -137,6 +137,24 @@ void do_combat(dungeon *d, character *atk, character *def)
   }
 }
 
+int addToInventory(dungeon *d, object *item) {
+  int i;
+  for (i = 0; i < INVENTORY_SIZE; i++) {
+    if (!d->PC->inventory[i]) {
+      d->PC->inventory[i] = item;
+      return 0;
+    }
+  }
+  return 1;
+}
+
+void pickupItems(dungeon *d, pair_t position) {
+  if (d->objmap[position[dim_y]][position[dim_x]]) {
+    addToInventory(d, d->objmap[position[dim_y]][position[dim_x]]);
+    d->objmap[position[dim_y]][position[dim_x]] = NULL;
+  }
+}
+
 /**
  *
  *
@@ -167,6 +185,7 @@ void move_character(dungeon *d, character *c, pair_t next)
   {
     /* No character in new position. */
 
+    pickupItems(d, next);
     d->character_map[c->position[dim_y]][c->position[dim_x]] = NULL;
     c->position[dim_y] = next[dim_y];
     c->position[dim_x] = next[dim_x];

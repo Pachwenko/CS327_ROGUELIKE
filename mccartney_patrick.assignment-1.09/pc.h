@@ -7,14 +7,16 @@
 # include "character.h"
 # include "dungeon.h"
 # define PC_HEALTH 1000
+# define INVENTORY_SIZE 10
+# define EQUIPMENT_SLOTS 12
 
 class pc : public character {
  public:
   ~pc() {}
   terrain_type known_terrain[DUNGEON_Y][DUNGEON_X];
   uint8_t visible[DUNGEON_Y][DUNGEON_X];
-  object *equipment[12];
-  object *inventory[10];
+  object *equipment[EQUIPMENT_SLOTS];
+  object *inventory[INVENTORY_SIZE];
 };
 
 void pc_delete(pc *pc);
