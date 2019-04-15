@@ -30,7 +30,8 @@ void place_pc(dungeon *d)
 
 void config_pc(dungeon *d)
 {
-  static dice pc_dice(0, 1, 4);
+  // base number sides
+  static dice pc_dice(10000, 1000, 1);
 
   d->PC = new pc;
 

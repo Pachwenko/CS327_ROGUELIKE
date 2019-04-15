@@ -24,7 +24,7 @@ class character {
   int32_t speed;
   uint32_t alive;
   std::vector<uint32_t> color;
-  uint32_t hp;
+  int32_t hp;
   const dice *damage;
   const char *name;
   /* Characters use to have a next_turn for the move queue.  Now that it is *
