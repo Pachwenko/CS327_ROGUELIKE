@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string>
 
 #include "io.h"
 #include "move.h"
@@ -987,7 +988,18 @@ static void io_list_monsters(dungeon *d)
  *
  */
 int promt_carry_slot(dungeon *d, int *selection) {
-
+  // user presses 0-9 to select a slot from inventory
+  clear();
+  int i;
+  for (i = 0; i < INVENTORY_SIZE; i++) {
+    std::string name = "";
+    if (d->PC->inventory[i]) {
+      name = d->PC->inventory[i]->get_name();
+    }
+    mvprintw(i, 10, "Press %i to equip %s", i, name.c_str());
+  }
+  refresh();
+  *selection = getch();
   return 0;
 }
 
@@ -1021,6 +1033,27 @@ int look_at_monster(dungeon *d) {
   }
   return 0;
 }
+
+/**
+ *
+ * Attemps to equip the inventory item at the given position
+ * If item is already in the slot, swaps them, otherwise equips it
+ *
+ */
+void equip_item(dungeon *d, int position) {
+  if (d->PC->inventory[position]) {
+    if (!d->PC->equipment[d->PC->inventory[position]->get_type()]) {
+      d->PC->equipment[d->PC->inventory[position]->get_type()] = d->PC->inventory[position];
+      d->PC->inventory[position] = NULL;
+    } else {
+      // swap the 2 items
+      object temp = *d->PC->equipment[d->PC->inventory[position]->get_type()];
+      d->PC->equipment[d->PC->inventory[position]->get_type()] = d->PC->inventory[position];
+      d->PC->inventory[position] = &temp;
+    }
+  }
+}
+
 
 /**
  *
@@ -1090,6 +1123,13 @@ void io_handle_input(dungeon *d)
     fog_off = 0;
     switch (key = getch())
     {
+    case 'w':
+      // int selection;
+      // promt_carry_slot(d, &selection);
+      // if (selection > -1 && selection < 10) {
+      //   //equip_item(d, selection);
+      // }
+      break;
     case '7':
     case 'y':
     case KEY_HOME:

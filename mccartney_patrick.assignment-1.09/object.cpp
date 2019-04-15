@@ -47,7 +47,7 @@ void gen_object(dungeon *d)
   do {
     i = rand_range(0, v.size() - 1);
   } while (!v[i].can_be_generated() || !v[i].pass_rarity_roll());
-  
+
   room = rand_range(0, d->num_rooms - 1);
   do {
     p[dim_y] = rand_range(d->rooms[room].position[dim_y],
@@ -61,7 +61,7 @@ void gen_object(dungeon *d)
   o = new object(v[i], p, d->objmap[p[dim_y]][p[dim_x]]);
 
   d->objmap[p[dim_y]][p[dim_x]] = o;
-  
+
 }
 
 void gen_objects(dungeon *d)
