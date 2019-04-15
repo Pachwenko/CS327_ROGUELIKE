@@ -614,6 +614,17 @@ static int make_rooms(dungeon *d)
   return 0;
 }
 
+void init_PC_items(dungeon *d) {
+  int i;
+  for (i = 0; INVENTORY_SIZE; i++) {
+    d->PC->inventory[i] = NULL;
+  }
+
+  for (i = 0; EQUIPMENT_SLOTS; i++) {
+    d->PC->equipment[i] = 0;
+  }
+}
+
 int gen_dungeon(dungeon *d)
 {
   empty_dungeon(d);
@@ -622,7 +633,7 @@ int gen_dungeon(dungeon *d)
   } while (place_rooms(d));
   connect_rooms(d);
   place_stairs(d);
-
+  init_PC_items(d);
   return 0;
 }
 

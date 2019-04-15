@@ -141,6 +141,7 @@ int addToInventory(dungeon *d, object *item) {
   int i;
   for (i = 0; i < INVENTORY_SIZE; i++) {
     if (!d->PC->inventory[i]) {
+      d->PC->inventory[i] = (object*) malloc(sizeof(object*));
       d->PC->inventory[i] = item;
       return 0;
     }
