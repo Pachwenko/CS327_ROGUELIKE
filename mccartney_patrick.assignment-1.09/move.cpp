@@ -13,12 +13,27 @@
 #include "utils.h"
 #include "path.h"
 #include "event.h"
-#include "io.h"
+#include "io.h"expression must have class type
 #include "npc.h"
+#include "object.h"
+
+int32_t player_damage_calc(dungeon *d) {
+  int i;
+  int32_t result;
+  for (i = 0; i < EQUIPMENT_SLOTS; i++) {
+    object equip = *d->PC->equipment[i];
+    result += equip.roll_dice();
+  }
+  return result;
+}
 
 int32_t roll_damage(dungeon *d, character *atk)
 {
-  return atk->damage->roll();
+  if (!(atk == d->PC)) {
+    return atk->damage->roll();
+  } else {
+    return player_damage_calc(d);
+  }
 }
 
 /**
@@ -32,7 +47,7 @@ int32_t roll_damage(dungeon *d, character *atk)
  *
  *
  *  Check if the killed defender is a BOSS, if so then the
- *  player was won the game. If dead defender is the PC,
+ *  player has won the game. If dead defender is the PC,
  *  then trigger game over (losing screen)
  *
  *
@@ -62,79 +77,79 @@ void do_combat(dungeon *d, character *atk, character *def)
     def->position[dim_x] = temp[dim_x];
   } else {
 
-  const char *organs[] = {
-    "liver",                   /*  0 */
-    "pancreas",                /*  1 */
-    "heart",                   /*  2 */
-    "eye",                     /*  3 */
-    "arm",                     /*  4 */
-    "leg",                     /*  5 */
-    "intestines",              /*  6 */
-    "gall bladder",            /*  7 */
-    "lungs",                   /*  8 */
-    "hand",                    /*  9 */
-    "foot",                    /* 10 */
-    "spinal cord",             /* 11 */
-    "pituitary gland",         /* 12 */
-    "thyroid",                 /* 13 */
-    "tongue",                  /* 14 */
-    "bladder",                 /* 15 */
-    "diaphram",                /* 16 */
-    "stomach",                 /* 17 */
-    "pharynx",                 /* 18 */
-    "esophagus",               /* 19 */
-    "trachea",                 /* 20 */
-    "urethra",                 /* 21 */
-    "spleen",                  /* 22 */
-    "ganglia",                 /* 23 */
-    "ear",                     /* 24 */
-    "subcutaneous tissue"      /* 25 */
-    "cerebellum",              /* 26 */ /* Brain parts begin here */
-    "hippocampus",             /* 27 */
-    "frontal lobe",            /* 28 */
-    "brain",                   /* 29 */
-  };
-  int part;
+    const char *organs[] = {
+      "liver",                   /*  0 */
+      "pancreas",                /*  1 */
+      "heart",                   /*  2 */
+      "eye",                     /*  3 */
+      "arm",                     /*  4 */
+      "leg",                     /*  5 */
+      "intestines",              /*  6 */
+      "gall bladder",            /*  7 */
+      "lungs",                   /*  8 */
+      "hand",                    /*  9 */
+      "foot",                    /* 10 */
+      "spinal cord",             /* 11 */
+      "pituitary gland",         /* 12 */
+      "thyroid",                 /* 13 */
+      "tongue",                  /* 14 */
+      "bladder",                 /* 15 */
+      "diaphram",                /* 16 */
+      "stomach",                 /* 17 */
+      "pharynx",                 /* 18 */
+      "esophagus",               /* 19 */
+      "trachea",                 /* 20 */
+      "urethra",                 /* 21 */
+      "spleen",                  /* 22 */
+      "ganglia",                 /* 23 */
+      "ear",                     /* 24 */
+      "subcutaneous tissue"      /* 25 */
+      "cerebellum",              /* 26 */ /* Brain parts begin here */
+      "hippocampus",             /* 27 */
+      "frontal lobe",            /* 28 */
+      "brain",                   /* 29 */
+    };
+    int part;
 
-  if (def == d->PC || atk == d->PC) {
-    def->hp -= atk->damage->roll();
-  }
-
-  if (def->hp <= 0) {
-    def->alive = 0;
-    charpair(def->position) = NULL;
-
-    if (atk == d->PC) {
-      io_queue_message("You smite %s%s!", is_unique(def) ? "" : "the ", def->name);
+    if (def == d->PC || atk == d->PC) {
+      def->hp -= atk->damage->roll();
     }
 
-    if (def != d->PC) {
-      d->num_monsters--;
-    } else {
-      if ((part = rand() % (sizeof (organs) / sizeof (organs[0]))) < 26) {
-        io_queue_message("As %s%s eats your %s,", is_unique(atk) ? "" : "the ",
-                         atk->name, organs[rand() % (sizeof (organs) /
-                                                     sizeof (organs[0]))]);
-        io_queue_message("   ...you wonder if there is an afterlife.");
-        /* Queue an empty message, otherwise the game will not pause for *
-         * player to see above.                                          */
-        io_queue_message("");
+    if (def->hp <= 0) {
+      def->alive = 0;
+      charpair(def->position) = NULL;
+
+      if (atk == d->PC) {
+        io_queue_message("You smite %s%s!", is_unique(def) ? "" : "the ", def->name);
+      }
+
+      if (def != d->PC) {
+        d->num_monsters--;
       } else {
-        io_queue_message("Your last thoughts fade away as "
-                         "%s%s eats your %s...",
-                         is_unique(atk) ? "" : "the ",
-                         atk->name, organs[part]);
+        if ((part = rand() % (sizeof (organs) / sizeof (organs[0]))) < 26) {
+          io_queue_message("As %s%s eats your %s,", is_unique(atk) ? "" : "the ",
+                          atk->name, organs[rand() % (sizeof (organs) /
+                                                      sizeof (organs[0]))]);
+          io_queue_message("   ...you wonder if there is an afterlife.");
+          /* Queue an empty message, otherwise the game will not pause for *
+          * player to see above.                                          */
+          io_queue_message("");
+        } else {
+          io_queue_message("Your last thoughts fade away as "
+                          "%s%s eats your %s...",
+                          is_unique(atk) ? "" : "the ",
+                          atk->name, organs[part]);
+          io_queue_message("");
+        }
+        /* Queue an empty message, otherwise the game will not pause for *
+        * player to see above.                                          */
         io_queue_message("");
       }
-      /* Queue an empty message, otherwise the game will not pause for *
-       * player to see above.                                          */
-      io_queue_message("");
+      atk->kills[kill_direct]++;
+      atk->kills[kill_avenged] += (def->kills[kill_direct] +
+                                    def->kills[kill_avenged]);
+      }
     }
-    atk->kills[kill_direct]++;
-    atk->kills[kill_avenged] += (def->kills[kill_direct] +
-                                  def->kills[kill_avenged]);
-    }
-  }
 }
 
 int addToInventory(dungeon *d, object *item) {
@@ -164,7 +179,7 @@ void pickupItems(dungeon *d, pair_t position) {
  *
  *
  * Only add items to the PC's inventory if the inventory is not full
- * Max items in inventory: 9
+ * Max items in inventory: 10
  *
  *
  *
