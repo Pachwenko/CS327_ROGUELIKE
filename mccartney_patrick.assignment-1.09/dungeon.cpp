@@ -614,6 +614,9 @@ static int make_rooms(dungeon *d)
   return 0;
 }
 
+
+
+
 int gen_dungeon(dungeon *d)
 {
   empty_dungeon(d);
@@ -622,7 +625,6 @@ int gen_dungeon(dungeon *d)
   } while (place_rooms(d));
   connect_rooms(d);
   place_stairs(d);
-
   return 0;
 }
 

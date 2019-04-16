@@ -834,7 +834,7 @@ static const char *adjectives[] = {
     "A kawaii ",      /* For our otaku */
     "Hao ke ai de ",  /* And for our Chinese */
     "Eine liebliche " /* For our Deutch */
-    /* And there's one special case (see below) */
+                      /* And there's one special case (see below) */
 };
 
 static void io_scroll_monster_list(char (*s)[60], uint32_t count)
@@ -987,20 +987,26 @@ static void io_list_monsters(dungeon *d)
  * Possible selections are integers 0-9 inclusive
  *
  */
-int promt_carry_slot(dungeon *d, int *selection) {
-  // user presses 0-9 to select a slot from inventory
-  clear();
+int prompt_carry_slot(dungeon *d, int *selection, std::string action)
+{
   int i;
-  for (i = 0; i < INVENTORY_SIZE; i++) {
+  for (i = 0; i < INVENTORY_SIZE; i++)
+  {
     std::string name = "";
-    if (d->PC->inventory[i]) {
+    if (d->PC->inventory[i])
+    {
       name = d->PC->inventory[i]->get_name();
+      name += d->PC->inventory[i]->get_type();
     }
-    mvprintw(i, 10, "Press %i to equip %s", i, name.c_str());
+    mvprintw(i + 9, 10, "Press i to %s %s", action.c_str(), name);
   }
   refresh();
-  *selection = getch();
-  return 0;
+  char c;
+  while (c != 27 && (c < 0 || c > 9))
+  {
+    c = getch();
+  }
+  return c;
 }
 
 /**
@@ -1010,25 +1016,97 @@ int promt_carry_slot(dungeon *d, int *selection) {
  *
  *
  */
-int promt_equipment_slot(dungeon *d, char *selection) {
+int promt_equipment_slot(dungeon *d, char *selection, std::string action)
+{
+  int i;
+  char input = 'a';
+  for (i = 0; i < EQUIPMENT_SLOTS; i++)
+  {
+    std::string name = "";
+    if (d->PC->equipment[i])
+    {
+      name = d->PC->equipment[i]->get_name();
+      name += d->PC->equipment[i]->get_type();
+    }
+    mvprintw(i + 9, 10, "Press %c to select %s", input + i, name);
+  }
+  refresh();
+  char c;
+  while (c != ESCAPE && (c < 'a' || c > 'l'))
+  {
+    c = getch();
+  }
+  return c;
+}
+
+int num_inventory(dungeon *d) {
+  int i;
+  for (i = 0; d->PC->inventory[i]; i++) {
+
+  }
+  io_queue_message("Number of items in inventory %i", i);
+  return i;
+}
+
+int list_inventory(dungeon *d)
+{
+  int i;
+  for (i = 0; i < INVENTORY_SIZE; i++)
+  {
+    if (d->PC->inventory[i])
+    {
+      mvprintw(i + 9, 10, "%s", d->PC->inventory[i]->get_name());
+    } else {
+    mvprintw(i + 9, 10, "%s", " ");
+    }
+  }
+  refresh();
   return 0;
 }
 
-int list_inventory(dungeon *d) {
+int list_equipment(dungeon *d)
+{
+  int i;
+  for (i = 0; i < EQUIPMENT_SLOTS; i++)
+  {
+    std::string name = "";
+    if (d->PC->equipment[i])
+    {
+      name = d->PC->equipment[i]->get_name();
+      name += d->PC->equipment[i]->get_type();
+    }
+    mvprintw(i + 9, 10, "%s", name);
+  }
+  refresh();
   return 0;
 }
 
-int list_equipment(dungeon *d) {
-  return 0;
+int inspect_item(dungeon *d)
+{
+  int i;
+  for (i = 0; i < INVENTORY_SIZE; i++)
+  {
+    if (d->PC->inventory[i])
+    {
+      mvprintw(i + 9, 10, "Press i to inspect %s", d->PC->inventory[i]->get_name());
+    } else {
+      mvprintw(i + 9, 10, "Press i to inspect %s", " ");
+    }
+  }
+  refresh();
+  int c;
+  while (c != ESCAPE && (c < 0 || c > 9))
+  {
+    c = getch();
+  }
+  return c;
 }
 
-int inspect_item(dungeon *d) {
-  return 0;
-}
-
-int look_at_monster(dungeon *d) {
+int look_at_monster(dungeon *d)
+{
   int key = 0;
-  while (key != ESCAPE) {
+  while (key != ESCAPE)
+  {
     // do similar to teleport displaying a * as the player moves it around
   }
   return 0;
@@ -1060,7 +1138,7 @@ void equip_item(dungeon *d, int position) {
  *
  *
  *
- *
+ *  TODO:
  *  Changes needed: handle new inputs:
  *
     w Wear an item. Prompts the user for a carry slot. If an item of that type is already
@@ -1093,12 +1171,15 @@ void equip_item(dungeon *d, int position) {
 
 void io_handle_input(dungeon *d)
 {
-  uint32_t fail_code;
-  int key;
+  uint32_t fail_code = 0;
+  int key = 0;
   fd_set readfs;
   struct timeval tv;
   uint32_t fog_off = 0;
   pair_t tmp = {DUNGEON_X, DUNGEON_Y};
+  int selection = -100;
+  char sel = 'z';
+  std::string action = "null";
 
   do
   {
@@ -1124,11 +1205,51 @@ void io_handle_input(dungeon *d)
     switch (key = getch())
     {
     case 'w':
-      // int selection;
-      // promt_carry_slot(d, &selection);
-      // if (selection > -1 && selection < 10) {
-      //   //equip_item(d, selection);
-      // }
+      // prompt for inventory and try to equip their selection
+      // selection is [0,9]
+      selection = 12;
+      action = "wear";
+      prompt_carry_slot(d, &selection, action);
+      io_handle_input(d);
+      break;
+    case 't':
+      // try to take off an equipped item
+      action = "take off";
+
+      promt_equipment_slot(d, &sel, action);
+
+      io_handle_input(d);
+      break;
+    case 'd':
+      // drop an item from inventory
+      action = "drop";
+      prompt_carry_slot(d, &selection, action);
+      io_handle_input(d);
+      break;
+    case 'x':
+      //expunge item frm the inventory
+      action = "expunge";
+      prompt_carry_slot(d, &selection, action);
+      io_handle_input(d);
+      break;
+    case 'i':
+      //list inventory
+      num_inventory(d);
+      //list_inventory(d);
+      //io_handle_input(d);
+      break;
+    case 'e':
+      //list equipment
+      list_equipment(d);
+      io_handle_input(d);
+      break;
+    case 'I':
+      //inspect item in inventory
+      selection = inspect_item(d);
+      break;
+    case 'L':
+      // look at monster
+
       break;
     case '7':
     case 'y':
@@ -1205,9 +1326,6 @@ void io_handle_input(dungeon *d)
       /* New command.  Return to normal display after displaying some   *
        * special screen.                                                */
       io_display(d);
-      fail_code = 1;
-      break;
-    case 'L':
       fail_code = 1;
       break;
     case 'g':

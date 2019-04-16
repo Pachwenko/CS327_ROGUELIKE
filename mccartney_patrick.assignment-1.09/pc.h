@@ -6,6 +6,8 @@
 # include "dims.h"
 # include "character.h"
 # include "dungeon.h"
+# include "object.h"
+
 # define PC_HEALTH 1000
 # define INVENTORY_SIZE 10
 # define EQUIPMENT_SLOTS 12
@@ -15,8 +17,8 @@ class pc : public character {
   ~pc() {}
   terrain_type known_terrain[DUNGEON_Y][DUNGEON_X];
   uint8_t visible[DUNGEON_Y][DUNGEON_X];
-  object *equipment[EQUIPMENT_SLOTS];
-  object *inventory[INVENTORY_SIZE];
+  std::vector<object> equipment;
+  std::vector<object> inventory;
 };
 
 void pc_delete(pc *pc);
