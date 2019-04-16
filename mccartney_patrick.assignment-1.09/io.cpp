@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string>
+#include <string.h>
 
 #include "io.h"
 #include "move.h"
@@ -977,6 +978,28 @@ static void io_list_monsters(dungeon *d)
   io_display(d);
 }
 
+
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ * My code starts
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+
 #define ESCAPE 27
 
 /**
@@ -987,26 +1010,45 @@ static void io_list_monsters(dungeon *d)
  * Possible selections are integers 0-9 inclusive
  *
  */
-int prompt_carry_slot(dungeon *d, int *selection, std::string action)
+int prompt_carry_slot(dungeon *d, std::string action)
 {
-  int i;
-  for (i = 0; i < INVENTORY_SIZE; i++)
+  uint i;
+  for (i = 0; i < d->PC->inventory.size() && i < INVENTORY_SIZE; i++)
   {
-    std::string name = "";
-    if (d->PC->inventory[i])
-    {
-      name = d->PC->inventory[i]->get_name();
-      name += d->PC->inventory[i]->get_type();
-    }
-    mvprintw(i + 9, 10, "Press i to %s %s", action.c_str(), name);
+    mvprintw(i + 9, 10, "Press i to %s %s", action.c_str(), d->PC->inventory.at(i).get_name());
   }
   refresh();
   char c;
-  while (c != 27 && (c < 0 || c > 9))
+  while (c != ESCAPE && (c < 0 || c > 9))
   {
     c = getch();
   }
   return c;
+}
+
+/**
+ *
+ * Returns a empty strng is no type is equipped
+ * else returns the equipped type
+ *
+ * If you want the nth element of that type set num to n, default to 0 for first occuring
+ * if num is 1, finds the second occurance
+ *
+ */
+const char* get_equipment_type(dungeon *d, object_type_t type, uint num) {
+  uint i, numfound = 0;
+  std::string result = "";
+  for (i = 0; i < d->PC->equipment.size(); i++) {
+    if (d->PC->equipment.at(i).get_type() == type) {
+      if (numfound == num) {
+        result.append(d->PC->equipment.at(i).get_name());
+        return result.c_str();
+      } else {
+        numfound++;
+      }
+    }
+  }
+  return result.c_str();
 }
 
 /**
@@ -1016,20 +1058,21 @@ int prompt_carry_slot(dungeon *d, int *selection, std::string action)
  *
  *
  */
-int promt_equipment_slot(dungeon *d, char *selection, std::string action)
-{
-  int i;
-  char input = 'a';
-  for (i = 0; i < EQUIPMENT_SLOTS; i++)
-  {
-    std::string name = "";
-    if (d->PC->equipment[i])
-    {
-      name = d->PC->equipment[i]->get_name();
-      name += d->PC->equipment[i]->get_type();
-    }
-    mvprintw(i + 9, 10, "Press %c to select %s", input + i, name);
-  }
+int promt_equipment_slot(dungeon *d, std::string action)
+{ // in this order, list: WEAPON OFFHAND RANGED ARMOR HELMET CLOAK GLOVES BOOTS ALUMET LIGHT RING1 RING2
+  mvprintw(10, 10, "WEAPON  Press 'a' to %s %s", action.c_str(), get_equipment_type(d, objtype_WEAPON, 0));
+  mvprintw(11, 10, "OFFHAND Press 'b' to %s %s", action.c_str(), get_equipment_type(d, objtype_OFFHAND, 0));
+  mvprintw(12, 10, "RANGED  Press 'c' to %s %s", action.c_str(), get_equipment_type(d, objtype_RANGED, 0));
+  mvprintw(13, 10, "ARMOR   Press 'd' to %s %s", action.c_str(), get_equipment_type(d, objtype_ARMOR, 0));
+  mvprintw(14, 10, "HELMET  Press 'e' to %s %s", action.c_str(), get_equipment_type(d, objtype_HELMET, 0));
+  mvprintw(15, 10, "CLOAK   Press 'f' to %s %s", action.c_str(), get_equipment_type(d, objtype_CLOAK, 0));
+  mvprintw(16, 10, "GLOVES  Press 'g' to %s %s", action.c_str(), get_equipment_type(d, objtype_GLOVES, 0));
+  mvprintw(17, 10, "BOOTS   Press 'h' to %s %s", action.c_str(), get_equipment_type(d, objtype_BOOTS, 0));
+  mvprintw(18, 10, "AMULET  Press 'i' to %s %s", action.c_str(), get_equipment_type(d, objtype_AMULET, 0));
+  mvprintw(19, 10, "LIGHT   Press 'j' to %s %s", action.c_str(), get_equipment_type(d, objtype_LIGHT, 0));
+  mvprintw(20, 10, "RING1   Press 'k' to %s %s", action.c_str(), get_equipment_type(d, objtype_RING, 0));
+  mvprintw(21, 10, "RING2   Press 'l' to %s %s", action.c_str(), get_equipment_type(d, objtype_RING, 1));
+  mvprintw(22, 10, "Press escape to exit equipment selection");
   refresh();
   char c;
   while (c != ESCAPE && (c < 'a' || c > 'l'))
@@ -1039,67 +1082,49 @@ int promt_equipment_slot(dungeon *d, char *selection, std::string action)
   return c;
 }
 
-int num_inventory(dungeon *d) {
-  int i;
-  for (i = 0; d->PC->inventory[i]; i++) {
-
-  }
-  io_queue_message("Number of items in inventory %i", i);
-  return i;
-}
-
 int list_inventory(dungeon *d)
 {
-  int i;
-  for (i = 0; i < INVENTORY_SIZE; i++)
+  uint i;
+  mvprintw(8, 10, "------ INVENTORY -----");
+  for (i = 0; i < INVENTORY_SIZE && i < d->PC->inventory.size(); i++)
   {
-    if (d->PC->inventory[i])
-    {
-      mvprintw(i + 9, 10, "%s", d->PC->inventory[i]->get_name());
-    } else {
-    mvprintw(i + 9, 10, "%s", " ");
-    }
+      mvprintw(i + 9, 10, "%s", d->PC->inventory.at(i).get_name());
   }
+  mvprintw(i + 10, 10, "Press any key to exit");
   refresh();
+  getch();
   return 0;
 }
 
 int list_equipment(dungeon *d)
 {
-  int i;
-  for (i = 0; i < EQUIPMENT_SLOTS; i++)
-  {
-    std::string name = "";
-    if (d->PC->equipment[i])
-    {
-      name = d->PC->equipment[i]->get_name();
-      name += d->PC->equipment[i]->get_type();
-    }
-    mvprintw(i + 9, 10, "%s", name);
-  }
+  mvprintw(10, 10, "WEAPON  %s", get_equipment_type(d, objtype_WEAPON, 0));
+  mvprintw(11, 10, "OFFHAND %s", get_equipment_type(d, objtype_OFFHAND, 0));
+  mvprintw(12, 10, "RANGED  %s", get_equipment_type(d, objtype_RANGED, 0));
+  mvprintw(13, 10, "ARMOR   %s", get_equipment_type(d, objtype_ARMOR, 0));
+  mvprintw(14, 10, "HELMET  %s", get_equipment_type(d, objtype_HELMET, 0));
+  mvprintw(15, 10, "CLOAK   %s", get_equipment_type(d, objtype_CLOAK, 0));
+  mvprintw(16, 10, "GLOVES  %s", get_equipment_type(d, objtype_GLOVES, 0));
+  mvprintw(17, 10, "BOOTS   %s", get_equipment_type(d, objtype_BOOTS, 0));
+  mvprintw(18, 10, "AMULET  %s", get_equipment_type(d, objtype_AMULET, 0));
+  mvprintw(19, 10, "LIGHT   %s", get_equipment_type(d, objtype_LIGHT, 0));
+  mvprintw(20, 10, "RING1   %s", get_equipment_type(d, objtype_RING, 0));
+  mvprintw(21, 10, "RING2   %s", get_equipment_type(d, objtype_RING, 1));
+  mvprintw(22, 10, "Press any key to exit");
   refresh();
+  getch();
   return 0;
 }
 
+
 int inspect_item(dungeon *d)
 {
-  int i;
-  for (i = 0; i < INVENTORY_SIZE; i++)
-  {
-    if (d->PC->inventory[i])
-    {
-      mvprintw(i + 9, 10, "Press i to inspect %s", d->PC->inventory[i]->get_name());
-    } else {
-      mvprintw(i + 9, 10, "Press i to inspect %s", " ");
-    }
-  }
-  refresh();
-  int c;
-  while (c != ESCAPE && (c < 0 || c > 9))
-  {
-    c = getch();
-  }
-  return c;
+  // std::string inspect = "inspect";
+  // int selection = prompt_carry_slot(d, inspect);
+
+  //TODO: this isnt the right way to do this but.... hey...
+  //io_queue_message(d->PC->inventory.at(selection).get_description.get_description());
+  return 0;
 }
 
 int look_at_monster(dungeon *d)
@@ -1119,16 +1144,16 @@ int look_at_monster(dungeon *d)
  *
  */
 void equip_item(dungeon *d, int position) {
-  if (d->PC->inventory[position]) {
-    if (!d->PC->equipment[d->PC->inventory[position]->get_type()]) {
-      d->PC->equipment[d->PC->inventory[position]->get_type()] = d->PC->inventory[position];
-      d->PC->inventory[position] = NULL;
-    } else {
-      // swap the 2 items
-      object temp = *d->PC->equipment[d->PC->inventory[position]->get_type()];
-      d->PC->equipment[d->PC->inventory[position]->get_type()] = d->PC->inventory[position];
-      d->PC->inventory[position] = &temp;
-    }
+  //check if already equipped
+  object_type_t type = (object_type_t) d->PC->inventory.at(position).get_type();
+
+  if (type != objtype_RING || (type == objtype_RING
+      && (strcmp(get_equipment_type(d, type, 1), "")))) {
+    //if no ring in slot ring1 or ring2, or if its not a ring then we can equip it
+    d->PC->equipment.push_back(d->PC->inventory.at(position));
+
+    // this next line causes a massive bug
+    //d->PC->inventory.erase(d->PC->inventory.begin() + position);
   }
 }
 
@@ -1209,34 +1234,33 @@ void io_handle_input(dungeon *d)
       // selection is [0,9]
       selection = 12;
       action = "wear";
-      prompt_carry_slot(d, &selection, action);
+      prompt_carry_slot(d, action);
       io_handle_input(d);
       break;
     case 't':
       // try to take off an equipped item
       action = "take off";
 
-      promt_equipment_slot(d, &sel, action);
+      promt_equipment_slot(d, action);
 
       io_handle_input(d);
       break;
     case 'd':
       // drop an item from inventory
       action = "drop";
-      prompt_carry_slot(d, &selection, action);
+      prompt_carry_slot(d, action);
       io_handle_input(d);
       break;
     case 'x':
       //expunge item frm the inventory
       action = "expunge";
-      prompt_carry_slot(d, &selection, action);
+      prompt_carry_slot(d, action);
       io_handle_input(d);
       break;
     case 'i':
       //list inventory
-      num_inventory(d);
-      //list_inventory(d);
-      //io_handle_input(d);
+      list_inventory(d);
+      io_handle_input(d);
       break;
     case 'e':
       //list equipment

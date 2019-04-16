@@ -18,12 +18,10 @@
 #include "object.h"
 
 int32_t player_damage_calc(dungeon *d) {
-  int i;
+  uint32_t i;
   int32_t result;
-  for (i = 0; i < EQUIPMENT_SLOTS; i++) {
-    if (d->PC->equipment[i]) {
-      result += d->PC->equipment[i]->roll_dice();
-    }
+  for (i = 0; i < d->PC->equipment.size(); i++) {
+    result += d->PC->equipment.at(i).roll_dice();
   }
   return result;
 }
@@ -68,7 +66,7 @@ void do_combat(dungeon *d, character *atk, character *def)
    * unsure why
    *
    */
-  if (atk == d->PC && def == d->PC) {
+  if (atk != d->PC && def != d->PC) {
     pair_t temp;
     temp[dim_y] = atk->position[dim_y];
     temp[dim_x] = atk->position[dim_x];
@@ -89,15 +87,12 @@ void do_combat(dungeon *d, character *atk, character *def)
 }
 
 int addToInventory(dungeon *d, object *item) {
-  int i;
-  for (i = 0; i < INVENTORY_SIZE; i++) {
-    if (!d->PC->inventory[i]) {
-      d->PC->inventory[i] = (object*) malloc(sizeof(object*));
-      d->PC->inventory[i] = item;
-      return 0;
-    }
+  if (d->PC->inventory.size() >= INVENTORY_SIZE) {
+    return 0;
+  } else {
+    d->PC->inventory.push_back(*item);
+    return 1;
   }
-  return 1;
 }
 
 void pickupItems(dungeon *d, pair_t position) {
@@ -127,11 +122,22 @@ void pickupItems(dungeon *d, pair_t position) {
 
 void move_character(dungeon *d, character *c, pair_t next)
 {
-  if (charpair(next) &&
-      ((next[dim_y] != c->position[dim_y]) ||
-       (next[dim_x] != c->position[dim_x])))
+  if (charpair(next) && ((next[dim_y] != c->position[dim_y]) || (next[dim_x] != c->position[dim_x])))
   {
-    do_combat(d, c, charpair(next));
+    if (c != d->PC && charpair(next) != d->PC) {
+      //swap the npc's positions
+      character *atk = charpair(next);
+      character *def = c;
+      pair_t temp;
+      temp[dim_y] = atk->position[dim_y];
+      temp[dim_x] = atk->position[dim_x];
+      atk->position[dim_y] = def->position[dim_y];
+      atk->position[dim_x] = def->position[dim_x];
+      def->position[dim_y] = temp[dim_y];
+      def->position[dim_x] = temp[dim_x];
+    } else{
+      do_combat(d, c, charpair(next));
+    }
   }
   else
   {
