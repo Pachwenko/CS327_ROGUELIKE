@@ -978,8 +978,6 @@ static void io_list_monsters(dungeon *d)
   io_display(d);
 }
 
-
-
 /**
  *
  *
@@ -999,7 +997,6 @@ static void io_list_monsters(dungeon *d)
  *
  */
 
-
 #define ESCAPE 27
 
 /**
@@ -1015,7 +1012,7 @@ int prompt_carry_slot(dungeon *d, std::string action)
   uint i;
   for (i = 0; i < d->PC->inventory.size() && i < INVENTORY_SIZE; i++)
   {
-    mvprintw(i + 9, 10, "Press i to %s %s", action.c_str(), d->PC->inventory.at(i).get_name());
+    mvprintw(i + 9, 10, "Press %u to %s %s", i, action.c_str(), d->PC->inventory.at(i).get_name());
   }
   refresh();
   char c;
@@ -1035,15 +1032,21 @@ int prompt_carry_slot(dungeon *d, std::string action)
  * if num is 1, finds the second occurance
  *
  */
-const char* get_equipment_type(dungeon *d, object_type_t type, uint num) {
+const char *get_equipment_type(dungeon *d, object_type_t type, uint num)
+{
   uint i, numfound = 0;
   std::string result = "";
-  for (i = 0; i < d->PC->equipment.size(); i++) {
-    if (d->PC->equipment.at(i).get_type() == type) {
-      if (numfound == num) {
+  for (i = 0; i < d->PC->equipment.size(); i++)
+  {
+    if (d->PC->equipment.at(i).get_type() == type)
+    {
+      if (numfound == num)
+      {
         result.append(d->PC->equipment.at(i).get_name());
         return result.c_str();
-      } else {
+      }
+      else
+      {
         numfound++;
       }
     }
@@ -1088,7 +1091,7 @@ int list_inventory(dungeon *d)
   mvprintw(8, 10, "------ INVENTORY -----");
   for (i = 0; i < INVENTORY_SIZE && i < d->PC->inventory.size(); i++)
   {
-      mvprintw(i + 9, 10, "%s", d->PC->inventory.at(i).get_name());
+    mvprintw(i + 9, 10, "item %u %s", i, d->PC->inventory.at(i).get_name());
   }
   mvprintw(i + 10, 10, "Press any key to exit");
   refresh();
@@ -1116,7 +1119,6 @@ int list_equipment(dungeon *d)
   return 0;
 }
 
-
 int inspect_item(dungeon *d)
 {
   // std::string inspect = "inspect";
@@ -1139,24 +1141,129 @@ int look_at_monster(dungeon *d)
 
 /**
  *
+ * It's stupid I have to write this method.
+ * Removes the given object from the given vector
+ *
+ * Note: removes only the first occurence
+ *
+ */
+void remove_obj_from_vector(std::vector<object> vector, object to_remove)
+{
+  std::vector<object> temp;
+  uint i;
+  bool was_removed = false;
+  for (i = 0; i < vector.size(); i++)
+  {
+    if (was_removed || (!(strcmp(vector.at(i).get_name(), to_remove.get_name()) == 0)))
+    {
+      // uses the name of the item as the primary key for comparison
+      temp.push_back(vector.at(i));
+    } else {
+      was_removed = true;
+    }
+  }
+  vector.clear();
+  for (i = 0; i < temp.size(); i++)
+  {
+    vector.push_back(temp.at(i));
+  }
+}
+
+const char* get_name_from_equipment_selection(dungeon *d, int selection) {
+  char sel = (char)selection;
+  std::string result;
+  switch(sel) {
+    case 'a':
+      result = get_equipment_type(d, objtype_WEAPON, 0);
+      break;
+    case 'b':
+      result = get_equipment_type(d, objtype_OFFHAND, 0);
+      break;
+    case 'c':
+      result = get_equipment_type(d, objtype_RANGED, 0);
+      break;
+    case 'd':
+      result = get_equipment_type(d, objtype_ARMOR, 0);
+      break;
+    case 'e':
+      result = get_equipment_type(d, objtype_HELMET, 0);
+      break;
+    case 'f':
+      result = get_equipment_type(d, objtype_CLOAK, 0);
+      break;
+    case 'g':
+      result = get_equipment_type(d, objtype_GLOVES, 0);
+      break;
+    case 'h':
+      result = get_equipment_type(d, objtype_BOOTS, 0);
+      break;
+    case 'i':
+      result = get_equipment_type(d, objtype_AMULET, 0);
+      break;
+    case 'j':
+      result = get_equipment_type(d, objtype_LIGHT, 0);
+      break;
+    case 'k':
+      result = get_equipment_type(d, objtype_RING, 0);
+      break;
+    case 'l':
+      result = get_equipment_type(d, objtype_RING, 1);
+      break;
+  }
+  return result.c_str();
+}
+/**
+ *
  * Attemps to equip the inventory item at the given position
  * If item is already in the slot, swaps them, otherwise equips it
  *
  */
-void equip_item(dungeon *d, int position) {
+void equip_item(dungeon *d, int position)
+{
   //check if already equipped
-  object_type_t type = (object_type_t) d->PC->inventory.at(position).get_type();
+  io_queue_message("equipping item at %d", position);
+  object obj = d->PC->inventory.at(position);
+  object_type_t type = (object_type_t)obj.get_type();
 
-  if (type != objtype_RING || (type == objtype_RING
-      && (strcmp(get_equipment_type(d, type, 1), "")))) {
+  if ((type != objtype_RING && (strcmp(get_equipment_type(d, type, 0), "") == 0)) || (type == objtype_RING && (strcmp(get_equipment_type(d, type, 1), ""))))
+  {
     //if no ring in slot ring1 or ring2, or if its not a ring then we can equip it
-    d->PC->equipment.push_back(d->PC->inventory.at(position));
+    d->PC->equipment.push_back(obj);
 
     // this next line causes a massive bug
     //d->PC->inventory.erase(d->PC->inventory.begin() + position);
+
+    // instead of doing the above line I am going to copy every
+    // element in our vector into a new vector and then
+    // clear our old vector and copy then back in without
+    // the object we want to delete
+    //
+    // this is the only solution I could find, searhcing online yielded no results
+    remove_obj_from_vector(d->PC->inventory, obj);
+  } else {
+    io_queue_message("could not equip that item");
   }
 }
 
+/**
+ * Attempts to take off the equipment at the given position/selection
+ *
+ */
+void take_off_equipment(dungeon *d, int position) {
+  const char* name = get_name_from_equipment_selection(d, position);
+  if ((strcmp(name, "") == 0) || d->PC->inventory.size() >= INVENTORY_SIZE) {
+    io_queue_message("no item to take off at that position");
+    io_queue_message("or inventory is full");
+    return;
+  }
+
+  uint i;
+  for (i = 0; i < d->PC->equipment.size() && !(strcmp(d->PC->equipment.at(i).get_name(), name) == 0); i++) {
+  }
+  object obj = d->PC->equipment.at(i);
+  remove_obj_from_vector(d->PC->equipment, obj);
+  d->PC->inventory.push_back(obj);
+}
 
 /**
  *
@@ -1196,14 +1303,19 @@ void equip_item(dungeon *d, int position) {
 
 void io_handle_input(dungeon *d)
 {
+  /**
+   *
+   * For some reason even though I use "selection" in the switch
+   * case it keeps saying it is unused, so I circumvent that here
+   * by modifying makefile flags with -Wno-unused-but-set-variable
+   */
   uint32_t fail_code = 0;
   int key = 0;
   fd_set readfs;
   struct timeval tv;
   uint32_t fog_off = 0;
   pair_t tmp = {DUNGEON_X, DUNGEON_Y};
-  int selection = -100;
-  char sel = 'z';
+  int selection;
   std::string action = "null";
 
   do
@@ -1232,48 +1344,56 @@ void io_handle_input(dungeon *d)
     case 'w':
       // prompt for inventory and try to equip their selection
       // selection is [0,9]
-      selection = 12;
       action = "wear";
-      prompt_carry_slot(d, action);
+      selection = prompt_carry_slot(d, action);
+      equip_item(d, selection);
+      io_display(d);
       io_handle_input(d);
       break;
     case 't':
       // try to take off an equipped item
       action = "take off";
-
-      promt_equipment_slot(d, action);
-
+      selection = promt_equipment_slot(d, action);
+      take_off_equipment(d, selection);
+      io_display(d);
       io_handle_input(d);
       break;
     case 'd':
       // drop an item from inventory
       action = "drop";
-      prompt_carry_slot(d, action);
+      selection = prompt_carry_slot(d, action);
+
+      io_display(d);
       io_handle_input(d);
       break;
     case 'x':
       //expunge item frm the inventory
       action = "expunge";
-      prompt_carry_slot(d, action);
+      selection = prompt_carry_slot(d, action);
+      io_display(d);
       io_handle_input(d);
       break;
     case 'i':
       //list inventory
       list_inventory(d);
+      io_display(d);
       io_handle_input(d);
       break;
     case 'e':
       //list equipment
       list_equipment(d);
+      io_display(d);
       io_handle_input(d);
       break;
     case 'I':
       //inspect item in inventory
-      selection = inspect_item(d);
+      inspect_item(d);
+      io_display(d);
       break;
     case 'L':
       // look at monster
 
+      io_display(d);
       break;
     case '7':
     case 'y':
