@@ -524,6 +524,7 @@ static int empty_dungeon(dungeon *d)
         mapxy(x, y) = ter_wall_immutable;
         hardnessxy(x, y) = 255;
       }
+      d->objmap[y][x] = NULL;
       charxy(x, y) = NULL;
     }
   }
@@ -615,6 +616,17 @@ static int make_rooms(dungeon *d)
 }
 
 
+void init_PC(dungeon *d) {
+  int i;
+  for (i = 0; i < INVENTORY_SIZE; i++) {
+    d->PC->inventory[i] = NULL;
+  }
+
+  for (i = 0; i < EQUIPMENT_SLOTS; i++) {
+    d->PC->equipment[i] = NULL;
+  }
+}
+
 int gen_dungeon(dungeon *d)
 {
   empty_dungeon(d);
@@ -623,6 +635,7 @@ int gen_dungeon(dungeon *d)
   } while (place_rooms(d));
   connect_rooms(d);
   place_stairs(d);
+  init_PC(d);
   return 0;
 }
 

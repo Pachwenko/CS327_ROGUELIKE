@@ -86,15 +86,50 @@ void do_combat(dungeon *d, character *atk, character *def)
   }
 }
 
+
+/**
+ *
+ *
+ * Returns 0 if no open slots, otherwise returns
+ * index of hte open slot
+ *
+ */
+
+int open_inventory_slot(dungeon *d) {
+  int i;
+  for (i = 0; i < INVENTORY_SIZE; i++) {
+    if (!(d->PC->inventor[i])) {
+      return i;
+    }
+  }
+  return 0;
+}
+
+
+/**
+ *
+ *  Attempts to add item to the player's inventory
+ *
+ */
 int addToInventory(dungeon *d, object *item) {
+  int slot = open_inventory_slot(d);
+  if (slot) {
+    d->PC->inventor[slot] = item;
+  }
+
   if (d->PC->inventory.size() >= INVENTORY_SIZE) {
-    return 0;
+    return 1;
   } else {
     d->PC->inventory.push_back(*item);
-    return 1;
+    return 0;
   }
 }
 
+/**
+ * Function to call whenever the player makes a move
+ * Automatically adds the items to the players inventory
+ * and removes it from the objmap
+ */
 void pickupItems(dungeon *d, pair_t position) {
   if (d->objmap[position[dim_y]][position[dim_x]]) {
     addToInventory(d, d->objmap[position[dim_y]][position[dim_x]]);
