@@ -1,56 +1,72 @@
-==4465== Memcheck, a memory error detector
-==4465== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==4465== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==4465== Command: ./rlg327
-==4465== Parent PID: 2945
-==4465== 
-==4465== Conditional jump or move depends on uninitialised value(s)
-==4465==    at 0x123608: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
-==4465==    by 0x124B88: io_handle_input(dungeon*) (io.cpp:1348)
-==4465==    by 0x118AD9: do_moves(dungeon*) (move.cpp:231)
-==4465==    by 0x10C698: main (rlg327.cpp:232)
-==4465== 
-==4465== Conditional jump or move depends on uninitialised value(s)
-==4465==    at 0x12360E: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
-==4465==    by 0x124B88: io_handle_input(dungeon*) (io.cpp:1348)
-==4465==    by 0x118AD9: do_moves(dungeon*) (move.cpp:231)
-==4465==    by 0x10C698: main (rlg327.cpp:232)
-==4465== 
-==4465== Conditional jump or move depends on uninitialised value(s)
-==4465==    at 0x1244A1: equip_item(dungeon*, int) (io.cpp:1228)
-==4465==    by 0x124BB4: io_handle_input(dungeon*) (io.cpp:1349)
-==4465==    by 0x118AD9: do_moves(dungeon*) (move.cpp:231)
-==4465==    by 0x10C698: main (rlg327.cpp:232)
-==4465== 
-==4465== 
-==4465== Process terminating with default action of signal 6 (SIGABRT)
-==4465==    at 0x5868E97: raise (raise.c:51)
-==4465==    by 0x586A800: abort (abort.c:79)
-==4465==    by 0x53158B6: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
-==4465==    by 0x531BA05: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
-==4465==    by 0x531BA40: std::terminate() (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
-==4465==    by 0x531BC73: __cxa_throw (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
-==4465==    by 0x53177B4: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
-==4465==    by 0x119351: std::vector<object, std::allocator<object> >::_M_range_check(unsigned long) const (stl_vector.h:825)
-==4465==    by 0x11923A: std::vector<object, std::allocator<object> >::at(unsigned long) (stl_vector.h:846)
-==4465==    by 0x1243E9: equip_item(dungeon*, int) (io.cpp:1225)
-==4465==    by 0x124BB4: io_handle_input(dungeon*) (io.cpp:1349)
-==4465==    by 0x118AD9: do_moves(dungeon*) (move.cpp:231)
-==4465== 
-==4465== HEAP SUMMARY:
-==4465==     in use at exit: 234,235 bytes in 505 blocks
-==4465==   total heap usage: 24,900 allocs, 24,395 frees, 1,424,471 bytes allocated
-==4465== 
-==4465== LEAK SUMMARY:
-==4465==    definitely lost: 440 bytes in 5 blocks
-==4465==    indirectly lost: 0 bytes in 0 blocks
-==4465==      possibly lost: 144 bytes in 1 blocks
-==4465==    still reachable: 233,651 bytes in 499 blocks
-==4465==                       of which reachable via heuristic:
-==4465==                         stdstring          : 94 bytes in 1 blocks
-==4465==         suppressed: 0 bytes in 0 blocks
-==4465== Rerun with --leak-check=full to see details of leaked memory
-==4465== 
-==4465== For counts of detected and suppressed errors, rerun with: -v
-==4465== Use --track-origins=yes to see where uninitialised values come from
-==4465== ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)
+==8305== Memcheck, a memory error detector
+==8305== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==8305== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==8305== Command: ./rlg327
+==8305== Parent PID: 2122
+==8305== 
+==8305== Conditional jump or move depends on uninitialised value(s)
+==8305==    at 0x1183D8: open_inventory_slot(dungeon*) (move.cpp:101)
+==8305==    by 0x118407: addToInventory(dungeon*, object*) (move.cpp:115)
+==8305==    by 0x118522: pickupItems(dungeon*, short*) (move.cpp:135)
+==8305==    by 0x118773: move_character(dungeon*, character*, short*) (move.cpp:181)
+==8305==    by 0x119168: move_pc(dungeon*, unsigned int) (move.cpp:403)
+==8305==    by 0x124F96: io_handle_input(dungeon*) (io.cpp:1419)
+==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
+==8305==    by 0x10C698: main (rlg327.cpp:232)
+==8305== 
+==8305== Conditional jump or move depends on uninitialised value(s)
+==8305==    at 0x1236CA: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
+==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
+==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
+==8305==    by 0x10C698: main (rlg327.cpp:232)
+==8305== 
+==8305== Conditional jump or move depends on uninitialised value(s)
+==8305==    at 0x1236D0: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
+==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
+==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
+==8305==    by 0x10C698: main (rlg327.cpp:232)
+==8305== 
+==8305== Conditional jump or move depends on uninitialised value(s)
+==8305==    at 0x4C32CF9: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==8305==    by 0x58874D2: vfprintf (vfprintf.c:1643)
+==8305==    by 0x595C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==8305==    by 0x4E52416: ??? (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==8305==    by 0x4E4D9EE: vwprintw (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==8305==    by 0x4E4DC51: mvprintw (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
+==8305==    by 0x123D6C: list_equipment(dungeon*) (io.cpp:1104)
+==8305==    by 0x124ECB: io_handle_input(dungeon*) (io.cpp:1387)
+==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
+==8305==    by 0x10C698: main (rlg327.cpp:232)
+==8305== 
+==8305== Conditional jump or move depends on uninitialised value(s)
+==8305==    at 0x1236CA: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
+==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
+==8305==    by 0x124EB7: io_handle_input(dungeon*) (io.cpp:1383)
+==8305==    by 0x124EE9: io_handle_input(dungeon*) (io.cpp:1389)
+==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
+==8305==    by 0x10C698: main (rlg327.cpp:232)
+==8305== 
+==8305== Conditional jump or move depends on uninitialised value(s)
+==8305==    at 0x1236D0: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
+==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
+==8305==    by 0x124EB7: io_handle_input(dungeon*) (io.cpp:1383)
+==8305==    by 0x124EE9: io_handle_input(dungeon*) (io.cpp:1389)
+==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
+==8305==    by 0x10C698: main (rlg327.cpp:232)
+==8305== 
+==8305== 
+==8305== HEAP SUMMARY:
+==8305==     in use at exit: 207,136 bytes in 349 blocks
+==8305==   total heap usage: 31,808 allocs, 31,459 frees, 1,755,577 bytes allocated
+==8305== 
+==8305== LEAK SUMMARY:
+==8305==    definitely lost: 88 bytes in 1 blocks
+==8305==    indirectly lost: 0 bytes in 0 blocks
+==8305==      possibly lost: 0 bytes in 0 blocks
+==8305==    still reachable: 207,048 bytes in 348 blocks
+==8305==         suppressed: 0 bytes in 0 blocks
+==8305== Rerun with --leak-check=full to see details of leaked memory
+==8305== 
+==8305== For counts of detected and suppressed errors, rerun with: -v
+==8305== Use --track-origins=yes to see where uninitialised values come from
+==8305== ERROR SUMMARY: 17 errors from 6 contexts (suppressed: 0 from 0)

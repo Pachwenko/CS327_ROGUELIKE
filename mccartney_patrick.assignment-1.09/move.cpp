@@ -177,8 +177,9 @@ void move_character(dungeon *d, character *c, pair_t next)
   else
   {
     /* No character in new position. */
-
-    pickupItems(d, next);
+    if (c == d->PC) {
+      pickupItems(d, next);
+    }
     d->character_map[c->position[dim_y]][c->position[dim_x]] = NULL;
     c->position[dim_y] = next[dim_y];
     c->position[dim_x] = next[dim_x];

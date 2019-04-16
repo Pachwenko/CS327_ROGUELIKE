@@ -616,16 +616,27 @@ static int make_rooms(dungeon *d)
 }
 
 
-void init_PC(dungeon *d) {
-  int i;
-  for (i = 0; i < INVENTORY_SIZE; i++) {
-    d->PC->inventory[i] = NULL;
-  }
+/**
+ *
+ *
+ *
+ * Initialize the invenotry and equipment arrays
+ * to NULL
+ *
+ *
+ *
+ */
+// void init_PC(dungeon *d) {
+//   int i;
+//   *d->PC->inventor = (object*) malloc(INVENTORY_SIZE * sizeof(object*));
+//   for (i = 0; i < INVENTORY_SIZE; i++) {
+//     d->PC->inventor[i] = NULL;
+//   }
 
-  for (i = 0; i < EQUIPMENT_SLOTS; i++) {
-    d->PC->equipment[i] = NULL;
-  }
-}
+//   for (i = 0; i < EQUIPMENT_SLOTS; i++) {
+//     d->PC->equipmen[i] = NULL;
+//   }
+// }
 
 int gen_dungeon(dungeon *d)
 {
@@ -635,7 +646,7 @@ int gen_dungeon(dungeon *d)
   } while (place_rooms(d));
   connect_rooms(d);
   place_stairs(d);
-  init_PC(d);
+  //init_PC(d);
   return 0;
 }
 

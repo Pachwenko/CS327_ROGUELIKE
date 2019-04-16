@@ -1218,8 +1218,11 @@ const char* get_name_from_equipment_selection(dungeon *d, int selection) {
  * If item is already in the slot, swaps them, otherwise equips it
  *
  */
-void equip_item(dungeon *d, int position)
+void equip_item(dungeon *d, uint position)
 {
+  if (d->PC->inventory.size() <= 0 || position >= d->PC->inventory.size()) {
+    return;
+  }
   //check if already equipped
   io_queue_message("equipping item at %d", position);
   object obj = d->PC->inventory.at(position);
