@@ -615,8 +615,6 @@ static int make_rooms(dungeon *d)
 }
 
 
-
-
 int gen_dungeon(dungeon *d)
 {
   empty_dungeon(d);
