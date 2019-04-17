@@ -983,7 +983,8 @@ static void io_list_monsters(dungeon *d)
  * Converts user selection 0 - 9 to a index in our vector
  *
  */
-uint selection_to_index(uint selection) {
+uint selection_to_index(uint selection)
+{
   return selection - 48;
 }
 
@@ -1024,11 +1025,6 @@ int prompt_carry_slot(dungeon *d, std::string action)
     mvprintw(i + 9, 10, "Press %u to %s %s", i, action.c_str(), d->PC->inventory.at(i).get_name());
   }
   refresh();
-  // char c;
-  // while (c != ESCAPE && (c < '0' || c > '9'))
-  // {
-  //   c = getch();
-  // }
   return getch();
 }
 
@@ -1128,24 +1124,36 @@ int list_equipment(dungeon *d)
   return 0;
 }
 
-int inspect_item(dungeon *d)
+/**
+ * Takes the given string and writes it to the screen
+ * using io_queue_message. The string will be modified
+ *
+ */
+void queue_string(std::string *to_queue)
 {
-  // std::string inspect = "inspect";
-  // int selection = prompt_carry_slot(d, inspect);
-
-  //TODO: this isnt the right way to do this but.... hey...
-  //io_queue_message(d->PC->inventory.at(selection).get_description.get_description());
-  return 0;
+  while (to_queue->length())
+  {
+    try
+    {
+      io_queue_message(to_queue->substr(0, 71).c_str());
+      to_queue->erase(0, 71);
+    }
+    catch (std::out_of_range &)
+    {
+      //oops str is too short!!!
+    }
+  }
+  io_queue_message("");
 }
 
-int look_at_monster(dungeon *d)
+void inspect_item(dungeon *d)
 {
-  int key = 0;
-  while (key != ESCAPE)
-  {
-    // do similar to teleport displaying a * as the player moves it around
-  }
-  return 0;
+  std::string inspect = "inspect";
+  int selection = prompt_carry_slot(d, inspect);
+  int index = selection_to_index(selection);
+
+  std::string description = d->PC->inventory.at(index).get_description();
+  queue_string(&description);
 }
 
 /**
@@ -1153,38 +1161,33 @@ int look_at_monster(dungeon *d)
  * It's stupid I have to write this method.
  * Removes the given object from the given vector
  *
- * Note: removes only the first occurence
+ * Note: removes ALL occurrences
+ *
+ * If using vector.erase() on a vector<object> then a nasty
+ * error will occur, likely due to how objects are destructed inside
+ * the vector class. Use this instead
  *
  */
 void remove_obj_from_vector(std::vector<object> *vector, object to_remove)
 {
   std::vector<object> temp;
   uint i;
-  io_queue_message("vector bagan with size %u", vector->size());
-;
   for (i = 0; i < vector->size(); i++)
   {
     if ((!(strcmp(vector->at(i).get_name(), to_remove.get_name()) == 0)))
     {
-      // uses the name of the item as the primary key for comparison
       temp.push_back(vector->at(i));
-    } else {
-      io_queue_message("Removed item from inventory");
-
     }
   }
-  while (!vector->empty()) {
+  while (!vector->empty())
+  {
     vector->pop_back();
   }
-
   for (i = 0; i < temp.size(); i++)
   {
     vector->push_back(temp.at(i));
   }
-  io_queue_message("vector ended with size %u", vector->size());
-
 }
-
 
 /**
  *
@@ -1192,46 +1195,48 @@ void remove_obj_from_vector(std::vector<object> *vector, object to_remove)
  *
  *
  */
-const char* get_name_from_equipment_selection(dungeon *d, int selection) {
+const char *get_name_from_equipment_selection(dungeon *d, int selection)
+{
   char sel = (char)selection;
   std::string result;
-  switch(sel) {
-    case 'a':
-      result = get_equipment_type(d, objtype_WEAPON, 0);
-      break;
-    case 'b':
-      result = get_equipment_type(d, objtype_OFFHAND, 0);
-      break;
-    case 'c':
-      result = get_equipment_type(d, objtype_RANGED, 0);
-      break;
-    case 'd':
-      result = get_equipment_type(d, objtype_ARMOR, 0);
-      break;
-    case 'e':
-      result = get_equipment_type(d, objtype_HELMET, 0);
-      break;
-    case 'f':
-      result = get_equipment_type(d, objtype_CLOAK, 0);
-      break;
-    case 'g':
-      result = get_equipment_type(d, objtype_GLOVES, 0);
-      break;
-    case 'h':
-      result = get_equipment_type(d, objtype_BOOTS, 0);
-      break;
-    case 'i':
-      result = get_equipment_type(d, objtype_AMULET, 0);
-      break;
-    case 'j':
-      result = get_equipment_type(d, objtype_LIGHT, 0);
-      break;
-    case 'k':
-      result = get_equipment_type(d, objtype_RING, 0);
-      break;
-    case 'l':
-      result = get_equipment_type(d, objtype_RING, 1);
-      break;
+  switch (sel)
+  {
+  case 'a':
+    result = get_equipment_type(d, objtype_WEAPON, 0);
+    break;
+  case 'b':
+    result = get_equipment_type(d, objtype_OFFHAND, 0);
+    break;
+  case 'c':
+    result = get_equipment_type(d, objtype_RANGED, 0);
+    break;
+  case 'd':
+    result = get_equipment_type(d, objtype_ARMOR, 0);
+    break;
+  case 'e':
+    result = get_equipment_type(d, objtype_HELMET, 0);
+    break;
+  case 'f':
+    result = get_equipment_type(d, objtype_CLOAK, 0);
+    break;
+  case 'g':
+    result = get_equipment_type(d, objtype_GLOVES, 0);
+    break;
+  case 'h':
+    result = get_equipment_type(d, objtype_BOOTS, 0);
+    break;
+  case 'i':
+    result = get_equipment_type(d, objtype_AMULET, 0);
+    break;
+  case 'j':
+    result = get_equipment_type(d, objtype_LIGHT, 0);
+    break;
+  case 'k':
+    result = get_equipment_type(d, objtype_RING, 0);
+    break;
+  case 'l':
+    result = get_equipment_type(d, objtype_RING, 1);
+    break;
   }
   return result.c_str();
 }
@@ -1244,7 +1249,8 @@ const char* get_name_from_equipment_selection(dungeon *d, int selection) {
 void equip_item(dungeon *d, uint selection)
 {
   uint index = selection_to_index(selection);
-  if (d->PC->inventory.size() <= 0 || index >= d->PC->inventory.size()) {
+  if (d->PC->inventory.size() <= 0 || index >= d->PC->inventory.size())
+  {
     io_queue_message("Empty inventory or bad selection: %u", index);
     return;
   }
@@ -1267,7 +1273,9 @@ void equip_item(dungeon *d, uint selection)
     //
     // this is the only solution I could find, searhcing online yielded no results
     remove_obj_from_vector(&d->PC->inventory, obj);
-  } else {
+  }
+  else
+  {
     io_queue_message("Could not equip that item");
   }
 }
@@ -1276,20 +1284,186 @@ void equip_item(dungeon *d, uint selection)
  * Attempts to take off the equipment at the given position/selection
  *
  */
-void take_off_equipment(dungeon *d, int position) {
-  const char* name = get_name_from_equipment_selection(d, position);
-  if ((strcmp(name, "") == 0) || d->PC->inventory.size() >= INVENTORY_SIZE) {
+void take_off_equipment(dungeon *d, int position)
+{
+  const char *name = get_name_from_equipment_selection(d, position);
+  if ((strcmp(name, "") == 0) || d->PC->inventory.size() >= INVENTORY_SIZE)
+  {
     io_queue_message("no item to take off at that position");
     io_queue_message("or inventory is full");
     return;
   }
 
   uint i;
-  for (i = 0; i < d->PC->equipment.size() && !(strcmp(d->PC->equipment.at(i).get_name(), name) == 0); i++) {
+  for (i = 0; i < d->PC->equipment.size() && !(strcmp(d->PC->equipment.at(i).get_name(), name) == 0); i++)
+  {
   }
   object obj = d->PC->equipment.at(i);
   remove_obj_from_vector(&d->PC->equipment, obj);
   d->PC->inventory.push_back(obj);
+}
+
+/**
+ *
+ * Basically a copy of teleport function, but for looking
+ * at a monster
+ *
+ *
+ */
+void look_at_monster(dungeon *d)
+{
+  pair_t dest;
+  int c;
+  fd_set readfs;
+  struct timeval tv;
+
+  pc_reset_visibility(d->PC);
+  io_display_no_fog(d);
+
+  mvprintw(0, 0,
+           "Press 't' to inspect a monster and escape to exit");
+
+  dest[dim_y] = d->PC->position[dim_y];
+  dest[dim_x] = d->PC->position[dim_x];
+
+  mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+  refresh();
+  do
+  {
+    do
+    {
+      FD_ZERO(&readfs);
+      FD_SET(STDIN_FILENO, &readfs);
+
+      tv.tv_sec = 0;
+      tv.tv_usec = 125000; /* An eigth of a second */
+
+      io_redisplay_non_terrain(d, dest);
+    } while (!select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv));
+    /* Can simply draw the terrain when we move the cursor away, *
+     * because if it is a character or object, the refresh       *
+     * function will fix it for us.                              */
+    switch (mappair(dest))
+    {
+    case ter_wall:
+    case ter_wall_immutable:
+    case ter_unknown:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], ' ');
+      break;
+    case ter_floor:
+    case ter_floor_room:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '.');
+      break;
+    case ter_floor_hall:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '#');
+      break;
+    case ter_debug:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+      break;
+    case ter_stairs_up:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '<');
+      break;
+    case ter_stairs_down:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '>');
+      break;
+    default:
+      /* Use zero as an error symbol, since it stands out somewhat, and it's *
+  * not otherwise used.                                                 */
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '0');
+    }
+    switch ((c = getch()))
+    {
+    case '7':
+    case 'y':
+    case KEY_HOME:
+      if (dest[dim_y] != 1)
+      {
+        dest[dim_y]--;
+      }
+      if (dest[dim_x] != 1)
+      {
+        dest[dim_x]--;
+      }
+      break;
+    case '8':
+    case 'k':
+    case KEY_UP:
+      if (dest[dim_y] != 1)
+      {
+        dest[dim_y]--;
+      }
+      break;
+    case '9':
+    case 'u':
+    case KEY_PPAGE:
+      if (dest[dim_y] != 1)
+      {
+        dest[dim_y]--;
+      }
+      if (dest[dim_x] != DUNGEON_X - 2)
+      {
+        dest[dim_x]++;
+      }
+      break;
+    case '6':
+    case 'l':
+    case KEY_RIGHT:
+      if (dest[dim_x] != DUNGEON_X - 2)
+      {
+        dest[dim_x]++;
+      }
+      break;
+    case '3':
+    case 'n':
+    case KEY_NPAGE:
+      if (dest[dim_y] != DUNGEON_Y - 2)
+      {
+        dest[dim_y]++;
+      }
+      if (dest[dim_x] != DUNGEON_X - 2)
+      {
+        dest[dim_x]++;
+      }
+      break;
+    case '2':
+    case 'j':
+    case KEY_DOWN:
+      if (dest[dim_y] != DUNGEON_Y - 2)
+      {
+        dest[dim_y]++;
+      }
+      break;
+    case '1':
+    case 'b':
+    case KEY_END:
+      if (dest[dim_y] != DUNGEON_Y - 2)
+      {
+        dest[dim_y]++;
+      }
+      if (dest[dim_x] != 1)
+      {
+        dest[dim_x]--;
+      }
+      break;
+    case '4':
+    case 'h':
+    case KEY_LEFT:
+      if (dest[dim_x] != 1)
+      {
+        dest[dim_x]--;
+      }
+      break;
+    }
+  } while (c != 't' && c != ESCAPE);
+
+  if (charpair(dest) && charpair(dest) != d->PC)
+  {
+    // print monster description at dest
+
+    npc *mob = (npc *)charpair(dest);
+    std::string description = mob->description;
+    queue_string(&description);
+  }
 }
 
 /**
@@ -1342,7 +1516,7 @@ void io_handle_input(dungeon *d)
   struct timeval tv;
   uint32_t fog_off = 0;
   pair_t tmp = {DUNGEON_X, DUNGEON_Y};
-  int selection;
+  int selection, index;
   std::string action = "null";
 
   do
@@ -1397,7 +1571,7 @@ void io_handle_input(dungeon *d)
       //expunge item frm the inventory
       action = "expunge";
       selection = prompt_carry_slot(d, action);
-      int index = selection_to_index(selection);
+      index = selection_to_index(selection);
       remove_obj_from_vector(&d->PC->inventory, d->PC->inventory.at(index));
       io_display(d);
       io_handle_input(d);
@@ -1421,7 +1595,7 @@ void io_handle_input(dungeon *d)
       break;
     case 'L':
       // look at monster
-
+      look_at_monster(d);
       io_display(d);
       break;
     case '7':
