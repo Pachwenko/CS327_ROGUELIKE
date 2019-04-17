@@ -1,72 +1,389 @@
-==8305== Memcheck, a memory error detector
-==8305== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==8305== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==8305== Command: ./rlg327
-==8305== Parent PID: 2122
-==8305== 
-==8305== Conditional jump or move depends on uninitialised value(s)
-==8305==    at 0x1183D8: open_inventory_slot(dungeon*) (move.cpp:101)
-==8305==    by 0x118407: addToInventory(dungeon*, object*) (move.cpp:115)
-==8305==    by 0x118522: pickupItems(dungeon*, short*) (move.cpp:135)
-==8305==    by 0x118773: move_character(dungeon*, character*, short*) (move.cpp:181)
-==8305==    by 0x119168: move_pc(dungeon*, unsigned int) (move.cpp:403)
-==8305==    by 0x124F96: io_handle_input(dungeon*) (io.cpp:1419)
-==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
-==8305==    by 0x10C698: main (rlg327.cpp:232)
-==8305== 
-==8305== Conditional jump or move depends on uninitialised value(s)
-==8305==    at 0x1236CA: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
-==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
-==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
-==8305==    by 0x10C698: main (rlg327.cpp:232)
-==8305== 
-==8305== Conditional jump or move depends on uninitialised value(s)
-==8305==    at 0x1236D0: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
-==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
-==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
-==8305==    by 0x10C698: main (rlg327.cpp:232)
-==8305== 
-==8305== Conditional jump or move depends on uninitialised value(s)
-==8305==    at 0x4C32CF9: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==8305==    by 0x58874D2: vfprintf (vfprintf.c:1643)
-==8305==    by 0x595C168: __vsnprintf_chk (vsnprintf_chk.c:63)
-==8305==    by 0x4E52416: ??? (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
-==8305==    by 0x4E4D9EE: vwprintw (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
-==8305==    by 0x4E4DC51: mvprintw (in /lib/x86_64-linux-gnu/libncurses.so.5.9)
-==8305==    by 0x123D6C: list_equipment(dungeon*) (io.cpp:1104)
-==8305==    by 0x124ECB: io_handle_input(dungeon*) (io.cpp:1387)
-==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
-==8305==    by 0x10C698: main (rlg327.cpp:232)
-==8305== 
-==8305== Conditional jump or move depends on uninitialised value(s)
-==8305==    at 0x1236CA: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
-==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
-==8305==    by 0x124EB7: io_handle_input(dungeon*) (io.cpp:1383)
-==8305==    by 0x124EE9: io_handle_input(dungeon*) (io.cpp:1389)
-==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
-==8305==    by 0x10C698: main (rlg327.cpp:232)
-==8305== 
-==8305== Conditional jump or move depends on uninitialised value(s)
-==8305==    at 0x1236D0: prompt_carry_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1019)
-==8305==    by 0x124CA4: io_handle_input(dungeon*) (io.cpp:1351)
-==8305==    by 0x124EB7: io_handle_input(dungeon*) (io.cpp:1383)
-==8305==    by 0x124EE9: io_handle_input(dungeon*) (io.cpp:1389)
-==8305==    by 0x118B9B: do_moves(dungeon*) (move.cpp:267)
-==8305==    by 0x10C698: main (rlg327.cpp:232)
-==8305== 
-==8305== 
-==8305== HEAP SUMMARY:
-==8305==     in use at exit: 207,136 bytes in 349 blocks
-==8305==   total heap usage: 31,808 allocs, 31,459 frees, 1,755,577 bytes allocated
-==8305== 
-==8305== LEAK SUMMARY:
-==8305==    definitely lost: 88 bytes in 1 blocks
-==8305==    indirectly lost: 0 bytes in 0 blocks
-==8305==      possibly lost: 0 bytes in 0 blocks
-==8305==    still reachable: 207,048 bytes in 348 blocks
-==8305==         suppressed: 0 bytes in 0 blocks
-==8305== Rerun with --leak-check=full to see details of leaked memory
-==8305== 
-==8305== For counts of detected and suppressed errors, rerun with: -v
-==8305== Use --track-origins=yes to see where uninitialised values come from
-==8305== ERROR SUMMARY: 17 errors from 6 contexts (suppressed: 0 from 0)
+==17897== Memcheck, a memory error detector
+==17897== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==17897== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==17897== Command: ./rlg327
+==17897== Parent PID: 17825
+==17897== 
+==17897== Conditional jump or move depends on uninitialised value(s)
+==17897==    at 0x12449E: equip_item(dungeon*, unsigned int) (io.cpp:1255)
+==17897==    by 0x124B37: io_handle_input(dungeon*) (io.cpp:1376)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C32CF2: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x58974D2: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123BF0: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x64ae9e0 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C32D04: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x58974D2: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123BF0: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x64ae9e1 is 1 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x58C8532: _IO_default_xsputn (genops.c:412)
+==17897==    by 0x5896FEA: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123BF0: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x64ae9e0 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x58C8540: _IO_default_xsputn (genops.c:411)
+==17897==    by 0x5896FEA: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123BF0: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x64ae9e2 is 2 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x123BD2: list_equipment(dungeon*) (io.cpp:1113)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Conditional jump or move depends on uninitialised value(s)
+==17897==    at 0x4C32CF9: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x58974D2: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123C24: list_equipment(dungeon*) (io.cpp:1114)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C371B8: mempcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x58C84CB: _IO_default_xsputn (genops.c:404)
+==17897==    by 0x5896FEA: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123CF4: list_equipment(dungeon*) (io.cpp:1118)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x64aea40 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x123CD6: list_equipment(dungeon*) (io.cpp:1118)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x123CD6: list_equipment(dungeon*) (io.cpp:1118)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C371C6: mempcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x58C84CB: _IO_default_xsputn (genops.c:404)
+==17897==    by 0x5896FEA: vfprintf (vfprintf.c:1643)
+==17897==    by 0x596C168: __vsnprintf_chk (vsnprintf_chk.c:63)
+==17897==    by 0x4E58D16: vsnprintf (stdio2.h:77)
+==17897==    by 0x4E58D16: _nc_printf_string (safe_sprintf.c:262)
+==17897==    by 0x4E515B3: vwprintw (lib_printw.c:143)
+==17897==    by 0x4E51977: mvprintw (lib_printw.c:103)
+==17897==    by 0x123CF4: list_equipment(dungeon*) (io.cpp:1118)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x64aea42 is 2 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x123CD6: list_equipment(dungeon*) (io.cpp:1118)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x123CD6: list_equipment(dungeon*) (io.cpp:1118)
+==17897==    by 0x124D32: io_handle_input(dungeon*) (io.cpp:1411)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Conditional jump or move depends on uninitialised value(s)
+==17897==    at 0x118295: do_combat(dungeon*, character*, character*) (move.cpp:79)
+==17897==    by 0x118648: move_character(dungeon*, character*, short*) (move.cpp:150)
+==17897==    by 0x119063: move_pc(dungeon*, unsigned int) (move.cpp:379)
+==17897==    by 0x124E3B: io_handle_input(dungeon*) (io.cpp:1453)
+==17897==    by 0x124D1E: io_handle_input(dungeon*) (io.cpp:1407)
+==17897==    by 0x124D50: io_handle_input(dungeon*) (io.cpp:1413)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Conditional jump or move depends on uninitialised value(s)
+==17897==    at 0x123A86: promt_equipment_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1090)
+==17897==    by 0x124BA2: io_handle_input(dungeon*) (io.cpp:1383)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Conditional jump or move depends on uninitialised value(s)
+==17897==    at 0x123A8C: promt_equipment_slot(dungeon*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (io.cpp:1090)
+==17897==    by 0x124BA2: io_handle_input(dungeon*) (io.cpp:1383)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C32CF2: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BEC93: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(char const*) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x1240D2: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x650e6e0 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x1240C0: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x1240C0: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C32D04: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BEC93: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(char const*) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x1240D2: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x650e6e1 is 1 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x1240C0: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x1240C0: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 8
+==17897==    at 0x4C367E0: memmove (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDD49: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BEA7A: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x1240D2: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x650e6e0 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1236B4: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1047)
+==17897==    by 0x1240C0: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BF262: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x12367A: get_equipment_type(dungeon*, object_type, unsigned int) (io.cpp:1054)
+==17897==    by 0x1240C0: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x12466D: take_off_equipment(dungeon*, int) (io.cpp:1281)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x650e740 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1242D5: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1197)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BEA7A: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x1240D2: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C33DA3: strcmp (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x124743: take_off_equipment(dungeon*, int) (io.cpp:1288)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x650e740 is 0 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1242D5: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1197)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BEA7A: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x1240D2: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== Invalid read of size 1
+==17897==    at 0x4C33DC7: strcmp (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x124743: take_off_equipment(dungeon*, int) (io.cpp:1288)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Address 0x650e741 is 1 bytes inside a block of size 31 free'd
+==17897==    at 0x4C3123B: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x1242D5: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1197)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897==  Block was alloc'd at
+==17897==    at 0x4C3017F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==17897==    by 0x53BDCFA: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x53BEA7A: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==17897==    by 0x1240D2: get_name_from_equipment_selection(dungeon*, int) (io.cpp:1200)
+==17897==    by 0x12465E: take_off_equipment(dungeon*, int) (io.cpp:1280)
+==17897==    by 0x124BCE: io_handle_input(dungeon*) (io.cpp:1384)
+==17897==    by 0x118A99: do_moves(dungeon*) (move.cpp:243)
+==17897==    by 0x10C669: main (rlg327.cpp:232)
+==17897== 
+==17897== 
+==17897== HEAP SUMMARY:
+==17897==     in use at exit: 360,717 bytes in 385 blocks
+==17897==   total heap usage: 27,075 allocs, 26,690 frees, 1,678,099 bytes allocated
+==17897== 
+==17897== LEAK SUMMARY:
+==17897==    definitely lost: 176 bytes in 2 blocks
+==17897==    indirectly lost: 0 bytes in 0 blocks
+==17897==      possibly lost: 0 bytes in 0 blocks
+==17897==    still reachable: 360,541 bytes in 383 blocks
+==17897==         suppressed: 0 bytes in 0 blocks
+==17897== Rerun with --leak-check=full to see details of leaked memory
+==17897== 
+==17897== For counts of detected and suppressed errors, rerun with: -v
+==17897== Use --track-origins=yes to see where uninitialised values come from
+==17897== ERROR SUMMARY: 230 errors from 17 contexts (suppressed: 0 from 0)

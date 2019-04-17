@@ -1397,6 +1397,8 @@ void io_handle_input(dungeon *d)
       //expunge item frm the inventory
       action = "expunge";
       selection = prompt_carry_slot(d, action);
+      int index = selection_to_index(selection);
+      remove_obj_from_vector(&d->PC->inventory, d->PC->inventory.at(index));
       io_display(d);
       io_handle_input(d);
       break;
