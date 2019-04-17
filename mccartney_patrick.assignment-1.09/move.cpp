@@ -19,10 +19,11 @@
 
 int32_t player_damage_calc(dungeon *d) {
   uint32_t i;
-  int32_t result;
+  int32_t result = d->PC->damage->roll();
   for (i = 0; i < d->PC->equipment.size(); i++) {
     result += d->PC->equipment.at(i).roll_dice();
   }
+  io_queue_message("You just hit %d", result);
   return result;
 }
 
@@ -31,7 +32,9 @@ int32_t roll_damage(dungeon *d, character *atk)
   if (atk == d->PC) {
     return player_damage_calc(d);
   } else {
-    return atk->damage->roll();
+    int32_t damage = atk->damage->roll();
+    io_queue_message("A monster just hit you for %d", damage);
+    return damage;
   }
 }
 

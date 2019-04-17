@@ -1563,7 +1563,12 @@ void io_handle_input(dungeon *d)
       // drop an item from inventory
       action = "drop";
       selection = prompt_carry_slot(d, action);
-
+      index = selection_to_index(selection);
+      {
+      object *toDrop = &d->PC->inventory.at(index);
+      d->objmap[d->PC->position[dim_y]][d->PC->position[dim_x]] = toDrop;
+      remove_obj_from_vector(&d->PC->inventory, *toDrop);
+      }
       io_display(d);
       io_handle_input(d);
       break;

@@ -93,6 +93,8 @@ void npc_next_pos_rand(dungeon *d, npc *c, pair_t next)
     uint8_t a[4];
   } r;
 
+  int num_tries = 0;
+
   do {
     n[dim_y] = next[dim_y];
     n[dim_x] = next[dim_x];
@@ -111,7 +113,8 @@ void npc_next_pos_rand(dungeon *d, npc *c, pair_t next)
         n[dim_x]++;
       }
     }
-  } while (mappair(n) < ter_floor);
+    num_tries++;
+  } while (mappair(n) < ter_floor && num_tries < 1000);
 
   next[dim_y] = n[dim_y];
   next[dim_x] = n[dim_x];
