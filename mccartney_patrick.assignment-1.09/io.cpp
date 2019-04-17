@@ -980,6 +980,15 @@ static void io_list_monsters(dungeon *d)
 
 /**
  *
+ * Converts user selection 0 - 9 to a index in our vector
+ *
+ */
+uint selection_to_index(uint selection) {
+  return selection - 48;
+}
+
+/**
+ *
  *
  *
  *
@@ -1015,12 +1024,12 @@ int prompt_carry_slot(dungeon *d, std::string action)
     mvprintw(i + 9, 10, "Press %u to %s %s", i, action.c_str(), d->PC->inventory.at(i).get_name());
   }
   refresh();
-  char c;
-  while (c != ESCAPE && (c < 0 || c > 9))
-  {
-    c = getch();
-  }
-  return c;
+  // char c;
+  // while (c != ESCAPE && (c < '0' || c > '9'))
+  // {
+  //   c = getch();
+  // }
+  return getch();
 }
 
 /**
@@ -1147,28 +1156,42 @@ int look_at_monster(dungeon *d)
  * Note: removes only the first occurence
  *
  */
-void remove_obj_from_vector(std::vector<object> vector, object to_remove)
+void remove_obj_from_vector(std::vector<object> *vector, object to_remove)
 {
   std::vector<object> temp;
   uint i;
-  bool was_removed = false;
-  for (i = 0; i < vector.size(); i++)
+  io_queue_message("vector bagan with size %u", vector->size());
+;
+  for (i = 0; i < vector->size(); i++)
   {
-    if (was_removed || (!(strcmp(vector.at(i).get_name(), to_remove.get_name()) == 0)))
+    if ((!(strcmp(vector->at(i).get_name(), to_remove.get_name()) == 0)))
     {
       // uses the name of the item as the primary key for comparison
-      temp.push_back(vector.at(i));
+      temp.push_back(vector->at(i));
     } else {
-      was_removed = true;
+      io_queue_message("Removed item from inventory");
+
     }
   }
-  vector.clear();
+  while (!vector->empty()) {
+    vector->pop_back();
+  }
+
   for (i = 0; i < temp.size(); i++)
   {
-    vector.push_back(temp.at(i));
+    vector->push_back(temp.at(i));
   }
+  io_queue_message("vector ended with size %u", vector->size());
+
 }
 
+
+/**
+ *
+ * Takes the givent selection from equipment and turns it into the name of the item
+ *
+ *
+ */
 const char* get_name_from_equipment_selection(dungeon *d, int selection) {
   char sel = (char)selection;
   std::string result;
@@ -1218,14 +1241,15 @@ const char* get_name_from_equipment_selection(dungeon *d, int selection) {
  * If item is already in the slot, swaps them, otherwise equips it
  *
  */
-void equip_item(dungeon *d, uint position)
+void equip_item(dungeon *d, uint selection)
 {
-  if (d->PC->inventory.size() <= 0 || position >= d->PC->inventory.size()) {
+  uint index = selection_to_index(selection);
+  if (d->PC->inventory.size() <= 0 || index >= d->PC->inventory.size()) {
+    io_queue_message("Empty inventory or bad selection: %u", index);
     return;
   }
   //check if already equipped
-  io_queue_message("equipping item at %d", position);
-  object obj = d->PC->inventory.at(position);
+  object obj = d->PC->inventory.at(index);
   object_type_t type = (object_type_t)obj.get_type();
 
   if ((type != objtype_RING && (strcmp(get_equipment_type(d, type, 0), "") == 0)) || (type == objtype_RING && (strcmp(get_equipment_type(d, type, 1), ""))))
@@ -1242,9 +1266,9 @@ void equip_item(dungeon *d, uint position)
     // the object we want to delete
     //
     // this is the only solution I could find, searhcing online yielded no results
-    remove_obj_from_vector(d->PC->inventory, obj);
+    remove_obj_from_vector(&d->PC->inventory, obj);
   } else {
-    io_queue_message("could not equip that item");
+    io_queue_message("Could not equip that item");
   }
 }
 
@@ -1264,7 +1288,7 @@ void take_off_equipment(dungeon *d, int position) {
   for (i = 0; i < d->PC->equipment.size() && !(strcmp(d->PC->equipment.at(i).get_name(), name) == 0); i++) {
   }
   object obj = d->PC->equipment.at(i);
-  remove_obj_from_vector(d->PC->equipment, obj);
+  remove_obj_from_vector(&d->PC->equipment, obj);
   d->PC->inventory.push_back(obj);
 }
 
