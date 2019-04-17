@@ -80,12 +80,12 @@ void do_combat(dungeon *d, character *atk, character *def)
   } else if (def == d->PC || atk == d->PC) {
       def->hp -= roll_damage(d, atk);
       if (def->hp <= 0) {
-      def->alive = 0;
-      charpair(def->position) = NULL;
-      if (def != d->PC) {
-        d->num_monsters--;
+        def->alive = 0;
+        charpair(def->position) = NULL;
+        if (def != d->PC) {
+          d->num_monsters--;
+        }
       }
-    }
   }
 }
 

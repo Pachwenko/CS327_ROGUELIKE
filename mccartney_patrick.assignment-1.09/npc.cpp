@@ -638,8 +638,31 @@ void npc_next_pos(dungeon *d, npc *c, pair_t next)
   npc_move_func[c->characteristics & 0x0000000f](d, c, next);
 }
 
+
+
+/**
+ *
+ *
+ *  CHANGES: Now checks character map to see if a boss monster exists
+ * if no boss is on the map, you have won! otherwise, nah
+ *
+ *
+ */
 uint32_t dungeon_has_npcs(dungeon *d)
 {
+  uint y, x;
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if (d->character_map[y][x]) {
+        character *c = d->character_map[y][x];
+        if (c != d->PC) {
+          if (((npc*) c)->characteristics & 0x00000100) {
+            return 0;
+          }
+        }
+      }
+    }
+  }
   return d->num_monsters;
 }
 

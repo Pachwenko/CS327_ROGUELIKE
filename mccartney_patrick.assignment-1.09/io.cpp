@@ -985,6 +985,9 @@ static void io_list_monsters(dungeon *d)
  */
 uint selection_to_index(uint selection)
 {
+  if (selection == 60) {
+    return 0; // for some reason my 0 key becomes 60 instead of 48
+  }
   return selection - 48;
 }
 
@@ -1022,7 +1025,8 @@ int prompt_carry_slot(dungeon *d, std::string action)
   uint i;
   for (i = 0; i < d->PC->inventory.size() && i < INVENTORY_SIZE; i++)
   {
-    mvprintw(i + 9, 10, "Press %u to %s %s", i, action.c_str(), d->PC->inventory.at(i).get_name());
+    mvprintw(i + 9, 10, "Press %u to %s NAME: %s DAMAGE: %i SPEED: %i", i, action.c_str(), d->PC->inventory.at(i).get_name()
+    , d->PC->inventory.at(i).get_damage_base(), d->PC->inventory.at(i).get_speed());
   }
   refresh();
   return getch();
@@ -1047,6 +1051,11 @@ const char *get_equipment_type(dungeon *d, object_type_t type, uint num)
     {
       if (numfound == num)
       {
+        result.append("DAMAGE: ");
+        result.append(std::to_string(d->PC->equipment.at(i).get_damage_base()));
+        result.append(" SPEED: ");
+        result.append(std::to_string(d->PC->equipment.at(i).get_speed()));
+        result.append(" NAME: ");
         result.append(d->PC->equipment.at(i).get_name());
         return result.c_str();
       }
@@ -1068,19 +1077,19 @@ const char *get_equipment_type(dungeon *d, object_type_t type, uint num)
  */
 int promt_equipment_slot(dungeon *d, std::string action)
 { // in this order, list: WEAPON OFFHAND RANGED ARMOR HELMET CLOAK GLOVES BOOTS ALUMET LIGHT RING1 RING2
-  mvprintw(10, 10, "WEAPON  Press 'a' to %s %s", action.c_str(), get_equipment_type(d, objtype_WEAPON, 0));
-  mvprintw(11, 10, "OFFHAND Press 'b' to %s %s", action.c_str(), get_equipment_type(d, objtype_OFFHAND, 0));
-  mvprintw(12, 10, "RANGED  Press 'c' to %s %s", action.c_str(), get_equipment_type(d, objtype_RANGED, 0));
-  mvprintw(13, 10, "ARMOR   Press 'd' to %s %s", action.c_str(), get_equipment_type(d, objtype_ARMOR, 0));
-  mvprintw(14, 10, "HELMET  Press 'e' to %s %s", action.c_str(), get_equipment_type(d, objtype_HELMET, 0));
-  mvprintw(15, 10, "CLOAK   Press 'f' to %s %s", action.c_str(), get_equipment_type(d, objtype_CLOAK, 0));
-  mvprintw(16, 10, "GLOVES  Press 'g' to %s %s", action.c_str(), get_equipment_type(d, objtype_GLOVES, 0));
-  mvprintw(17, 10, "BOOTS   Press 'h' to %s %s", action.c_str(), get_equipment_type(d, objtype_BOOTS, 0));
-  mvprintw(18, 10, "AMULET  Press 'i' to %s %s", action.c_str(), get_equipment_type(d, objtype_AMULET, 0));
-  mvprintw(19, 10, "LIGHT   Press 'j' to %s %s", action.c_str(), get_equipment_type(d, objtype_LIGHT, 0));
-  mvprintw(20, 10, "RING1   Press 'k' to %s %s", action.c_str(), get_equipment_type(d, objtype_RING, 0));
-  mvprintw(21, 10, "RING2   Press 'l' to %s %s", action.c_str(), get_equipment_type(d, objtype_RING, 1));
-  mvprintw(22, 10, "Press escape to exit equipment selection");
+  mvprintw(5, 10,  "WEAPON  Press 'a' to %s %s", action.c_str(), get_equipment_type(d, objtype_WEAPON, 0));
+  mvprintw(6, 10,  "OFFHAND Press 'b' to %s %s", action.c_str(), get_equipment_type(d, objtype_OFFHAND, 0));
+  mvprintw(7, 10,  "RANGED  Press 'c' to %s %s", action.c_str(), get_equipment_type(d, objtype_RANGED, 0));
+  mvprintw(8, 10,  "ARMOR   Press 'd' to %s %s", action.c_str(), get_equipment_type(d, objtype_ARMOR, 0));
+  mvprintw(9, 10,  "HELMET  Press 'e' to %s %s", action.c_str(), get_equipment_type(d, objtype_HELMET, 0));
+  mvprintw(10, 10, "CLOAK   Press 'f' to %s %s", action.c_str(), get_equipment_type(d, objtype_CLOAK, 0));
+  mvprintw(11, 10, "GLOVES  Press 'g' to %s %s", action.c_str(), get_equipment_type(d, objtype_GLOVES, 0));
+  mvprintw(12, 10, "BOOTS   Press 'h' to %s %s", action.c_str(), get_equipment_type(d, objtype_BOOTS, 0));
+  mvprintw(13, 10, "AMULET  Press 'i' to %s %s", action.c_str(), get_equipment_type(d, objtype_AMULET, 0));
+  mvprintw(14, 10, "LIGHT   Press 'j' to %s %s", action.c_str(), get_equipment_type(d, objtype_LIGHT, 0));
+  mvprintw(15, 10, "RING1   Press 'k' to %s %s", action.c_str(), get_equipment_type(d, objtype_RING, 0));
+  mvprintw(16, 10, "RING2   Press 'l' to %s %s", action.c_str(), get_equipment_type(d, objtype_RING, 1));
+  mvprintw(17, 10, "Press escape to exit equipment selection");
   refresh();
   char c;
   while (c != ESCAPE && (c < 'a' || c > 'l'))
@@ -1096,7 +1105,8 @@ int list_inventory(dungeon *d)
   mvprintw(8, 10, "------ INVENTORY -----");
   for (i = 0; i < INVENTORY_SIZE && i < d->PC->inventory.size(); i++)
   {
-    mvprintw(i + 9, 10, "item %u %s", i, d->PC->inventory.at(i).get_name());
+     mvprintw(i + 9, 10, "%u NAME: %s DAMAGE: %i SPEED: %i", i, d->PC->inventory.at(i).get_name()
+    , d->PC->inventory.at(i).get_damage_base(), d->PC->inventory.at(i).get_speed());
   }
   mvprintw(i + 10, 10, "Press any key to exit");
   refresh();
@@ -1106,19 +1116,19 @@ int list_inventory(dungeon *d)
 
 int list_equipment(dungeon *d)
 {
-  mvprintw(10, 10, "WEAPON  %s", get_equipment_type(d, objtype_WEAPON, 0));
-  mvprintw(11, 10, "OFFHAND %s", get_equipment_type(d, objtype_OFFHAND, 0));
-  mvprintw(12, 10, "RANGED  %s", get_equipment_type(d, objtype_RANGED, 0));
-  mvprintw(13, 10, "ARMOR   %s", get_equipment_type(d, objtype_ARMOR, 0));
-  mvprintw(14, 10, "HELMET  %s", get_equipment_type(d, objtype_HELMET, 0));
-  mvprintw(15, 10, "CLOAK   %s", get_equipment_type(d, objtype_CLOAK, 0));
-  mvprintw(16, 10, "GLOVES  %s", get_equipment_type(d, objtype_GLOVES, 0));
-  mvprintw(17, 10, "BOOTS   %s", get_equipment_type(d, objtype_BOOTS, 0));
-  mvprintw(18, 10, "AMULET  %s", get_equipment_type(d, objtype_AMULET, 0));
-  mvprintw(19, 10, "LIGHT   %s", get_equipment_type(d, objtype_LIGHT, 0));
-  mvprintw(20, 10, "RING1   %s", get_equipment_type(d, objtype_RING, 0));
-  mvprintw(21, 10, "RING2   %s", get_equipment_type(d, objtype_RING, 1));
-  mvprintw(22, 10, "Press any key to exit");
+  mvprintw(5, 10, "WEAPON  %s", get_equipment_type(d, objtype_WEAPON, 0));
+  mvprintw(6, 10, "OFFHAND %s", get_equipment_type(d, objtype_OFFHAND, 0));
+  mvprintw(7, 10, "RANGED  %s", get_equipment_type(d, objtype_RANGED, 0));
+  mvprintw(8, 10, "ARMOR   %s", get_equipment_type(d, objtype_ARMOR, 0));
+  mvprintw(9, 10, "HELMET  %s", get_equipment_type(d, objtype_HELMET, 0));
+  mvprintw(10, 10, "CLOAK   %s", get_equipment_type(d, objtype_CLOAK, 0));
+  mvprintw(11, 10, "GLOVES  %s", get_equipment_type(d, objtype_GLOVES, 0));
+  mvprintw(12, 10, "BOOTS   %s", get_equipment_type(d, objtype_BOOTS, 0));
+  mvprintw(13, 10, "AMULET  %s", get_equipment_type(d, objtype_AMULET, 0));
+  mvprintw(14, 10, "LIGHT   %s", get_equipment_type(d, objtype_LIGHT, 0));
+  mvprintw(15, 10, "RING1   %s", get_equipment_type(d, objtype_RING, 0));
+  mvprintw(16, 10, "RING2   %s", get_equipment_type(d, objtype_RING, 1));
+  mvprintw(17, 10, "Press any key to exit");
   refresh();
   getch();
   return 0;
