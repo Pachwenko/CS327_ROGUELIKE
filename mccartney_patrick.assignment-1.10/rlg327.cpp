@@ -223,7 +223,6 @@ int main(int argc, char *argv[])
   gen_monsters(&d);
   gen_objects(&d);
   pc_observe_terrain(d.PC, &d);
-  d.PC->mana = 100;
 
   io_display(&d);
   if (!do_load && !do_image) {

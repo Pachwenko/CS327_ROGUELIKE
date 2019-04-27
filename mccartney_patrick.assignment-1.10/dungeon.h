@@ -18,7 +18,7 @@
 #define ROOM_MAX_Y             15
 #define PC_VISUAL_RANGE        3
 #define NPC_VISUAL_RANGE       15
-#define PC_SPEED               10
+#define PC_SPEED               50
 #define NPC_MIN_SPEED          5
 #define NPC_MAX_SPEED          20
 #define MAX_MONSTERS           15

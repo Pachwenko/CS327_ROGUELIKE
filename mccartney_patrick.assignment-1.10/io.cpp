@@ -1476,6 +1476,24 @@ uint32_t io_expunge_in(dungeon *d)
   return 1;
 }
 
+
+/**
+ *
+ *
+ *
+ * Prompts user to a monster selection, but only if
+ * they have a ranged weapon equipped. If re_target is 1
+ * then it first checks if the previous target is valid
+ * if not, then just continues as normal, else attacks
+ * the same position as before.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 void ranged_attack(dungeon *d, int re_target) {
   //check if player has a ranged weapon equipped
   if (!d->PC->eq[2]) {

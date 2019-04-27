@@ -1,7 +1,7 @@
 Builds off Schaeffer's 1.09 solution.
 
 Only works if you have a ranged weapon equipped (index 2, slot 'c').
-A melee weapon is also provided in descriptions to test this.
+A melee weapon is also provided in descriptions to test this. Also, pc speed was increased for testing purposes.
 Note that sometimes the game crashes, but when ran with valgrind the crash does not happen...
 
 Press 'r' to attack with a ranged weapon equipped.

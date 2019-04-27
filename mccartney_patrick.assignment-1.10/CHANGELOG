@@ -1,6 +1,8 @@
-4a92b70 2019-04-27 | ranged combat now works and added custom object_descriptions for testing (HEAD -> master)
+46cc04b 2019-04-27 | added mana to updated UI and added 'R' to attack previous target (instead of 'r') (HEAD -> master, origin/master, origin/HEAD)
+8f8cc13 2019-04-27 | added changelog and readme
+4a92b70 2019-04-27 | ranged combat now works and added custom object_descriptions for testing
 803789c 2019-04-27 | Merge branch 'master' of github.com:Pachwenko/roguelike-text-game
-5ac1e28 2019-04-26 | added stub for throwing poison (origin/master, origin/HEAD)
+5ac1e28 2019-04-26 | added stub for throwing poison
 4237baa 2019-04-26 | added ranged attacks (requires ranged weapon- good luck finding one (edit objects file)
 e2860cc 2019-04-24 | started 1.10 using professor's solution to 1.09
 daaab5c 2019-04-19 | Merge branch 'master' of github.com:Pachwenko/roguelike-text-game
