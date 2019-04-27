@@ -18,5 +18,6 @@ uint32_t in_corner(dungeon *d, character *c);
 uint32_t against_wall(dungeon *d, character *c);
 uint32_t move_pc(dungeon *d, uint32_t dir);
 void move_character(dungeon *d, character *c, pair_t next);
+void do_combat(dungeon *d, character *atk, character *def);
 
 #endif

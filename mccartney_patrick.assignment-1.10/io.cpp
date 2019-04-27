@@ -688,7 +688,7 @@ uint32_t io_teleport_pc(dungeon *d)
 
   if (charpair(dest) && charpair(dest) != d->PC) {
     io_queue_message("Teleport failed.  Destination occupied.");
-  } else {  
+  } else {
     d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = NULL;
     d->character_map[dest[dim_y]][dest[dim_x]] = d->PC;
 
@@ -1117,7 +1117,7 @@ static uint32_t io_display_obj_info(object *o)
   refresh();
   getch();
 
-  return 0;  
+  return 0;
 }
 
 static uint32_t io_inspect_eq(dungeon *d);
@@ -1360,12 +1360,12 @@ static uint32_t io_inspect_monster(dungeon *d)
   mvprintw(n + 4, 0, "Hit any key to continue. ");
 
   refresh();
-  
+
   getch();
 
   io_display(d);
 
-  return 0;  
+  return 0;
 }
 
 static uint32_t io_inspect_eq(dungeon *d)
@@ -1477,6 +1477,218 @@ uint32_t io_expunge_in(dungeon *d)
   return 1;
 }
 
+void ranged_attack(dungeon *d) {
+  //check if player has a ranged weapon equipped
+  if (!d->PC->eq[1]) {
+    io_queue_message("No weapon equipped.");
+    io_queue_message("");
+    return;
+  }
+  if (d->PC->eq[1] && !((d->PC->eq[1]->get_type() == objtype_RANGED))) {
+    io_queue_message("You don't have a ranged weapon equipped!");
+    io_queue_message("");
+    return;
+  }
+  if (!charpair(d->PC->target)) {
+    pair_t dest, tmp;
+    int c;
+    fd_set readfs;
+    struct timeval tv;
+
+    io_display(d);
+
+    mvprintw(0, 0, "Choose a monster. 'r' to attack; 'ESC' to cancel.");
+
+    dest[dim_y] = d->PC->position[dim_y];
+    dest[dim_x] = d->PC->position[dim_x];
+
+    mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+    refresh();
+
+    do {
+      do{
+        FD_ZERO(&readfs);
+        FD_SET(STDIN_FILENO, &readfs);
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 125000; /* An eigth of a second */
+
+        io_redisplay_visible_monsters(d, dest);
+      } while (!select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv));
+      /* Can simply draw the terrain when we move the cursor away, *
+      * because if it is a character or object, the refresh       *
+      * function will fix it for us.                              */
+      switch (mappair(dest)) {
+      case ter_wall:
+      case ter_wall_immutable:
+      case ter_unknown:
+        mvaddch(dest[dim_y] + 1, dest[dim_x], ' ');
+        break;
+      case ter_floor:
+      case ter_floor_room:
+        mvaddch(dest[dim_y] + 1, dest[dim_x], '.');
+        break;
+      case ter_floor_hall:
+        mvaddch(dest[dim_y] + 1, dest[dim_x], '#');
+        break;
+      case ter_debug:
+        mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+        break;
+      case ter_stairs_up:
+        mvaddch(dest[dim_y] + 1, dest[dim_x], '<');
+        break;
+      case ter_stairs_down:
+        mvaddch(dest[dim_y] + 1, dest[dim_x], '>');
+        break;
+      default:
+  /* Use zero as an error symbol, since it stands out somewhat, and it's *
+    * not otherwise used.                                                 */
+        mvaddch(dest[dim_y] + 1, dest[dim_x], '0');
+      }
+      tmp[dim_y] = dest[dim_y];
+      tmp[dim_x] = dest[dim_x];
+      switch ((c = getch())) {
+      case '7':
+      case 'y':
+      case KEY_HOME:
+        tmp[dim_y]--;
+        tmp[dim_x]--;
+        if (dest[dim_y] != 1 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_y]--;
+        }
+        if (dest[dim_x] != 1 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_x]--;
+        }
+        break;
+      case '8':
+      case 'k':
+      case KEY_UP:
+        tmp[dim_y]--;
+        if (dest[dim_y] != 1 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_y]--;
+        }
+        break;
+      case '9':
+      case 'u':
+      case KEY_PPAGE:
+        tmp[dim_y]--;
+        tmp[dim_x]++;
+        if (dest[dim_y] != 1 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_y]--;
+        }
+        if (dest[dim_x] != DUNGEON_X - 2 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_x]++;
+        }
+        break;
+      case '6':
+      case 'l':
+      case KEY_RIGHT:
+        tmp[dim_x]++;
+        if (dest[dim_x] != DUNGEON_X - 2 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_x]++;
+        }
+        break;
+      case '3':
+      case 'n':
+      case KEY_NPAGE:
+        tmp[dim_y]++;
+        tmp[dim_x]++;
+        if (dest[dim_y] != DUNGEON_Y - 2 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_y]++;
+        }
+        if (dest[dim_x] != DUNGEON_X - 2 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_x]++;
+        }
+        break;
+      case '2':
+      case 'j':
+      case KEY_DOWN:
+        tmp[dim_y]++;
+        if (dest[dim_y] != DUNGEON_Y - 2 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_y]++;
+        }
+        break;
+      case '1':
+      case 'b':
+      case KEY_END:
+        tmp[dim_y]++;
+        tmp[dim_x]--;
+        if (dest[dim_y] != DUNGEON_Y - 2 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_y]++;
+        }
+        if (dest[dim_x] != 1 &&
+            can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_x]--;
+        }
+        break;
+      case '4':
+      case 'h':
+      case KEY_LEFT:
+        tmp[dim_x]--;
+        if (dest[dim_x] != 1 && can_see(d, d->PC->position, tmp, 1, 0)) {
+          dest[dim_x]--;
+        }
+        break;
+      }
+
+    } while (((c == 'r') &&
+              (!charpair(dest) || charpair(dest) == d->PC)) ||
+            (c != 'r' && c != 27 /* ESC */));
+
+    if (c == 27 /* ESC */) {
+      io_display(d);
+      return;
+    }
+    d->PC->target[dim_y] = dest[dim_y];
+    d->PC->target[dim_x] = dest[dim_x];
+  }
+
+  // if target was already selected it just attacks it again
+  do_combat(d, d->PC, charpair(d->PC->target));
+}
+
+
+
+
+/**
+ *
+ *
+ *
+ * 1.10 Changes to be made:
+ *
+ * add new input 'r' to attack a monster with range
+ * First check if there is a ranged weapon equipped (bow, sling, holy hand grenade, etc.).
+ *
+ * add new input 's' which throws a poison ball at the enemy
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 void io_handle_input(dungeon *d)
 {
   uint32_t fail_code;
@@ -1503,6 +1715,9 @@ void io_handle_input(dungeon *d)
     } while (!select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv));
     fog_off = 0;
     switch (key = getch()) {
+    case 'r':
+      ranged_attack(d);
+      break;
     case '7':
     case 'y':
     case KEY_HOME:
