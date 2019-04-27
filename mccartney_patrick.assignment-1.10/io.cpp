@@ -1479,14 +1479,16 @@ uint32_t io_expunge_in(dungeon *d)
 
 void ranged_attack(dungeon *d) {
   //check if player has a ranged weapon equipped
-  if (!d->PC->eq[1]) {
-    io_queue_message("No weapon equipped.");
+  if (!d->PC->eq[2]) {
+    io_queue_message("No ranged weapon equipped.");
     io_queue_message("");
+    getch();
     return;
   }
-  if (d->PC->eq[1] && !((d->PC->eq[1]->get_type() == objtype_RANGED))) {
-    io_queue_message("You don't have a ranged weapon equipped!");
+  if (!((d->PC->eq[2]->get_type() == objtype_RANGED))) {
+    io_queue_message("Somehow you equipped a ranged weapon in slot 3  :>|");
     io_queue_message("");
+    getch();
     return;
   }
   if (!charpair(d->PC->target)) {
