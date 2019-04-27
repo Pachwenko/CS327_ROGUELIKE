@@ -37,6 +37,7 @@ class pc : public character {
   object *eq[num_eq_slots];
   object *in[MAX_INVENTORY];
   pair_t target;
+  uint32_t mana;
 
   uint32_t wear_in(uint32_t slot);
   uint32_t remove_eq(uint32_t slot);

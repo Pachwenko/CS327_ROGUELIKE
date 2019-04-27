@@ -402,8 +402,7 @@ void io_display(dungeon *d)
     }
   }
 
-  mvprintw(23, 1, "PC position is (%2d,%2d).",
-           d->PC->position[dim_x], d->PC->position[dim_y]);
+  mvprintw(23, 1, "PC stats HP:%4d Mana: %-4d",d->PC->hp, d->PC->mana);
   mvprintw(22, 1, "%d known %s.", visible_monsters,
            visible_monsters > 1 ? "monsters" : "monster");
   mvprintw(22, 30, "Nearest visible monster: ");
@@ -1477,7 +1476,7 @@ uint32_t io_expunge_in(dungeon *d)
   return 1;
 }
 
-void ranged_attack(dungeon *d) {
+void ranged_attack(dungeon *d, int re_target) {
   //check if player has a ranged weapon equipped
   if (!d->PC->eq[2]) {
     io_queue_message("No ranged weapon equipped.");
@@ -1491,176 +1490,185 @@ void ranged_attack(dungeon *d) {
     getch();
     return;
   }
-  if (!charpair(d->PC->target)) {
-    pair_t dest, tmp;
-    int c;
-    fd_set readfs;
-    struct timeval tv;
-
-    io_display(d);
-
-    mvprintw(0, 0, "Choose a monster. 'r' to attack; 'ESC' to cancel.");
-
-    dest[dim_y] = d->PC->position[dim_y];
-    dest[dim_x] = d->PC->position[dim_x];
-
-    mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
-    refresh();
-
-    do {
-      do{
-        FD_ZERO(&readfs);
-        FD_SET(STDIN_FILENO, &readfs);
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 125000; /* An eigth of a second */
-
-        io_redisplay_visible_monsters(d, dest);
-      } while (!select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv));
-      /* Can simply draw the terrain when we move the cursor away, *
-      * because if it is a character or object, the refresh       *
-      * function will fix it for us.                              */
-      switch (mappair(dest)) {
-      case ter_wall:
-      case ter_wall_immutable:
-      case ter_unknown:
-        mvaddch(dest[dim_y] + 1, dest[dim_x], ' ');
-        break;
-      case ter_floor:
-      case ter_floor_room:
-        mvaddch(dest[dim_y] + 1, dest[dim_x], '.');
-        break;
-      case ter_floor_hall:
-        mvaddch(dest[dim_y] + 1, dest[dim_x], '#');
-        break;
-      case ter_debug:
-        mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
-        break;
-      case ter_stairs_up:
-        mvaddch(dest[dim_y] + 1, dest[dim_x], '<');
-        break;
-      case ter_stairs_down:
-        mvaddch(dest[dim_y] + 1, dest[dim_x], '>');
-        break;
-      default:
-  /* Use zero as an error symbol, since it stands out somewhat, and it's *
-    * not otherwise used.                                                 */
-        mvaddch(dest[dim_y] + 1, dest[dim_x], '0');
-      }
-      tmp[dim_y] = dest[dim_y];
-      tmp[dim_x] = dest[dim_x];
-      switch ((c = getch())) {
-      case '7':
-      case 'y':
-      case KEY_HOME:
-        tmp[dim_y]--;
-        tmp[dim_x]--;
-        if (dest[dim_y] != 1 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_y]--;
-        }
-        if (dest[dim_x] != 1 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_x]--;
-        }
-        break;
-      case '8':
-      case 'k':
-      case KEY_UP:
-        tmp[dim_y]--;
-        if (dest[dim_y] != 1 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_y]--;
-        }
-        break;
-      case '9':
-      case 'u':
-      case KEY_PPAGE:
-        tmp[dim_y]--;
-        tmp[dim_x]++;
-        if (dest[dim_y] != 1 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_y]--;
-        }
-        if (dest[dim_x] != DUNGEON_X - 2 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_x]++;
-        }
-        break;
-      case '6':
-      case 'l':
-      case KEY_RIGHT:
-        tmp[dim_x]++;
-        if (dest[dim_x] != DUNGEON_X - 2 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_x]++;
-        }
-        break;
-      case '3':
-      case 'n':
-      case KEY_NPAGE:
-        tmp[dim_y]++;
-        tmp[dim_x]++;
-        if (dest[dim_y] != DUNGEON_Y - 2 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_y]++;
-        }
-        if (dest[dim_x] != DUNGEON_X - 2 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_x]++;
-        }
-        break;
-      case '2':
-      case 'j':
-      case KEY_DOWN:
-        tmp[dim_y]++;
-        if (dest[dim_y] != DUNGEON_Y - 2 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_y]++;
-        }
-        break;
-      case '1':
-      case 'b':
-      case KEY_END:
-        tmp[dim_y]++;
-        tmp[dim_x]--;
-        if (dest[dim_y] != DUNGEON_Y - 2 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_y]++;
-        }
-        if (dest[dim_x] != 1 &&
-            can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_x]--;
-        }
-        break;
-      case '4':
-      case 'h':
-      case KEY_LEFT:
-        tmp[dim_x]--;
-        if (dest[dim_x] != 1 && can_see(d, d->PC->position, tmp, 1, 0)) {
-          dest[dim_x]--;
-        }
-        break;
-      }
-
-    } while (((c == 'r') &&
-              (!charpair(dest) || charpair(dest) == d->PC)) ||
-            (c != 'r' && c != 27 /* ESC */));
-
-    if (c == 27 /* ESC */) {
-      io_display(d);
+  if (re_target) {
+    if (!charpair(d->PC->target)) {
+      io_queue_message("No valid previous target - re-aquiring target");
+      io_queue_message(" ");
+      // fall through
+    } else {
+      //attack the old target and then exit
+      do_combat(d, d->PC, charpair(d->PC->target));
       return;
     }
-    d->PC->target[dim_y] = dest[dim_y];
-    d->PC->target[dim_x] = dest[dim_x];
   }
+  pair_t dest, tmp;
+  int c;
+  fd_set readfs;
+  struct timeval tv;
+
+  io_display(d);
+
+  mvprintw(0, 0, "Choose a monster. 'r' to attack; 'ESC' to cancel.");
+
+  dest[dim_y] = d->PC->position[dim_y];
+  dest[dim_x] = d->PC->position[dim_x];
+
+  mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+  refresh();
+
+  do {
+    do{
+      FD_ZERO(&readfs);
+      FD_SET(STDIN_FILENO, &readfs);
+
+      tv.tv_sec = 0;
+      tv.tv_usec = 125000; /* An eigth of a second */
+
+      io_redisplay_visible_monsters(d, dest);
+    } while (!select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv));
+    /* Can simply draw the terrain when we move the cursor away, *
+    * because if it is a character or object, the refresh       *
+    * function will fix it for us.                              */
+    switch (mappair(dest)) {
+    case ter_wall:
+    case ter_wall_immutable:
+    case ter_unknown:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], ' ');
+      break;
+    case ter_floor:
+    case ter_floor_room:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '.');
+      break;
+    case ter_floor_hall:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '#');
+      break;
+    case ter_debug:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '*');
+      break;
+    case ter_stairs_up:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '<');
+      break;
+    case ter_stairs_down:
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '>');
+      break;
+    default:
+/* Use zero as an error symbol, since it stands out somewhat, and it's *
+  * not otherwise used.                                                 */
+      mvaddch(dest[dim_y] + 1, dest[dim_x], '0');
+    }
+    tmp[dim_y] = dest[dim_y];
+    tmp[dim_x] = dest[dim_x];
+    switch ((c = getch())) {
+    case '7':
+    case 'y':
+    case KEY_HOME:
+      tmp[dim_y]--;
+      tmp[dim_x]--;
+      if (dest[dim_y] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]--;
+      }
+      if (dest[dim_x] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]--;
+      }
+      break;
+    case '8':
+    case 'k':
+    case KEY_UP:
+      tmp[dim_y]--;
+      if (dest[dim_y] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]--;
+      }
+      break;
+    case '9':
+    case 'u':
+    case KEY_PPAGE:
+      tmp[dim_y]--;
+      tmp[dim_x]++;
+      if (dest[dim_y] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]--;
+      }
+      if (dest[dim_x] != DUNGEON_X - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]++;
+      }
+      break;
+    case '6':
+    case 'l':
+    case KEY_RIGHT:
+      tmp[dim_x]++;
+      if (dest[dim_x] != DUNGEON_X - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]++;
+      }
+      break;
+    case '3':
+    case 'n':
+    case KEY_NPAGE:
+      tmp[dim_y]++;
+      tmp[dim_x]++;
+      if (dest[dim_y] != DUNGEON_Y - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]++;
+      }
+      if (dest[dim_x] != DUNGEON_X - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]++;
+      }
+      break;
+    case '2':
+    case 'j':
+    case KEY_DOWN:
+      tmp[dim_y]++;
+      if (dest[dim_y] != DUNGEON_Y - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]++;
+      }
+      break;
+    case '1':
+    case 'b':
+    case KEY_END:
+      tmp[dim_y]++;
+      tmp[dim_x]--;
+      if (dest[dim_y] != DUNGEON_Y - 2 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_y]++;
+      }
+      if (dest[dim_x] != 1 &&
+          can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]--;
+      }
+      break;
+    case '4':
+    case 'h':
+    case KEY_LEFT:
+      tmp[dim_x]--;
+      if (dest[dim_x] != 1 && can_see(d, d->PC->position, tmp, 1, 0)) {
+        dest[dim_x]--;
+      }
+      break;
+    }
+
+  } while (((c == 'r') &&
+            (!charpair(dest) || charpair(dest) == d->PC)) ||
+          (c != 'r' && c != 27 /* ESC */));
+
+  if (c == 27 /* ESC */) {
+    io_display(d);
+    return;
+  }
+  d->PC->target[dim_y] = dest[dim_y];
+  d->PC->target[dim_x] = dest[dim_x];
 
   // if target was already selected it just attacks it again
   do_combat(d, d->PC, charpair(d->PC->target));
 }
 
 void throw_poison(dungeon *d) {
-
+  d->PC->mana -= 10;
 }
 
 
@@ -1720,7 +1728,10 @@ void io_handle_input(dungeon *d)
     fog_off = 0;
     switch (key = getch()) {
     case 'r':
-      ranged_attack(d);
+      ranged_attack(d, 0);
+      break;
+    case 'R':
+      ranged_attack(d, 1);
       break;
     case 'z':
       throw_poison(d);
