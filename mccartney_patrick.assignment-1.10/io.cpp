@@ -1657,7 +1657,9 @@ void ranged_attack(dungeon *d) {
   do_combat(d, d->PC, charpair(d->PC->target));
 }
 
+void throw_poison(dungeon *d) {
 
+}
 
 
 /**
@@ -1669,7 +1671,7 @@ void ranged_attack(dungeon *d) {
  * add new input 'r' to attack a monster with range
  * First check if there is a ranged weapon equipped (bow, sling, holy hand grenade, etc.).
  *
- * add new input 's' which throws a poison ball at the enemy
+ * add new input 'z' which throws a poison ball at the enemy
  *
  *
  *
@@ -1717,6 +1719,9 @@ void io_handle_input(dungeon *d)
     switch (key = getch()) {
     case 'r':
       ranged_attack(d);
+      break;
+    case 'z':
+      throw_poison(d);
       break;
     case '7':
     case 'y':
