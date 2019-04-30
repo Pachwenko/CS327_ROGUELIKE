@@ -1478,6 +1478,41 @@ uint32_t io_expunge_in(dungeon *d)
 
 
 /**
+ * Poisons monsters in a 3x3 around hte given position
+ * Poison does a defualt of 100 damage and decreaeses
+ * by 25 dmage per turn
+ */
+void poison_monsters(dungeon *d, pair_t pos) {
+  if (charpair(pos)) {
+    charpair(pos)->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]+1][pos[dim_x]]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]][pos[dim_x]+1]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]+1][pos[dim_x]+1]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]-1][pos[dim_x]]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]][pos[dim_x]-1]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]-1][pos[dim_x]-1]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]+1][pos[dim_x]-1]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+  if (d->character_map[pos[dim_y]-1][pos[dim_x]+1]) {
+    d->character_map[pos[dim_y]][pos[dim_x]]->poisonDamage = poisDamage;
+  }
+}
+
+/**
  *
  *
  *
@@ -1494,15 +1529,15 @@ uint32_t io_expunge_in(dungeon *d)
  *
  *
  */
-void ranged_attack(dungeon *d, int re_target) {
+void ranged_attack(dungeon *d, int re_target, int bomb) {
   //check if player has a ranged weapon equipped
-  if (!d->PC->eq[2]) {
+  if (!bomb && (!d->PC->eq[2])) {
     io_queue_message("No ranged weapon equipped.");
     io_queue_message("");
     getch();
     return;
   }
-  if (!((d->PC->eq[2]->get_type() == objtype_RANGED))) {
+  if (!bomb && !((d->PC->eq[2]->get_type() == objtype_RANGED))) {
     io_queue_message("Somehow you equipped a ranged weapon in slot 3  :>|");
     io_queue_message("");
     getch();
@@ -1682,11 +1717,21 @@ void ranged_attack(dungeon *d, int re_target) {
   d->PC->target[dim_x] = dest[dim_x];
 
   // if target was already selected it just attacks it again
-  do_combat(d, d->PC, charpair(d->PC->target));
+  if (bomb) {
+    // poison the enemies in a a 3x3 around the target
+    poison_monsters(d, d->PC->target);
+    io_queue_message("You poisoned those.. things!");
+    io_queue_message(" ");
+  } else {
+    do_combat(d, d->PC, charpair(d->PC->target));
+    io_queue_message("You range attacked that thing!");
+    io_queue_message(" ");
+  }
 }
 
 void throw_poison(dungeon *d) {
   d->PC->mana -= 10;
+  ranged_attack(d, 0, 1);
 }
 
 
@@ -1746,10 +1791,10 @@ void io_handle_input(dungeon *d)
     fog_off = 0;
     switch (key = getch()) {
     case 'r':
-      ranged_attack(d, 0);
+      ranged_attack(d, 0, 0);
       break;
     case 'R':
-      ranged_attack(d, 1);
+      ranged_attack(d, 1, 0);
       break;
     case 'z':
       throw_poison(d);

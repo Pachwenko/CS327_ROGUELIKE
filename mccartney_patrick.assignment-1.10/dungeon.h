@@ -30,6 +30,8 @@
 #define MONSTER_DESC_FILE      "monster_desc.txt"
 #define OBJECT_DESC_FILE       "object_desc.txt"
 #define MAX_INVENTORY          10
+#define poisDamage 100
+#define poisDecreaseBy 25
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
