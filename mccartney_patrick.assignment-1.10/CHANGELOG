@@ -1,4 +1,6 @@
-46cc04b 2019-04-27 | added mana to updated UI and added 'R' to attack previous target (instead of 'r') (HEAD -> master, origin/master, origin/HEAD)
+4815ad5 2019-04-30 | added working poison bombs (HEAD -> master, origin/master, origin/HEAD)
+0403ffd 2019-04-27 | updated README and CHANGELOG
+46cc04b 2019-04-27 | added mana to updated UI and added 'R' to attack previous target (instead of 'r')
 8f8cc13 2019-04-27 | added changelog and readme
 4a92b70 2019-04-27 | ranged combat now works and added custom object_descriptions for testing
 803789c 2019-04-27 | Merge branch 'master' of github.com:Pachwenko/roguelike-text-game
