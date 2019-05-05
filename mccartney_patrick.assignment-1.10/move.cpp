@@ -135,8 +135,24 @@ void do_combat(dungeon *d, character *atk, character *def)
   }
 }
 
+
+/**
+ *
+ *
+ *
+ * Changs to be made: poison the character whenever its turn is called
+ * decrease it's poison damage by the default in dungeon.h
+ *
+ *
+ *
+ *
+ */
 void move_character(dungeon *d, character *c, pair_t next)
 {
+  if (c->poisonDamage) {
+    c->hp -= c->poisonDamage;
+    c->poisonDamage -= poisDecreaseBy;
+  }
   int can_see_atk, can_see_def;
   pair_t displacement;
   uint32_t found_cell;

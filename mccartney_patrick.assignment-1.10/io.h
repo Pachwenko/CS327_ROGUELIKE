@@ -1,6 +1,7 @@
 #ifndef IO_H
 # define IO_H
 
+
 class dungeon;
 
 void io_init_terminal(void);

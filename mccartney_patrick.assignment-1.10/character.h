@@ -25,6 +25,7 @@ class character {
   uint32_t alive;
   std::vector<uint32_t> color;
   uint32_t hp;
+  int poisonDamage; // decrease this by X every turn
   const dice *damage;
   const char *name;
   /* Characters use to have a next_turn for the move queue.  Now that it is *
