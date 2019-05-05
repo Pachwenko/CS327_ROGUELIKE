@@ -61,6 +61,6 @@ Usage: %s [-r|--rand <seed>] [-l|--load [<file>]] [-s|--save [<file>]] [-i|--ima
 You are able to add your own monsters and objects to be loaded by the game as long as your format follows the ones already provided.
 Screenshots of the descriptions that are possible:
 
-![monster description table](./screenshots/monster_desc_table)
-![object description table](./screenshots/object_desc_table)
-![possible objects](./screenshots/objects_screenshot)
+![monster description table](./screenshots/monster_desc_table.png)
+![object description table](./screenshots/object_desc_table.png)
+![possible objects](./screenshots/objects_screenshot.png)
