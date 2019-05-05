@@ -7,7 +7,8 @@ Note that sometimes the game crashes, but when ran with valgrind the crash does 
 Press 'r' to attack with a ranged weapon equipped.
 Press 'R' to attack previous target (if none available, enters normal targeting as if you press 'r' instead).
 
-Press 'z' to throw a poison bomb (similar to 'z' but uses mana instead of a ranged weapon);
+Press 'z' to target with poison bomb and 'r' to throw it (uses mana) (similar to 'r' but uses mana instead of a ranged weapon).
+Poisoned monsters take 100 damage, 75 damage, 50 damage, 25 damage, then it wears off.
 
 Has updated UI to display player health and mana instead of PC position.
 
