@@ -38,6 +38,9 @@ make
 
 There are too many to list. Check here for basic movement such as arrow keys, equip items with 'w' and more. Includes debug bindings such as teleport and toggling of fog of war. Prompts will be shown on screen to assist. Escape will exit the current prompt and 'Q' will exit the game.
 
+Also, of note: 'r' to initial ranged attack (if you have a ranged weapon) and 'r' again to attack your selection. 'R" will attack your previous target if still valid. Pressing 'z' will target a monster with a poison bomb and affects all nearby monsters over time.
+
+
 ![movement bindings screenshot](./screenshots/movement.png)
 
 ![complete keybindings screenshot](./screenshots/more_keybindings.png)
