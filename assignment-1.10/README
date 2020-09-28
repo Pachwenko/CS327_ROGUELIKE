@@ -1,0 +1,15 @@
+Builds off Schaeffer's 1.09 solution.
+
+Only works if you have a ranged weapon equipped (index 2, slot 'c').
+A melee weapon is also provided in descriptions to test this. Also, pc speed was increased for testing purposes.
+Note that sometimes the game crashes, but when ran with valgrind the crash does not happen...
+
+Press 'r' to attack with a ranged weapon equipped.
+Press 'R' to attack previous target (if none available, enters normal targeting as if you press 'r' instead).
+
+Press 'z' to target with poison bomb and 'r' to throw it (uses mana) (similar to 'r' but uses mana instead of a ranged weapon).
+Poisoned monsters take 100 damage, 75 damage, 50 damage, 25 damage, then it wears off.
+
+Has updated UI to display player health and mana instead of PC position.
+
+Implements ranged combat. In order to test this I provide a modified object_descriptions.txt in the descriptions folder.
