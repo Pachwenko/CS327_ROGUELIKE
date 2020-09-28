@@ -1,4 +1,0 @@
-Uses Schaeffers 1.08 solution.
-
-All keys and functionalities are implemented, just not prettily.
-Player has extremely high base damage for testing, as well as increased speed. Can be changed in pc.h constants

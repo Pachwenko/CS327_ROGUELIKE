@@ -1,5 +1,0 @@
-Extends the solution to 1.05 to supports teleportation both random and chosen by user.
-
-All keys are mapped as outlined in the assignment, and the curor when teleporting is displayed as an asterist, '*'.
-
-All code is changed from C to C++ except for the heap. PC and NPC inherit from the Character class.
